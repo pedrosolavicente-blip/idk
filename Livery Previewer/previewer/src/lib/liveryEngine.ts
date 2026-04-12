@@ -99,7 +99,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   };
   window.addEventListener('resize', handleResize);
 
-
   const probeTarget = new THREE.WebGLCubeRenderTarget(256, {
     generateMipmaps: true,
     minFilter: THREE.LinearMipmapLinearFilter,
@@ -255,6 +254,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
         if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
         if (!isPaint(mat.name)) return;
         const s = mat as THREE.MeshStandardMaterial;
+        if (s.map) return; // skip textured panels
         s.color.set(color); s.metalness = 0.4; s.roughness = 0.35; s.needsUpdate = true;
       });
     });
@@ -298,7 +298,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
 
     const savedBg  = scene.background;
     scene.background = null;
-    renderer.setClearColor(0x000000, 0); // fully transparent
+    renderer.setClearColor(0x000000, 0);
 
     renderer.setSize(W, H, false);
     renderer.render(scene, showcaseCam);

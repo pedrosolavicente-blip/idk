@@ -206,6 +206,8 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
                       const s = mat as THREE.MeshStandardMaterial;
                       s.map = tex;
                       s.color.set(0xffffff);
+                      s.transparent = true;
+                      s.alphaTest = 0.01;
                       s.needsUpdate = true;
                     });
                   });
@@ -218,111 +220,3 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
           scene.add(currentModel);
 
           const size = box.getSize(new THREE.Vector3());
-          currentModelSize.copy(size);
-          const dist = Math.max(size.x, size.y, size.z) * 2;
-          camera.position.set(dist, dist * 0.5, dist);
-          camera.lookAt(0, size.y / 2, 0);
-          controls.target.set(0, size.y / 2, 0);
-          controls.update();
-
-          updateProbe(currentModel, size.y / 2);
-          markDirty();
-          onProgress?.('Model loaded', 100);
-          resolve();
-        },
-        (p) => onProgress?.('Loading...', p.total > 0 ? (p.loaded / p.total) * 100 : 0),
-        () => { if (loadId === currentLoadId) reject(new Error('Failed to load model')); else resolve(); }
-      );
-    });
-  }
-
-  function playELS(_pattern: any): void {}
-  function stopELS(): void {
-    if (elsInterval !== null) { clearInterval(elsInterval); elsInterval = null; }
-    elsLights.forEach(l => { scene.remove(l); l.dispose(); });
-    elsLights = [];
-  }
-
-  function updateColor(color: string): void {
-    if (!currentModel) return;
-    currentModel.traverse((child) => {
-      if (!(child as THREE.Mesh).isMesh) return;
-      const mats = Array.isArray((child as THREE.Mesh).material)
-        ? (child as THREE.Mesh).material as THREE.Material[]
-        : [(child as THREE.Mesh).material as THREE.Material];
-      mats.forEach((mat) => {
-        if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
-        if (!isPaint(mat.name)) return;
-        const s = mat as THREE.MeshStandardMaterial;
-        if (s.map) return; // skip textured panels
-        s.color.set(color); s.metalness = 0.4; s.roughness = 0.35; s.needsUpdate = true;
-      });
-    });
-    markDirty();
-  }
-
-  function captureThumbnail(): string {
-    const vw = container.clientWidth, vh = container.clientHeight;
-    renderer.setSize(3840, 2160, false);
-    camera.aspect = 3840 / 2160;
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
-    const dataUrl = renderer.domElement.toDataURL('image/png', 1.0);
-    renderer.setSize(vw, vh, false);
-    camera.aspect = vw / vh;
-    camera.updateProjectionMatrix();
-    markDirty();
-    return dataUrl;
-  }
-
-  function captureShowcase(side: ShowcaseSide): string {
-    if (!currentModel) return '';
-
-    const W = 4096, H = 2048;
-    const cx = 0, cy = currentModelSize.y / 2, cz = 0;
-    const longestSide = Math.max(currentModelSize.x, currentModelSize.z);
-    const fov  = 20;
-    const dist = (longestSide / 2) / Math.tan((fov / 2) * (Math.PI / 180)) * 1.15;
-
-    const offsets: Record<ShowcaseSide, THREE.Vector3> = {
-      right: new THREE.Vector3( dist, 0, 0),
-      left:  new THREE.Vector3(-dist, 0, 0),
-      front: new THREE.Vector3(0, 0,  dist),
-      back:  new THREE.Vector3(0, 0, -dist),
-    };
-
-    const showcaseCam = new THREE.PerspectiveCamera(fov, W / H, 0.1, 10000);
-    const offset = offsets[side];
-    showcaseCam.position.set(cx + offset.x, cy, cz + offset.z);
-    showcaseCam.lookAt(cx, cy, cz);
-
-    const savedBg  = scene.background;
-    scene.background = null;
-    renderer.setClearColor(0x000000, 0);
-
-    renderer.setSize(W, H, false);
-    renderer.render(scene, showcaseCam);
-    const dataUrl = renderer.domElement.toDataURL('image/png', 1.0);
-
-    scene.background = savedBg;
-    renderer.setClearColor(0x000000, 1);
-    renderer.setSize(container.clientWidth, container.clientHeight, false);
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    markDirty();
-
-    return dataUrl;
-  }
-
-  function dispose(): void {
-    window.removeEventListener('resize', handleResize);
-    stopELS();
-    if (currentModel) scene.remove(currentModel);
-    probeTarget.dispose();
-    renderer.dispose();
-    controls.dispose();
-    if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
-  }
-
-  return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
-}

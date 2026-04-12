@@ -1,3 +1,9 @@
+export interface VehicleModel {
+  id: string;
+  name: string;
+  path: string;
+}
+
 const R2 = 'https://pub-13c1fc73579544bdb2eb07e28434bd74.r2.dev';
 
 const MODELS: VehicleModel[] = [
@@ -22,3 +28,5 @@ const MODELS: VehicleModel[] = [
   { id: 'sprinter', name: 'Sprinter', path: `${R2}/Sprinter.glb` },
   { id: 'swat-armored-truck-2011', name: 'SWAT Armored Truck 2011', path: `${R2}/SWAT%20Armored%20Truck%202011.glb` },
 ];
+
+export default MODELS;

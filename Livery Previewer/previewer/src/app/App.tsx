@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import LiveryViewer from './components/LiveryViewer';
+import itzzLogo from './imports/itzz-logo.png';
 import {
   handleAuthCallback,
   validateStoredToken,
@@ -9,6 +10,32 @@ import {
 } from '../lib/discordAuth';
 
 type AuthState = 'checking' | 'login' | 'denied' | 'authed';
+
+const DISCLAIMER_TEXT = `LIVERY PREVIEWER — DISCLAIMER & LEGAL NOTICE
+
+This tool is an independent, fan-made project created for the itzz community. It is not affiliated with, endorsed by, or connected to Police Roleplay Community (PRC), the developers of Emergency Response: Liberty County (ERLC), Roblox, or any third-party platform.
+
+SOURCE OF ASSETS
+
+The 3D vehicle models displayed within this tool are originally created by and belong to Police Roleplay Community (PRC), the developers of Emergency Response: Liberty County. We do not claim ownership of these models in any way. Full credit for their creation belongs entirely to the PRC development team.
+
+These models were obtained from samkalish.dev, a third-party website on which they were publicly accessible. We did not extract these models directly from ERLC or the Roblox platform. All intellectual property rights remain with their respective owners.
+
+USE & INTENT
+
+This tool exists purely for the personal, non-commercial enjoyment of the itzz community. No assets are sold, redistributed as standalone files, or used for any commercial gain whatsoever. The tool is provided completely free of charge and is intended solely as a livery design aid for community members.
+
+NO WARRANTY
+
+This tool is provided "as is" without any guarantees of availability, accuracy, or fitness for any particular purpose. We reserve the right to modify or discontinue the service at any time without notice.
+
+By logging in with Discord, you acknowledge that you have read this disclaimer and understand the nature of this tool and its assets.`;
+
+const Credits = () => (
+  <p className="fixed bottom-4 left-4 text-[10px] text-zinc-600 tracking-wider pointer-events-none">
+    developed by itzz industries | sonar & itzz_link
+  </p>
+);
 
 export default function App() {
   const [authState, setAuthState] = useState<AuthState>('checking');
@@ -46,26 +73,7 @@ export default function App() {
   };
 
   const handleDisclaimer = () => {
-    const text = `LIVERY PREVIEWER — DISCLAIMER & LEGAL NOTICE
-
-This tool is an independent, fan-made project created for the itzz community. It is not affiliated with, endorsed by, or connected to Police Roleplay Community (PRC), the developers of Emergency Response: Liberty County (ERLC), Roblox, or any third-party platform.
-
-SOURCE OF ASSETS
-
-The 3D vehicle models displayed within this tool are originally created by and belong to Police Roleplay Community (PRC), the developers of Emergency Response: Liberty County. We do not claim ownership of these models in any way. Full credit for their creation belongs entirely to the PRC development team.
-
-These models were obtained from samkalish.dev, a third-party website on which they were publicly accessible. We did not extract these models directly from ERLC or the Roblox platform. All intellectual property rights remain with their respective owners.
-
-USE & INTENT
-
-This tool exists purely for the personal, non-commercial enjoyment of the itzz community. No assets are sold, redistributed as standalone files, or used for any commercial gain whatsoever. The tool is provided completely free of charge and is intended solely as a livery design aid for community members.
-
-NO WARRANTY
-
-This tool is provided "as is" without any guarantees of availability, accuracy, or fitness for any particular purpose. We reserve the right to modify or discontinue the service at any time without notice.
-
-By logging in with Discord, you acknowledge that you have read this disclaimer and understand the nature of this tool and its assets.`;
-    const blob = new Blob([text], { type: 'text/plain' });
+    const blob = new Blob([DISCLAIMER_TEXT], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -80,6 +88,7 @@ By logging in with Discord, you acknowledge that you have read this disclaimer a
     return (
       <div className="flex h-screen bg-[#0d0d0d] items-center justify-center">
         <div className="w-6 h-6 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
+        <Credits />
       </div>
     );
   }
@@ -97,6 +106,7 @@ By logging in with Discord, you acknowledge that you have read this disclaimer a
             Try again
           </button>
         </div>
+        <Credits />
       </div>
     );
   }
@@ -105,9 +115,10 @@ By logging in with Discord, you acknowledge that you have read this disclaimer a
     return (
       <div className="flex h-screen bg-[#0d0d0d] items-center justify-center text-white">
         <div className="text-center space-y-6 px-6">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300">Livery Previewer</p>
-            <p className="text-[10px] text-zinc-600 tracking-wider">itzz members only</p>
+          <div className="space-y-3">
+            <img src={itzzLogo} alt="itzz" className="h-16 w-auto mx-auto drop-shadow-[0_0_12px_rgba(196,255,13,0.4)]" />
+            <p className="text-2xl font-bold tracking-[0.2em] uppercase text-white">Livery Previewer</p>
+            <p className="text-[10px] text-zinc-600 tracking-[0.3em] uppercase">ITZZ MEMBERS ONLY</p>
           </div>
           <button
             onClick={() => redirectToDiscordLogin()}
@@ -125,9 +136,15 @@ By logging in with Discord, you acknowledge that you have read this disclaimer a
             Legal Disclaimer
           </button>
         </div>
+        <Credits />
       </div>
     );
   }
 
-  return <LiveryViewer user={user} onLogout={handleLogout} />;
+  return (
+    <>
+      <LiveryViewer user={user} onLogout={handleLogout} />
+      <Credits />
+    </>
+  );
 }

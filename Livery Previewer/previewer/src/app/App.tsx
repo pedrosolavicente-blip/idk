@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import LiveryViewer from './components/LiveryViewer';
-import itzzLogo from './imports/itzz-logo.png';
+import itzzLogo from '../imports/itzz-logo.png';
 import {
   handleAuthCallback,
   validateStoredToken,

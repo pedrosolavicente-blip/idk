@@ -21,6 +21,7 @@ export interface LiveryViewer {
   dispose: () => void;
 }
 
+
 export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x111111);
@@ -116,32 +117,28 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
       const mats = Array.isArray((child as THREE.Mesh).material)
         ? (child as THREE.Mesh).material as THREE.Material[]
         : [(child as THREE.Mesh).material as THREE.Material];
-
       mats.forEach((mat) => {
         if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
         if (!isPaint(mat.name)) return;
-
         const s = mat as THREE.MeshStandardMaterial;
-        s.envMap = probeTarget.texture;
-        s.envMapIntensity = 1.8;
-        s.needsUpdate = true;
+        s.envMap           = probeTarget.texture;
+        s.envMapIntensity  = 1.8;
+        s.needsUpdate      = true;
       });
     });
-
     markDirty();
   }
 
-  const loader = new GLTFLoader();
+  const loader    = new GLTFLoader();
   const texLoader = new THREE.TextureLoader();
-
   let currentModel: THREE.Group | null = null;
   let currentModelSize = new THREE.Vector3();
   let currentLoadId = 0;
+  let elsInterval: number | null = null;
+  let elsLights: THREE.PointLight[] = [];
 
   const PAINT_PREFIXES = ['Right', 'Left', 'Back', 'Top', 'Front', 'NoDecal'];
-  function isPaint(name: string) {
-    return PAINT_PREFIXES.some(p => name.startsWith(p));
-  }
+  function isPaint(name: string) { return PAINT_PREFIXES.some(p => name.startsWith(p)); }
 
   async function loadLivery(
     glbUrl: string,
@@ -149,95 +146,71 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     textures: Record<string, string>,
     onProgress?: (message: string, progress: number) => void
   ): Promise<void> {
-    if (currentModel) {
-      scene.remove(currentModel);
-      currentModel = null;
-      markDirty();
-    }
-
+    if (currentModel) { scene.remove(currentModel); currentModel = null; markDirty(); }
     const loadId = ++currentLoadId;
 
     return new Promise((resolve, reject) => {
+      onProgress?.('Loading model...', 0);
       loader.load(
         glbUrl,
         async (gltf) => {
-          if (loadId !== currentLoadId) return resolve();
-
+          if (loadId !== currentLoadId) { resolve(); return; }
           currentModel = gltf.scene;
 
-          // ✅ MATERIAL SETUP
           currentModel.traverse((child) => {
             if (!(child as THREE.Mesh).isMesh) return;
-
             const mesh = child as THREE.Mesh;
+            if (!mesh.material) return;
             const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-
             mats.forEach((mat) => {
               if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
-
               const s = mat as THREE.MeshStandardMaterial;
-
               s.side = THREE.DoubleSide;
               s.transparent = false;
-              s.depthWrite = true;
               s.opacity = 1;
-
               if (isPaint(mat.name)) {
                 s.color.set(color);
                 s.metalness = 0.4;
                 s.roughness = 0.35;
+                s.envMapIntensity = 1.0;
               }
-
               s.needsUpdate = true;
             });
           });
 
-          // ✅ TEXTURES (FIXED TRANSPARENCY)
+          const box    = new THREE.Box3().setFromObject(currentModel);
+          const center = box.getCenter(new THREE.Vector3());
+          currentModel.position.sub(center);
+          currentModel.position.y = -box.min.y;
+
           if (Object.keys(textures).length > 0) {
             await Promise.all(Object.entries(textures).map(([panel, url]) =>
               new Promise<void>((res) => {
                 texLoader.load(url, (tex) => {
-
-                  tex.flipY = false;
-                  tex.colorSpace = THREE.SRGBColorSpace;
-                  tex.minFilter = THREE.LinearFilter;
-                  tex.magFilter = THREE.LinearFilter;
+                  tex.flipY           = false;
+                  tex.colorSpace      = THREE.SRGBColorSpace;
+                  tex.minFilter       = THREE.LinearFilter;
+                  tex.magFilter       = THREE.LinearFilter;
                   tex.generateMipmaps = false;
-                  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-
-                  // 🔥 KEY FIX
-                  tex.premultiplyAlpha = false;
-
-                  tex.needsUpdate = true;
-
+                  tex.anisotropy      = renderer.capabilities.getMaxAnisotropy();
+                  tex.needsUpdate     = true;
                   const prefix = panel.replace(/\d+$/, '');
-
                   currentModel?.traverse((child) => {
                     if (!(child as THREE.Mesh).isMesh) return;
-
-                    const mesh = child as THREE.Mesh;
-                    const mats = Array.isArray(mesh.material)
-                      ? mesh.material
-                      : [mesh.material];
-
+                    const mats = Array.isArray((child as THREE.Mesh).material)
+                      ? (child as THREE.Mesh).material as THREE.Material[]
+                      : [(child as THREE.Mesh).material as THREE.Material];
                     mats.forEach((mat) => {
                       if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
                       if (!mat.name.startsWith(prefix)) return;
-
                       const s = mat as THREE.MeshStandardMaterial;
-
                       s.map = tex;
                       s.color.set(0xffffff);
-
-                      // 🔥 TRANSPARENCY FIX
                       s.transparent = true;
                       s.alphaTest = 0.01;
-                      s.depthWrite = false;
-
                       s.needsUpdate = true;
                     });
                   });
-
                   res();
                 }, undefined, () => res());
               })
@@ -246,73 +219,4 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
 
           scene.add(currentModel);
 
-          const box = new THREE.Box3().setFromObject(currentModel);
           const size = box.getSize(new THREE.Vector3());
-          currentModelSize.copy(size);
-
-          updateProbe(currentModel, size.y / 2);
-
-          markDirty();
-          resolve();
-        },
-        undefined,
-        reject
-      );
-    });
-  }
-
-  function updateColor(color: string) {
-    if (!currentModel) return;
-
-    currentModel.traverse((child) => {
-      if (!(child as THREE.Mesh).isMesh) return;
-
-      const mats = Array.isArray((child as THREE.Mesh).material)
-        ? (child as THREE.Mesh).material
-        : [(child as THREE.Mesh).material];
-
-      mats.forEach((mat) => {
-        if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
-        if (!isPaint(mat.name)) return;
-
-        const s = mat as THREE.MeshStandardMaterial;
-
-        if (s.map) return;
-
-        s.color.set(color);
-        s.needsUpdate = true;
-      });
-    });
-
-    markDirty();
-  }
-
-  function playELS(): void {}
-  function stopELS(): void {}
-
-  function captureThumbnail(): string {
-    return renderer.domElement.toDataURL('image/png');
-  }
-
-  function captureShowcase(): string {
-    return renderer.domElement.toDataURL('image/png');
-  }
-
-  function dispose() {
-    renderer.dispose();
-    controls.dispose();
-  }
-
-  return {
-    loadLivery,
-    updateColor,
-    playELS,
-    stopELS,
-    captureThumbnail,
-    captureShowcase,
-    dispose
-  };
-}
-
-  return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
-}

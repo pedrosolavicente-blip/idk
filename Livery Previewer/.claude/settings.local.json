@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/pedrosolavicente-blip/liveries/main/previewer/src/app/components/LiveryViewer.tsx\")",
+      "Bash(curl -s \"https://api.github.com/repos/pedrosolavicente-blip/liveries/contents/previewer/src/app/components\")"
+    ]
+  }
+}

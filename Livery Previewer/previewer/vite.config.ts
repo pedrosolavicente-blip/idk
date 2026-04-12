@@ -4,6 +4,8 @@ import fs from 'fs'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 const serveGlbsPlugin = {
   name: 'serve-parent-glbs',
   configureServer(server: any) {
@@ -24,7 +26,7 @@ const serveGlbsPlugin = {
 };
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), serveGlbsPlugin],
+  plugins: [react(), tailwindcss(), serveGlbsPlugin, cloudflare()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

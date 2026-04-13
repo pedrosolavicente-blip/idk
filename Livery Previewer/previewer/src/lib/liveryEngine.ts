@@ -167,7 +167,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
           if (loadId !== currentLoadId) { resolve(); return; }
           currentModel = gltf.scene;
 
-          // Apply paint color to base materials
           currentModel.traverse((child) => {
             if (!(child as THREE.Mesh).isMesh) return;
             const mesh = child as THREE.Mesh;
@@ -196,7 +195,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
 
           scene.add(currentModel);
 
-          // Apply textures as overlay meshes on top of paint panels
           if (Object.keys(textures).length > 0) {
             await Promise.all(Object.entries(textures).map(([panel, url]) =>
               new Promise<void>((res) => {
@@ -209,7 +207,9 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
                   tex.anisotropy      = renderer.capabilities.getMaxAnisotropy();
                   tex.needsUpdate     = true;
 
-                  const prefix = panel.replace(/\d+$/, '');
+                  // Use the full panel name (e.g. "Left2") to match materials
+                  // that start with it (e.g. "Left2", "Left2.003")
+                  const prefix = panel;
 
                   currentModel?.traverse((child) => {
                     if (!(child as THREE.Mesh).isMesh) return;
@@ -221,7 +221,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
                     mats.forEach((mat) => {
                       if (!mat.name.startsWith(prefix)) return;
 
-                      // Clone the geometry and create an overlay mesh
                       const overlayGeo = mesh.geometry.clone();
                       const overlayMat = new THREE.MeshStandardMaterial({
                         map: tex,
@@ -240,8 +239,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
 
                       const overlayMesh = new THREE.Mesh(overlayGeo, overlayMat);
                       overlayMesh.renderOrder = 1;
-
-                      // Match the parent mesh transform
                       overlayMesh.position.copy(mesh.getWorldPosition(new THREE.Vector3()));
                       overlayMesh.quaternion.copy(mesh.getWorldQuaternion(new THREE.Quaternion()));
                       overlayMesh.scale.copy(mesh.getWorldScale(new THREE.Vector3()));
@@ -364,5 +361,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
   }
 
+  return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
+}
   return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
 }

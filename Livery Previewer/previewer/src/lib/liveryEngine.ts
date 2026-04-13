@@ -206,7 +206,11 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
                       s.map = tex;
                       s.color.set(0xffffff);
                       s.transparent = true;
-                      s.alphaTest = 0.01;
+                      s.alphaTest = 0.5;
+                      s.depthWrite = true;
+                      s.metalness = 0.0;
+                      s.roughness = 1.0;
+                      s.envMapIntensity = 0.0;
                       s.needsUpdate = true;
                     });
                   });

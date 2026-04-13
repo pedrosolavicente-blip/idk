@@ -29,6 +29,10 @@ NO WARRANTY
 
 This tool is provided "as is" without any guarantees of availability, accuracy, or fitness for any particular purpose. We reserve the right to modify or discontinue the service at any time without notice.
 
+IF YOU'RE FROM THE PRC TEAM
+
+Please reach out to us if you have any issue with this tool. 
+
 By logging in with Discord, you acknowledge that you have read this disclaimer and understand the nature of this tool and its assets.`;
 
 const Credits = () => (

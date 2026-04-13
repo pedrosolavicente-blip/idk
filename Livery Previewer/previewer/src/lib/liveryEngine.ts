@@ -135,9 +135,19 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   let currentLoadId = 0;
   let elsInterval: number | null = null;
   let elsLights: THREE.PointLight[] = [];
+  let overlayMeshes: THREE.Mesh[] = [];
 
   const PAINT_PREFIXES = ['Right', 'Left', 'Back', 'Top', 'Front', 'NoDecal'];
   function isPaint(name: string) { return PAINT_PREFIXES.some(p => name.startsWith(p)); }
+
+  function removeOverlays() {
+    overlayMeshes.forEach(m => {
+      scene.remove(m);
+      (m.material as THREE.Material).dispose();
+      m.geometry.dispose();
+    });
+    overlayMeshes = [];
+  }
 
   async function loadLivery(
     glbUrl: string,
@@ -146,6 +156,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     onProgress?: (message: string, progress: number) => void
   ): Promise<void> {
     if (currentModel) { scene.remove(currentModel); currentModel = null; markDirty(); }
+    removeOverlays();
     const loadId = ++currentLoadId;
 
     return new Promise((resolve, reject) => {
@@ -156,6 +167,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
           if (loadId !== currentLoadId) { resolve(); return; }
           currentModel = gltf.scene;
 
+          // Apply paint color to base materials
           currentModel.traverse((child) => {
             if (!(child as THREE.Mesh).isMesh) return;
             const mesh = child as THREE.Mesh;
@@ -182,6 +194,9 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
           currentModel.position.sub(center);
           currentModel.position.y = -box.min.y;
 
+          scene.add(currentModel);
+
+          // Apply textures as overlay meshes on top of paint panels
           if (Object.keys(textures).length > 0) {
             await Promise.all(Object.entries(textures).map(([panel, url]) =>
               new Promise<void>((res) => {
@@ -193,34 +208,54 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
                   tex.generateMipmaps = false;
                   tex.anisotropy      = renderer.capabilities.getMaxAnisotropy();
                   tex.needsUpdate     = true;
+
                   const prefix = panel.replace(/\d+$/, '');
+
                   currentModel?.traverse((child) => {
                     if (!(child as THREE.Mesh).isMesh) return;
-                    const mats = Array.isArray((child as THREE.Mesh).material)
-                      ? (child as THREE.Mesh).material as THREE.Material[]
-                      : [(child as THREE.Mesh).material as THREE.Material];
+                    const mesh = child as THREE.Mesh;
+                    const mats = Array.isArray(mesh.material)
+                      ? mesh.material as THREE.Material[]
+                      : [mesh.material as THREE.Material];
+
                     mats.forEach((mat) => {
-                      if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
                       if (!mat.name.startsWith(prefix)) return;
-                      const s = mat as THREE.MeshStandardMaterial;
-                      s.map = tex;
-                      s.color.set(0xffffff);
-                      s.transparent = true;
-                      s.alphaTest = 0.5;
-                      s.depthWrite = true;
-                      s.metalness = 0.0;
-                      s.roughness = 1.0;
-                      s.envMapIntensity = 0.0;
-                      s.needsUpdate = true;
+
+                      // Clone the geometry and create an overlay mesh
+                      const overlayGeo = mesh.geometry.clone();
+                      const overlayMat = new THREE.MeshStandardMaterial({
+                        map: tex,
+                        transparent: true,
+                        alphaTest: 0.01,
+                        depthWrite: false,
+                        depthTest: true,
+                        metalness: 0.0,
+                        roughness: 1.0,
+                        envMapIntensity: 0.0,
+                        side: THREE.DoubleSide,
+                        polygonOffset: true,
+                        polygonOffsetFactor: -1,
+                        polygonOffsetUnits: -1,
+                      });
+
+                      const overlayMesh = new THREE.Mesh(overlayGeo, overlayMat);
+                      overlayMesh.renderOrder = 1;
+
+                      // Match the parent mesh transform
+                      overlayMesh.position.copy(mesh.getWorldPosition(new THREE.Vector3()));
+                      overlayMesh.quaternion.copy(mesh.getWorldQuaternion(new THREE.Quaternion()));
+                      overlayMesh.scale.copy(mesh.getWorldScale(new THREE.Vector3()));
+
+                      scene.add(overlayMesh);
+                      overlayMeshes.push(overlayMesh);
                     });
                   });
+
                   res();
                 }, undefined, () => res());
               })
             ));
           }
-
-          scene.add(currentModel);
 
           const size = box.getSize(new THREE.Vector3());
           currentModelSize.copy(size);
@@ -259,7 +294,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
         if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;
         if (!isPaint(mat.name)) return;
         const s = mat as THREE.MeshStandardMaterial;
-        if (s.map) return;
         s.color.set(color); s.metalness = 0.4; s.roughness = 0.35; s.needsUpdate = true;
       });
     });
@@ -322,6 +356,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   function dispose(): void {
     window.removeEventListener('resize', handleResize);
     stopELS();
+    removeOverlays();
     if (currentModel) scene.remove(currentModel);
     probeTarget.dispose();
     renderer.dispose();

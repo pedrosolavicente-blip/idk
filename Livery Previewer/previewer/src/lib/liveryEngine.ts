@@ -363,5 +363,3 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
 
   return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
 }
-  return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
-}

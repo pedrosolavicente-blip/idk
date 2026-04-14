@@ -6,6 +6,16 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 
 export type ShowcaseSide = 'right' | 'left' | 'front' | 'back';
 
+export interface SceneSettings {
+  brightness: number;
+  lightX: number;
+  lightY: number;
+  lightZ: number;
+  background: 'default' | 'plain' | 'sunset' | 'night' | 'custom';
+  bgColor: string;
+  bgCustomUrl: string;
+}
+
 export interface LiveryViewer {
   loadLivery: (
     glbUrl: string,
@@ -14,6 +24,7 @@ export interface LiveryViewer {
     onProgress?: (message: string, progress: number) => void
   ) => Promise<void>;
   updateColor: (color: string) => void;
+  updateScene: (settings: SceneSettings) => void;
   playELS: (pattern: any) => void;
   stopELS: () => void;
   captureThumbnail: () => string;
@@ -23,7 +34,7 @@ export interface LiveryViewer {
 
 export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x111111);
+  scene.background = new THREE.Color(0x87CEEB);
 
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -104,6 +115,12 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   });
   const cubeCamera = new THREE.CubeCamera(0.5, 2000, probeTarget);
   scene.add(cubeCamera);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(1, 2, 1);
+  scene.add(directionalLight);
+
+  const bgTextureLoader = new THREE.TextureLoader();
 
   function updateProbe(model: THREE.Group, paintY: number) {
     model.visible = false;
@@ -207,8 +224,6 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
                   tex.anisotropy      = renderer.capabilities.getMaxAnisotropy();
                   tex.needsUpdate     = true;
 
-                  // Use the full panel name (e.g. "Left2") to match materials
-                  // that start with it (e.g. "Left2", "Left2.003")
                   const prefix = panel;
 
                   currentModel?.traverse((child) => {
@@ -297,6 +312,37 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     markDirty();
   }
 
+  function updateScene(settings: SceneSettings): void {
+    renderer.toneMappingExposure = settings.brightness;
+    directionalLight.position.set(settings.lightX, settings.lightY, settings.lightZ);
+
+    switch (settings.background) {
+      case 'plain':
+        scene.background = new THREE.Color(settings.bgColor);
+        break;
+      case 'sunset':
+        scene.background = new THREE.Color(0xff7043);
+        break;
+      case 'night':
+        scene.background = new THREE.Color(0x0a0a1a);
+        break;
+      case 'custom':
+        if (settings.bgCustomUrl) {
+          bgTextureLoader.load(settings.bgCustomUrl, (tex) => {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            scene.background = tex;
+            markDirty();
+          });
+        }
+        break;
+      case 'default':
+      default:
+        scene.background = new THREE.Color(0x87CEEB);
+        break;
+    }
+    markDirty();
+  }
+
   function captureThumbnail(): string {
     const vw = container.clientWidth, vh = container.clientHeight;
     renderer.setSize(3840, 2160, false);
@@ -361,5 +407,5 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
   }
 
-  return { loadLivery, updateColor, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
+  return { loadLivery, updateColor, updateScene, playELS, stopELS, captureThumbnail, captureShowcase, dispose };
 }

@@ -2,8 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import MODELS, { type VehicleModel } from '../../lib/models';
 import type { DiscordUser } from '../../lib/discordAuth';
 import { clearAuth } from '../../lib/discordAuth';
-import { initLiveryViewer, type LiveryViewer as Viewer, type ShowcaseSide } from '../../lib/liveryEngine';
-import { Upload, Camera, ChevronDown, ChevronRight, Palette, Box, Image, Search, LogOut, Send, Copy, Check } from 'lucide-react';
+import { initLiveryViewer, type LiveryViewer as Viewer, type ShowcaseSide, type SceneSettings } from '../../lib/liveryEngine';
+import { Upload, Camera, ChevronDown, ChevronRight, Palette, Box, Image, Search, LogOut, Send, Copy, Check, Settings, RotateCcw } from 'lucide-react';
 import type { ReactNode, ElementType } from 'react';
 import itzzLogo from '../../imports/itzz-logo.png';
 import ColorPicker from './ColorPicker';
@@ -13,6 +13,16 @@ const PANELS   = ['Left', 'Right', 'Top', 'Front', 'Back'] as const;
 type PanelFace = typeof PANELS[number];
 
 const ACCENT = '#c4ff0d';
+
+const DEFAULT_SETTINGS: SceneSettings = {
+  brightness: 1.1,
+  lightX: 1,
+  lightY: 2,
+  lightZ: 1,
+  background: 'default',
+  bgColor: '#87CEEB',
+  bgCustomUrl: '',
+};
 
 function ModelListItem({ model, selected, onClick }: { model: VehicleModel; selected: boolean; onClick: () => void }) {
   return (
@@ -60,26 +70,33 @@ export default function LiveryViewer({ user, onLogout }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef    = useRef<Viewer | null>(null);
 
-  const [glbUrl, setGlbUrl]               = useState('');
-  const [selectedModel, setSelectedModel]   = useState<VehicleModel | null>(null);
-  const [vehicleColor, setVehicleColor]     = useState('#000000');
-  const [textures, setTextures]             = useState<Record<string, string>>({});
-  const [loading, setLoading]               = useState<string | null>(null);
-  const [error, setError]                   = useState<string | null>(null);
-  const [panelNums, setPanelNums]           = useState<Record<PanelFace, number>>({ Left:1, Right:1, Top:1, Front:1, Back:1 });
-  const [searchQuery, setSearchQuery]       = useState('');
+  const [glbUrl, setGlbUrl]             = useState('');
+  const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
+  const [vehicleColor, setVehicleColor]   = useState('#000000');
+  const [textures, setTextures]           = useState<Record<string, string>>({});
+  const [loading, setLoading]             = useState<string | null>(null);
+  const [error, setError]                 = useState<string | null>(null);
+  const [panelNums, setPanelNums]         = useState<Record<PanelFace, number>>({ Left:1, Right:1, Top:1, Front:1, Back:1 });
+  const [searchQuery, setSearchQuery]     = useState('');
+  const [showSettings, setShowSettings]   = useState(false);
+  const [settings, setSettings]           = useState<SceneSettings>({ ...DEFAULT_SETTINGS });
 
-  const [rblxCookie, setRblxCookie]         = useState(() => localStorage.getItem('rblx_cookie') ?? '');
-  const [rblxGroupId, setRblxGroupId]       = useState(() => localStorage.getItem('rblx_group_id') ?? '');
-  const [uploadStatus, setUploadStatus]     = useState<Record<string, string>>({});
-  const [uploadResults, setUploadResults]   = useState<Record<string, string>>({});
-  const [copiedPanel, setCopiedPanel]       = useState<string | null>(null);
+  const [rblxCookie, setRblxCookie]       = useState(() => localStorage.getItem('rblx_cookie') ?? '');
+  const [rblxGroupId, setRblxGroupId]     = useState(() => localStorage.getItem('rblx_group_id') ?? '');
+  const [uploadStatus, setUploadStatus]   = useState<Record<string, string>>({});
+  const [uploadResults, setUploadResults] = useState<Record<string, string>>({});
+  const [copiedPanel, setCopiedPanel]     = useState<string | null>(null);
 
   useEffect(() => {
     const viewer = initLiveryViewer(containerRef.current!);
     viewerRef.current = viewer;
     return () => viewer.dispose();
   }, []);
+
+  useEffect(() => {
+    if (!viewerRef.current) return;
+    viewerRef.current.updateScene(settings);
+  }, [settings]);
 
   const applyLivery = useCallback(async (url: string, color: string, tex: Record<string, string>) => {
     if (!url || !viewerRef.current) return;
@@ -152,6 +169,13 @@ export default function LiveryViewer({ user, onLogout }: Props) {
     );
   };
 
+  const handleBgCustomUpload = (file: File) => {
+    const url = URL.createObjectURL(file);
+    setSettings(s => ({ ...s, background: 'custom', bgCustomUrl: url }));
+  };
+
+  const handleResetSettings = () => setSettings({ ...DEFAULT_SETTINGS });
+
   const filteredModels = MODELS
     .filter(m => !searchQuery || m.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -191,6 +215,112 @@ export default function LiveryViewer({ user, onLogout }: Props) {
     <div className="flex h-screen bg-black text-white overflow-hidden">
 
       <div className="relative flex-1 bg-gradient-to-br from-black via-zinc-950 to-black" ref={containerRef}>
+
+        {/* Settings button top left */}
+        <div className="absolute top-4 left-4 z-20">
+          <button
+            onClick={() => setShowSettings(s => !s)}
+            className="flex items-center gap-2 bg-black/70 hover:bg-black/90 border border-white/10 hover:border-[#c4ff0d]/50 text-zinc-300 hover:text-[#c4ff0d] text-xs font-bold px-3 py-2 rounded-lg transition-all backdrop-blur-sm"
+          >
+            <Settings size={13} />
+            Settings
+          </button>
+
+          {showSettings && (
+            <div className="mt-2 w-72 bg-[#0a0a0a]/95 border border-white/10 rounded-xl p-4 backdrop-blur-sm shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Scene Settings</p>
+                <button
+                  onClick={handleResetSettings}
+                  className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-[#c4ff0d] transition-colors"
+                >
+                  <RotateCcw size={10} />
+                  Reset
+                </button>
+              </div>
+
+              {/* Brightness */}
+              <div className="mb-4">
+                <Label>Brightness — {settings.brightness.toFixed(2)}</Label>
+                <input
+                  type="range" min={0.1} max={3} step={0.05}
+                  value={settings.brightness}
+                  onChange={e => setSettings(s => ({ ...s, brightness: parseFloat(e.target.value) }))}
+                  className="w-full accent-[#c4ff0d]"
+                />
+              </div>
+
+              {/* Light Direction */}
+              <div className="mb-4 space-y-2">
+                <Label>Light Direction</Label>
+                <div>
+                  <p className="text-[10px] text-zinc-600 mb-1">X — {settings.lightX.toFixed(1)}</p>
+                  <input type="range" min={-5} max={5} step={0.1}
+                    value={settings.lightX}
+                    onChange={e => setSettings(s => ({ ...s, lightX: parseFloat(e.target.value) }))}
+                    className="w-full accent-[#c4ff0d]"
+                  />
+                </div>
+                <div>
+                  <p className="text-[10px] text-zinc-600 mb-1">Y — {settings.lightY.toFixed(1)}</p>
+                  <input type="range" min={0.1} max={10} step={0.1}
+                    value={settings.lightY}
+                    onChange={e => setSettings(s => ({ ...s, lightY: parseFloat(e.target.value) }))}
+                    className="w-full accent-[#c4ff0d]"
+                  />
+                </div>
+                <div>
+                  <p className="text-[10px] text-zinc-600 mb-1">Z — {settings.lightZ.toFixed(1)}</p>
+                  <input type="range" min={-5} max={5} step={0.1}
+                    value={settings.lightZ}
+                    onChange={e => setSettings(s => ({ ...s, lightZ: parseFloat(e.target.value) }))}
+                    className="w-full accent-[#c4ff0d]"
+                  />
+                </div>
+              </div>
+
+              {/* Background */}
+              <div>
+                <Label>Background</Label>
+                <div className="grid grid-cols-3 gap-1.5 mb-2">
+                  {(['default', 'plain', 'sunset', 'night'] as const).map(bg => (
+                    <button
+                      key={bg}
+                      onClick={() => setSettings(s => ({ ...s, background: bg }))}
+                      className={`text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all capitalize ${
+                        settings.background === bg
+                          ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
+                          : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      {bg}
+                    </button>
+                  ))}
+                  <label className={`text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all cursor-pointer text-center ${
+                    settings.background === 'custom'
+                      ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
+                      : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+                  }`}>
+                    Custom
+                    <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleBgCustomUpload(e.target.files[0])} />
+                  </label>
+                </div>
+                {settings.background === 'plain' && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      type="color"
+                      value={settings.bgColor}
+                      onChange={e => setSettings(s => ({ ...s, bgColor: e.target.value }))}
+                      className="w-8 h-6 rounded cursor-pointer border-0 bg-transparent"
+                    />
+                    <span className="text-[10px] font-mono text-zinc-400">{settings.bgColor}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10 gap-3">
             <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
@@ -224,7 +354,6 @@ export default function LiveryViewer({ user, onLogout }: Props) {
                   key={side}
                   onClick={() => handleShowcase(side)}
                   className="flex items-center gap-1.5 bg-black/70 hover:bg-black/90 border border-white/10 hover:border-[#c4ff0d]/50 text-zinc-300 hover:text-[#c4ff0d] text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all backdrop-blur-sm uppercase tracking-wider"
-                  title={`Showcase – ${side} side, transparent PNG`}
                 >
                   <Image size={10} />
                   {side}
@@ -271,7 +400,6 @@ export default function LiveryViewer({ user, onLogout }: Props) {
               className="w-full bg-black/40 border border-white/10 rounded-lg text-xs pl-9 pr-3 py-2.5 text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 focus:bg-black/60 transition-all"
             />
           </div>
-
           <div className="space-y-1 max-h-96 overflow-y-auto pr-0.5">
             {filteredModels.length > 0
               ? filteredModels.map(m => (
@@ -371,7 +499,6 @@ export default function LiveryViewer({ user, onLogout }: Props) {
           <p className="text-[10px] text-zinc-600 mb-3 leading-relaxed">
             Get your cookie from browser DevTools → Application → Cookies → roblox.com → <span className="text-zinc-500 font-mono">.ROBLOSECURITY</span>
           </p>
-
           <Label>Upload Panels</Label>
           <div className="space-y-2">
             {Object.keys(textures).length === 0 && (

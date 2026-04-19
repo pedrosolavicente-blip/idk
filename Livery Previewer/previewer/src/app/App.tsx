@@ -92,11 +92,6 @@ function DisclaimerModal({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
-
-const Credits = () => (
-  <p className="fixed bottom-4 left-4 text-[10px] text-zinc-600 tracking-wider pointer-events-none">
-    developed by itzz industries | sonar & itzz_link
-  </p>
 );
 
 export default function App() {
@@ -140,7 +135,6 @@ export default function App() {
     return (
       <div className="flex h-screen bg-[#0d0d0d] items-center justify-center">
         <div className="w-6 h-6 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
-        <Credits />
       </div>
     );
   }
@@ -159,7 +153,6 @@ export default function App() {
             Try again
           </button>
         </div>
-        <Credits />
       </div>
     );
   }
@@ -182,7 +175,6 @@ export default function App() {
     <>
       {showDisclaimer && <DisclaimerModal onClose={() => setShowDisclaimer(false)} />}
       <LiveryViewer user={user} onLogout={handleLogout} onShowDisclaimer={() => setShowDisclaimer(true)} />
-      <Credits />
     </>
   );
 }

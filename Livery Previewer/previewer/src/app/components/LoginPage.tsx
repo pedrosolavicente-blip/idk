@@ -4,7 +4,7 @@
 // Then render: <LoginPage onLogin={redirectToDiscordLogin} onDisclaimer={() => setShowDisclaimer(true)} />
 
 import { useEffect, useRef } from 'react';
-import itzzLogo from '../imports/itzz-logo.png';
+import itzzLogo from '../../imports/itzz-logo.png';
 
 interface Props {
   onLogin: () => void;

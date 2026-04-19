@@ -638,7 +638,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                                     className="text-[10px] font-bold text-zinc-500 hover:text-red-400 transition-colors">Delete</button>
                                 )}
                               </div>
-                            )}
                           </div>
                         </div>
                         {/* Inline reply input */}

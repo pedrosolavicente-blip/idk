@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { HsvaColorPicker } from 'react-colorful';
+import { HsvColorPicker } from 'react-colorful';
 
 type HSVA = { h: number; s: number; v: number; a: number };
+type HSV  = { h: number; s: number; v: number };
 type RGB  = { r: number; g: number; b: number };
 
 function hexToRgb(hex: string): RGB {
@@ -57,22 +58,39 @@ export default function ColorPicker({ color, onChange }: Props) {
   const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (open) return; // picker is driving — don't clobber its internal state
     setHsva(hexToHsva(color));
     setHexInput(color.replace('#', '').toUpperCase());
-  }, [color]);
+  }, [color, open]);
 
   useEffect(() => {
     if (!open) return;
-    function handler(e: MouseEvent) {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    // Track whether a drag started inside the popover so we don't close mid-drag.
+    let draggingInside = false;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (popoverRef.current?.contains(e.target as Node)) draggingInside = true;
+    };
+    const onPointerUp = () => { draggingInside = false; };
+    const onMouseDown = (e: MouseEvent) => {
+      if (draggingInside) return;
+      if (!popoverRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('pointerup',   onPointerUp,   true);
+    document.addEventListener('mousedown',   onMouseDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown, true);
+      document.removeEventListener('pointerup',   onPointerUp,   true);
+      document.removeEventListener('mousedown',   onMouseDown);
+    };
   }, [open]);
 
-  const handleHsvaChange = useCallback((next: HSVA) => {
-    setHsva(next);
-    const hex = hsvaToHex(next);
+  const handleHsvaChange = useCallback((next: HSV) => {
+    const full: HSVA = { ...next, a: 1 };
+    setHsva(full);
+    const hex = hsvaToHex(full);
     setHexInput(hex.replace('#', '').toUpperCase());
     onChange(hex);
   }, [onChange]);
@@ -122,8 +140,7 @@ export default function ColorPicker({ color, onChange }: Props) {
               border-radius: 10px 10px 0 0;
               height: 180px;
             }
-            .custom-picker .react-colorful__hue,
-            .custom-picker .react-colorful__alpha {
+            .custom-picker .react-colorful__hue {
               height: 14px;
               border-radius: 7px;
               margin-top: 10px;
@@ -135,8 +152,8 @@ export default function ColorPicker({ color, onChange }: Props) {
               box-shadow: 0 2px 6px rgba(0,0,0,0.5);
             }
           `}</style>
-          <HsvaColorPicker
-            color={hsva}
+          <HsvColorPicker
+            color={{ h: hsva.h, s: hsva.s, v: hsva.v }}
             onChange={handleHsvaChange}
             className="custom-picker"
           />

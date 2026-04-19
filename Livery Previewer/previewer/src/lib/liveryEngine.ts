@@ -4,16 +4,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-export type ShowcaseSide = 'right' | 'left' | 'front' | 'back';
+export type ShowcaseSide = 'right' | 'left' | 'front' | 'back'
+  | 'front-right' | 'front-left' | 'back-right' | 'back-left'
+  | 'top' | 'top-front' | 'top-back' | 'top-left' | 'top-right';
 
 export interface SceneSettings {
-  brightness: number;
-  lightX: number;
-  lightY: number;
-  lightZ: number;
-  background: 'default' | 'plain' | 'sunset' | 'night' | 'custom';
-  bgColor: string;
-  bgCustomUrl: string;
+  brightness:    number;
+  skyRotX:       number; // skybox X tilt  in degrees
+  skyRotY:       number; // skybox Y spin   in degrees
+  skyRotZ:       number; // skybox Z roll   in degrees
+  background:    'default' | 'sunset' | 'night' | 'custom';
+  bgCustomUrl:   string;
+  bgCustomIsEXR: boolean;
 }
 
 export interface LiveryViewer {
@@ -32,7 +34,8 @@ export interface LiveryViewer {
   dispose: () => void;
 }
 
-export function initLiveryViewer(container: HTMLElement): LiveryViewer {
+export function initLiveryViewer(container: HTMLElement, options?: { zoomFactor?: number }): LiveryViewer {
+  const _zoomFactor = options?.zoomFactor ?? 2;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x87CEEB);
 
@@ -76,6 +79,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   const pmrem = new THREE.PMREMGenerator(renderer);
   pmrem.compileEquirectangularShader();
 
+  // Room environment as fallback for PBR reflections while skybox loads
   function applyRoomEnv() {
     const roomEnv = new RoomEnvironment();
     scene.environment = pmrem.fromScene(roomEnv).texture;
@@ -84,21 +88,32 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
   }
   applyRoomEnv();
 
-  new EXRLoader().load(
-    '/skybox.exr',
-    (exrTexture) => {
-      const envMap = pmrem.fromEquirectangular(exrTexture).texture;
-      scene.background  = envMap;
-      scene.environment = envMap;
-      exrTexture.dispose();
-      markDirty();
-    },
-    undefined,
-    () => {
-      scene.background = new THREE.Color(0x87CEEB);
-      markDirty();
-    }
-  );
+  // EXR cache — stores both the raw equirectangular texture (for background display)
+  // and the PMREM-processed cube-UV texture (for PBR environment reflections).
+  // The raw texture must NOT be disposed — Three.js needs it to render the skybox.
+  interface EXREntry { bg: THREE.Texture; env: THREE.Texture; }
+  const exrCache = new Map<string, EXREntry>();
+  const exrLoader = new EXRLoader();
+
+  function loadEXR(path: string): Promise<EXREntry> {
+    if (exrCache.has(path)) return Promise.resolve(exrCache.get(path)!);
+    return new Promise((resolve, reject) => {
+      exrLoader.load(
+        path,
+        (exrTexture) => {
+          // Keep raw texture for background (equirectangular projection, rotates with camera)
+          exrTexture.mapping = THREE.EquirectangularReflectionMapping;
+          // Generate PMREM version for accurate PBR reflections on paint
+          const env   = pmrem.fromEquirectangular(exrTexture).texture;
+          const entry: EXREntry = { bg: exrTexture, env };
+          exrCache.set(path, entry);
+          resolve(entry);
+        },
+        undefined,
+        reject,
+      );
+    });
+  }
 
   const handleResize = () => {
     camera.aspect = container.clientWidth / container.clientHeight;
@@ -271,7 +286,7 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
 
           const size = box.getSize(new THREE.Vector3());
           currentModelSize.copy(size);
-          const dist = Math.max(size.x, size.y, size.z) * 2;
+          const dist = Math.max(size.x, size.y, size.z) * _zoomFactor;
           camera.position.set(dist, dist * 0.5, dist);
           camera.lookAt(0, size.y / 2, 0);
           controls.target.set(0, size.y / 2, 0);
@@ -312,35 +327,74 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     markDirty();
   }
 
+  // Track the currently active background key so we only reload when it actually changes.
+  // Changing brightness / light direction must NOT re-trigger skybox loading.
+  let activeBgKey = '';
+
+  function applyEXRBackground(path: string, fallbackColor: number) {
+    loadEXR(path).then(({ bg, env }) => {
+      scene.background  = bg;   // raw equirectangular — displays & rotates correctly
+      scene.environment = env;  // PMREM — used for paint reflections
+      markDirty();
+    }).catch(() => {
+      scene.background = new THREE.Color(fallbackColor);
+      markDirty();
+    });
+  }
+
   function updateScene(settings: SceneSettings): void {
     renderer.toneMappingExposure = settings.brightness;
-    directionalLight.position.set(settings.lightX, settings.lightY, settings.lightZ);
+
+    // Sky rotation — all three axes, converted from degrees to radians
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    scene.backgroundRotation.x  = toRad(settings.skyRotX);
+    scene.backgroundRotation.y  = toRad(settings.skyRotY);
+    scene.backgroundRotation.z  = toRad(settings.skyRotZ);
+    scene.environmentRotation.x = toRad(settings.skyRotX);
+    scene.environmentRotation.y = toRad(settings.skyRotY);
+    scene.environmentRotation.z = toRad(settings.skyRotZ);
+    markDirty();
+
+    // Compute a key for the current background selection
+    const bgKey = settings.background === 'custom'
+      ? `custom:${settings.bgCustomUrl}`
+      : settings.background;
+
+    // Skip background reload if nothing changed
+    if (bgKey === activeBgKey) return;
+    activeBgKey = bgKey;
 
     switch (settings.background) {
-      case 'plain':
-        scene.background = new THREE.Color(settings.bgColor);
-        break;
       case 'sunset':
-        scene.background = new THREE.Color(0xff7043);
+        applyEXRBackground('/noon.exr', 0xff7043);
         break;
       case 'night':
-        scene.background = new THREE.Color(0x0a0a1a);
+        applyEXRBackground('/night.exr', 0x0a0a1a);
         break;
       case 'custom':
         if (settings.bgCustomUrl) {
-          bgTextureLoader.load(settings.bgCustomUrl, (tex) => {
-            tex.colorSpace = THREE.SRGBColorSpace;
-            scene.background = tex;
-            markDirty();
-          });
+          // Use EXR loader for .exr files, regular texture loader for everything else
+          if (settings.bgCustomUrl.toLowerCase().endsWith('.exr') || settings.bgCustomIsEXR) {
+            loadEXR(settings.bgCustomUrl).then(({ bg, env }) => {
+              scene.background  = bg;
+              scene.environment = env;
+              markDirty();
+            }).catch(() => markDirty());
+          } else {
+            bgTextureLoader.load(settings.bgCustomUrl, (tex) => {
+              tex.colorSpace   = THREE.SRGBColorSpace;
+              tex.mapping      = THREE.EquirectangularReflectionMapping;
+              scene.background = tex;
+              markDirty();
+            });
+          }
         }
         break;
       case 'default':
       default:
-        scene.background = new THREE.Color(0x87CEEB);
+        applyEXRBackground('/day.exr', 0x87CEEB);
         break;
     }
-    markDirty();
   }
 
   function captureThumbnail(): string {
@@ -365,17 +419,33 @@ export function initLiveryViewer(container: HTMLElement): LiveryViewer {
     const longestSide = Math.max(currentModelSize.x, currentModelSize.z);
     const fov  = 20;
     const dist = (longestSide / 2) / Math.tan((fov / 2) * (Math.PI / 180)) * 1.15;
+    const d45  = dist / Math.SQRT2;                    // diagonal component
+    const lift = currentModelSize.y * 0.45;            // slight elevation for corners
+
+    const hi = dist * 0.75; // horizontal component for high-angle shots
+    const up = dist * 0.9;  // vertical component for high-angle shots
 
     const offsets: Record<ShowcaseSide, THREE.Vector3> = {
-      right: new THREE.Vector3( dist, 0, 0),
-      left:  new THREE.Vector3(-dist, 0, 0),
-      front: new THREE.Vector3(0, 0,  dist),
-      back:  new THREE.Vector3(0, 0, -dist),
+      right:       new THREE.Vector3( dist, 0,     0),
+      left:        new THREE.Vector3(-dist, 0,     0),
+      front:       new THREE.Vector3(0,     0,     dist),
+      back:        new THREE.Vector3(0,     0,    -dist),
+      'front-right': new THREE.Vector3( d45,  lift,  d45),
+      'front-left':  new THREE.Vector3(-d45,  lift,  d45),
+      'back-right':  new THREE.Vector3( d45,  lift, -d45),
+      'back-left':   new THREE.Vector3(-d45,  lift, -d45),
+      top:           new THREE.Vector3(0,     dist,  0),
+      'top-front':   new THREE.Vector3(0,     up,    hi),
+      'top-back':    new THREE.Vector3(0,     up,   -hi),
+      'top-left':    new THREE.Vector3(-hi,   up,    0),
+      'top-right':   new THREE.Vector3( hi,   up,    0),
     };
 
-    const showcaseCam = new THREE.PerspectiveCamera(fov, W / H, 0.1, 10000);
+    const isTop = side === 'top';
+    const showcaseCam = new THREE.PerspectiveCamera(isTop ? 30 : fov, W / H, 0.1, 10000);
+    if (isTop) showcaseCam.up.set(0, 0, -1); // prevent gimbal flip looking straight down
     const offset = offsets[side];
-    showcaseCam.position.set(cx + offset.x, cy, cz + offset.z);
+    showcaseCam.position.set(cx + offset.x, cy + offset.y, cz + offset.z);
     showcaseCam.lookAt(cx, cy, cz);
 
     const savedBg = scene.background;

@@ -31,9 +31,66 @@ This tool is provided "as is" without any guarantees of availability, accuracy, 
 
 IF YOU'RE FROM THE PRC TEAM
 
-Please reach out to us if you have any issue with this tool. 
+Please reach out to us if you have any issue with this tool.
 
 By logging in with Discord, you acknowledge that you have read this disclaimer and understand the nature of this tool and its assets.`;
+
+function downloadDisclaimer() {
+  const blob = new Blob([DISCLAIMER_TEXT], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'LiveryPreviewer-Disclaimer.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function DisclaimerModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
+          <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Legal Disclaimer</p>
+          <button
+            onClick={onClose}
+            className="text-zinc-500 hover:text-white transition-colors text-lg leading-none"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <pre className="text-[10.5px] text-zinc-400 leading-relaxed whitespace-pre-wrap font-sans">
+            {DISCLAIMER_TEXT}
+          </pre>
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-white/10 flex gap-2 shrink-0">
+          <button
+            onClick={downloadDisclaimer}
+            className="flex-1 text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white px-4 py-2.5 rounded-xl transition-all"
+          >
+            ↓ Download TXT
+          </button>
+          <button
+            onClick={onClose}
+            className="text-xs font-bold bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-[#c4ff0d]/20"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const Credits = () => (
   <p className="fixed bottom-4 left-4 text-[10px] text-zinc-600 tracking-wider pointer-events-none">
@@ -42,9 +99,10 @@ const Credits = () => (
 );
 
 export default function App() {
-  const [authState, setAuthState] = useState<AuthState>('checking');
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [user, setUser]           = useState<DiscordUser | null>(null);
+  const [authState, setAuthState]       = useState<AuthState>('checking');
+  const [authError, setAuthError]       = useState<string | null>(null);
+  const [user, setUser]                 = useState<DiscordUser | null>(null);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -60,6 +118,7 @@ export default function App() {
         return;
       }
 
+      // Re-validate stored token silently — user won't need to log in again
       const u = await validateStoredToken();
       if (u) {
         setUser(u);
@@ -74,18 +133,6 @@ export default function App() {
   const handleLogout = () => {
     setUser(null);
     setAuthState('login');
-  };
-
-  const handleDisclaimer = () => {
-    const blob = new Blob([DISCLAIMER_TEXT], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'LiveryPreviewer-Disclaimer.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   if (authState === 'checking') {
@@ -118,6 +165,8 @@ export default function App() {
   if (authState === 'login') {
     return (
       <div className="flex h-screen bg-[#0d0d0d] items-center justify-center text-white">
+        {showDisclaimer && <DisclaimerModal onClose={() => setShowDisclaimer(false)} />}
+
         <div className="text-center space-y-6 px-6">
           <div className="space-y-3">
             <img src={itzzLogo} alt="itzz" className="h-16 w-auto mx-auto drop-shadow-[0_0_12px_rgba(196,255,13,0.4)]" />
@@ -134,7 +183,7 @@ export default function App() {
             Login with Discord
           </button>
           <button
-            onClick={handleDisclaimer}
+            onClick={() => setShowDisclaimer(true)}
             className="text-xs text-zinc-500 hover:text-zinc-300 underline transition-colors mx-auto block"
           >
             Legal Disclaimer
@@ -147,7 +196,8 @@ export default function App() {
 
   return (
     <>
-      <LiveryViewer user={user} onLogout={handleLogout} />
+      {showDisclaimer && <DisclaimerModal onClose={() => setShowDisclaimer(false)} />}
+      <LiveryViewer user={user} onLogout={handleLogout} onShowDisclaimer={() => setShowDisclaimer(true)} />
       <Credits />
     </>
   );

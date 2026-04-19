@@ -34,20 +34,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/roblox-api': {
-        target: 'https://apis.roblox.com',
+      // Proxy R2 asset requests through localhost so CORS isn't an issue in dev
+      '/r2-proxy': {
+        target: 'https://pub-13c1fc73579544bdb2eb07e28434bd74.r2.dev',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/roblox-api/, ''),
-      },
-      '/roblox-auth': {
-        target: 'https://auth.roblox.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/roblox-auth/, ''),
-      },
-      '/roblox-data': {
-        target: 'https://data.roblox.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/roblox-data/, ''),
+        rewrite: (path) => path.replace(/^\/r2-proxy/, ''),
       },
     },
   },

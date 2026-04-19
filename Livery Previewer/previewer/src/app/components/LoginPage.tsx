@@ -89,10 +89,10 @@ function CarSpinner() {
           scene.add(pivot);
 
           // Position camera based on actual model size
-const dist = size2.z * 0.90;
+const dist = size2.z * 1.1;
 const height = size2.y * 0.35;
-camera.position.set(0, height, dist);
-camera.lookAt(0, size2.y * 0.2, 0);
+camera.position.set(-1.5, height, dist);
+camera.lookAt(-1.5, size2.y * 0.2, 0);
 
           model.traverse((child: any) => {
             if (child.isMesh) {

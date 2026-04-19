@@ -64,7 +64,7 @@ async function blobUrlToDataUrl(url: string): Promise<string> {
   });
 }
 
-// ─── Shared styles (matches LoginPage exactly) ────────────────────────────────
+// ─── Shared styles ────────────────────────────────────────────────────────────
 
 const glassBtn = {
   background: 'rgba(255,255,255,0.04)',
@@ -77,45 +77,93 @@ const glassBtnLime = {
   color: ACCENT,
   background: 'rgba(196,255,13,0.07)',
   border: '1px solid rgba(196,255,13,0.22)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
 } as const;
 
 const glassBtnActive = {
   background: 'rgba(196,255,13,0.10)',
   border: '1px solid rgba(196,255,13,0.35)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
+  boxShadow: '0 0 16px rgba(196,255,13,0.12), inset 0 0 0 1px rgba(196,255,13,0.1)',
 } as const;
 
 const navbarStyle = {
   paddingTop: '10px',
   paddingBottom: '10px',
-  background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+  background: 'rgba(4,4,4,0.97)',
   backdropFilter: 'blur(24px)',
   WebkitBackdropFilter: 'blur(24px)',
   borderBottom: '1px solid rgba(255,255,255,0.06)',
-  boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
+  boxShadow: '0 1px 0 0 rgba(196,255,13,0.08)',
 } as const;
 
 const dropdownStyle = {
-  background: 'rgba(10,10,10,0.97)',
+  background: 'rgba(6,6,6,0.98)',
   border: '1px solid rgba(255,255,255,0.08)',
   backdropFilter: 'blur(24px)',
   WebkitBackdropFilter: 'blur(24px)',
 } as const;
 
+// ─── GlassButton component — handles hover green-sweep effect ─────────────────
+
+interface GlassBtnProps {
+  onClick?: () => void;
+  active?: boolean;
+  lime?: boolean;
+  className?: string;
+  children: ReactNode;
+  style?: React.CSSProperties;
+  disabled?: boolean;
+  title?: string;
+}
+
+function GlassButton({ onClick, active, lime, className = '', children, style = {}, disabled, title }: GlassBtnProps) {
+  const [hovered, setHovered] = useState(false);
+
+  const baseStyle = active ? glassBtnActive : lime ? glassBtnLime : glassBtn;
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`relative overflow-hidden transition-all duration-200 ${className}`}
+      style={{
+        ...baseStyle,
+        ...style,
+        ...(hovered && !active && !lime ? {
+          borderColor: 'rgba(196,255,13,0.28)',
+          boxShadow: '0 0 14px rgba(196,255,13,0.07), inset 0 0 0 1px rgba(196,255,13,0.08)',
+        } : {}),
+        transform: hovered ? 'scale(1.01)' : 'scale(1)',
+      }}
+    >
+      {/* Green sweep from right on hover */}
+      <span
+        className="pointer-events-none absolute inset-y-0 right-0 transition-all duration-300"
+        style={{
+          width: hovered ? '55%' : '0%',
+          background: 'linear-gradient(to left, rgba(196,255,13,0.13) 0%, transparent 100%)',
+          borderRadius: 'inherit',
+        }}
+      />
+      <span className="relative z-10 flex items-center gap-1.5">{children}</span>
+    </button>
+  );
+}
+
 // ─── Small shared components ──────────────────────────────────────────────────
 
 function ModelListItem({ model, selected, onClick }: { model: VehicleModel; selected: boolean; onClick: () => void }) {
   return (
-    <button
+    <GlassButton
       onClick={onClick}
-      className="w-full text-left rounded-xl px-3 py-2.5 transition-all text-[11px] font-semibold truncate"
-      style={selected ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#71717a' }}
+      active={selected}
+      className="w-full text-left rounded-xl px-3 py-2.5 text-[11px] font-semibold truncate"
+      style={{ color: selected ? ACCENT : '#71717a', justifyContent: 'flex-start' }}
     >
       {model.name}
-    </button>
+    </GlassButton>
   );
 }
 
@@ -128,7 +176,6 @@ function Section({ title, icon: Icon, children, defaultOpen = false }: {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-2.5 px-4 py-3 transition-colors group"
-        style={{ fontFamily: 'Inter, sans-serif' }}
       >
         <Icon size={11} style={{ color: ACCENT }} />
         <span className="flex-1 text-left text-[10px] font-black tracking-widest uppercase text-zinc-500 group-hover:text-white transition-colors">{title}</span>
@@ -143,7 +190,7 @@ function Section({ title, icon: Icon, children, defaultOpen = false }: {
 
 function Label({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-1.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-1.5">
       {children}
     </p>
   );
@@ -326,11 +373,9 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
       {/* ── 3-D Viewport ── */}
       <div className="relative flex-1 overflow-hidden" ref={containerRef}>
 
-        {/* Background glows — same as login page */}
+        {/* Background glows */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          <img
-            src="/Vector_(7).svg"
-            alt="" aria-hidden="true"
+          <img src="/Vector_(7).svg" alt="" aria-hidden="true"
             style={{
               position: 'absolute', top: '50%', left: '50%',
               transform: 'translate(-50%, -50%)',
@@ -340,7 +385,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           />
           <div className="absolute -top-32 -right-32 rounded-full" style={{ width: 700, height: 700, opacity: 0.15, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 65%)' }} />
           <div className="absolute -bottom-24 -left-24 rounded-full" style={{ width: 500, height: 500, opacity: 0.08, background: 'radial-gradient(circle, #88ff00 0%, transparent 65%)' }} />
-          <div className="absolute rounded-full" style={{ width: 500, height: 500, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.06, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 60%)' }} />
+          <div className="absolute rounded-full" style={{ width: 500, height: 500, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.05, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 60%)' }} />
         </div>
 
         {/* Credits modal */}
@@ -349,20 +394,21 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
             onMouseDown={e => { if (e.target === e.currentTarget) setShowCredits(false); }}
           >
-            <div className="w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.10)' }}>
-              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Credits</p>
                 <button onClick={() => setShowCredits(false)} className="text-zinc-600 hover:text-white transition-colors text-xs">✕</button>
               </div>
               <div className="px-5 py-5 space-y-3">
-                <div className="px-4 py-4 rounded-xl" style={glassBtn}>
-                  <p className="text-sm font-bold text-white">Sonarsilly</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mt-1" style={{ color: ACCENT }}>Backend Development</p>
-                </div>
-                <div className="px-4 py-4 rounded-xl" style={glassBtn}>
-                  <p className="text-sm font-bold text-white">Link</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mt-1" style={{ color: ACCENT }}>Frontend Development</p>
-                </div>
+                {[
+                  { name: 'Sonarsilly', role: 'Backend Development' },
+                  { name: 'Link',       role: 'Frontend Development' },
+                ].map(p => (
+                  <div key={p.name} className="px-4 py-4 rounded-xl" style={glassBtn}>
+                    <p className="text-sm font-bold text-white">{p.name}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest mt-1" style={{ color: ACCENT }}>{p.role}</p>
+                  </div>
+                ))}
               </div>
               <div className="px-5 pb-5">
                 <button
@@ -400,24 +446,24 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           />
         )}
 
-        {/* ── Navbar — identical style to LoginPage ── */}
+        {/* ── Navbar ── */}
         <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8" style={navbarStyle}>
 
           <img src="/itzz.svg" alt="itzz" className="h-7 w-auto" />
 
           {/* Center */}
           <div className="flex items-center gap-2">
-
             {/* Settings */}
             <div className="relative">
-              <button
+              <GlassButton
                 onClick={() => { setShowSettings(s => !s); setShowMenu(false); }}
-                className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
-                style={showSettings ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#71717a' }}
+                active={showSettings}
+                className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg"
+                style={{ color: showSettings ? ACCENT : '#71717a' }}
               >
-                <Settings size={11} />
+                <Settings size={11} style={{ color: showSettings ? ACCENT : '#71717a' }} />
                 Settings
-              </button>
+              </GlassButton>
 
               {showSettings && (
                 <div className="absolute left-0 top-full mt-2 w-72 rounded-2xl p-4 shadow-2xl z-30" style={dropdownStyle}>
@@ -455,17 +501,20 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     <Label>Skybox</Label>
                     <div className="grid grid-cols-3 gap-1.5 mb-2">
                       {(['default', 'sunset', 'night'] as const).map(bg => (
-                        <button key={bg}
+                        <GlassButton key={bg}
                           onClick={() => setSettings(s => ({ ...s, background: bg, ...SKYBOX_LIGHTING[bg] }))}
-                          className="text-[10px] font-bold px-2 py-1.5 rounded-lg transition-all capitalize"
-                          style={settings.background === bg ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#52525b' }}
+                          active={settings.background === bg}
+                          className="text-[10px] font-bold px-2 py-1.5 rounded-lg capitalize"
+                          style={{ color: settings.background === bg ? ACCENT : '#52525b' }}
                         >
                           {bg === 'default' ? 'Default' : bg === 'sunset' ? 'Sunset' : 'Night'}
-                        </button>
+                        </GlassButton>
                       ))}
                     </div>
-                    <label className="w-full text-[10px] font-bold px-2 py-1.5 rounded-lg transition-all cursor-pointer text-center block"
-                      style={settings.background === 'custom' ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#52525b' }}>
+                    <label
+                      className="relative overflow-hidden w-full text-[10px] font-bold px-2 py-1.5 rounded-lg transition-all cursor-pointer text-center block"
+                      style={settings.background === 'custom' ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#52525b' }}
+                    >
                       Custom
                       <input type="file" accept="image/*,.exr" className="hidden"
                         onChange={e => e.target.files?.[0] && handleBgCustomUpload(e.target.files[0])} />
@@ -476,19 +525,18 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             </div>
 
             {/* Showcases */}
-            <button
+            <GlassButton
               onClick={() => { setShowShowcases(true); setShowMenu(false); }}
-              className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all hover:text-white"
-              style={{ ...glassBtn, color: '#71717a' }}
+              className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg"
+              style={{ color: '#71717a' }}
             >
-              <Users size={11} />
+              <Users size={11} style={{ color: '#71717a' }} />
               Showcases
-            </button>
+            </GlassButton>
           </div>
 
           {/* Right */}
           <div className="flex items-center gap-2">
-            {/* User pill */}
             {user && (
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={glassBtn}>
                 <img
@@ -503,16 +551,16 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               </div>
             )}
 
-            {/* Menu */}
             <div className="relative">
-              <button
+              <GlassButton
                 onClick={() => { setShowMenu(s => !s); setShowSettings(false); }}
-                className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
-                style={showMenu ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#71717a' }}
+                active={showMenu}
+                className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg"
+                style={{ color: showMenu ? ACCENT : '#71717a' }}
               >
-                <MoreHorizontal size={11} />
+                <MoreHorizontal size={11} style={{ color: showMenu ? ACCENT : '#71717a' }} />
                 Menu
-              </button>
+              </GlassButton>
 
               {showMenu && (
                 <div className="absolute right-0 top-full mt-2 w-44 rounded-2xl overflow-hidden shadow-2xl z-30" style={dropdownStyle}>
@@ -521,16 +569,17 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     { label: 'Disclaimer', icon: FileText,  action: () => { onShowDisclaimer(); setShowMenu(false); },     danger: false },
                     { label: 'Log Out',    icon: LogOut,    action: () => { clearAuth(); onLogout(); },                    danger: true  },
                   ].map((item, i, arr) => (
-                    <button
+                    <GlassButton
                       key={item.label}
                       onClick={item.action}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold transition-all hover:bg-white/[0.03] ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold ${
                         item.danger ? 'text-zinc-500 hover:text-red-400' : 'text-zinc-400 hover:text-white'
                       } ${i < arr.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
+                      style={{ background: 'transparent', border: 'none', backdropFilter: 'none', borderRadius: 0, ...(i < arr.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}) }}
                     >
                       <item.icon size={11} style={{ color: item.danger ? '#ef4444' : ACCENT }} />
                       {item.label}
-                    </button>
+                    </GlassButton>
                   ))}
                 </div>
               )}
@@ -569,14 +618,14 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {glbUrl && (
           <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 z-10">
             <div className="relative">
-              <button
+              <GlassButton
                 onClick={() => setShowAngleMenu(o => !o)}
-                className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all hover:text-white w-full justify-between"
-                style={{ ...glassBtn, color: '#71717a' }}
+                className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg w-full justify-between"
+                style={{ color: '#71717a', minWidth: '140px' }}
               >
                 <span className="flex items-center gap-1.5"><Image size={10} />Angle Shots</span>
                 <ChevronDown size={10} className={`transition-transform ${showAngleMenu ? 'rotate-180' : ''}`} />
-              </button>
+              </GlassButton>
               {showAngleMenu && (
                 <div className="absolute bottom-full mb-2 right-0 rounded-2xl shadow-2xl overflow-hidden w-48" style={dropdownStyle}>
                   {([
@@ -599,25 +648,21 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                   ] as const).map((entry, i) => 'group' in entry ? (
                     <p key={i} className="px-3 pt-2.5 pb-0.5 text-[8px] font-black uppercase tracking-widest text-zinc-700">{entry.group}</p>
                   ) : (
-                    <button
+                    <GlassButton
                       key={entry.side}
                       onClick={() => { handleShowcase(entry.side as ShowcaseSide); setShowAngleMenu(false); }}
-                      className="w-full flex items-center px-3 py-1.5 text-[11px] font-semibold text-zinc-500 hover:text-[#c4ff0d] hover:bg-white/[0.03] transition-all text-left"
+                      className="w-full flex items-center px-3 py-1.5 text-[11px] font-semibold text-left"
+                      style={{ background: 'transparent', border: 'none', backdropFilter: 'none', borderRadius: 0, color: '#71717a' }}
                     >
                       {entry.label}
-                    </button>
+                    </GlassButton>
                   ))}
                 </div>
               )}
             </div>
-            <button
-              onClick={handleCapture}
-              className="flex items-center justify-center gap-2 bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black text-[11px] font-black tracking-widest uppercase px-5 py-2.5 rounded-xl transition-all hover:scale-[1.02] w-full"
-              style={{ boxShadow: '0 4px 24px rgba(196,255,13,0.2)' }}
-            >
-              <Camera size={13} />
-              Capture
-            </button>
+
+            {/* Capture — lime version with right-sweep in white */}
+            <CaptureButton onClick={handleCapture} />
           </div>
         )}
 
@@ -633,10 +678,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
       {/* ── Sidebar ── */}
       <div
         className="w-60 flex flex-col overflow-y-auto shrink-0"
-        style={{
-          background: 'rgba(6,6,6,0.98)',
-          borderLeft: '1px solid rgba(255,255,255,0.05)',
-        }}
+        style={{ background: 'rgba(6,6,6,0.98)', borderLeft: '1px solid rgba(255,255,255,0.05)' }}
       >
         {/* Header */}
         <div className="px-4 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -647,16 +689,17 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </p>
         </div>
 
-        {/* Model section */}
+        {/* Model */}
         <Section title="Model" icon={Box} defaultOpen={true}>
           <div className="flex gap-1 mb-2">
             {(['All', ...AVAILABLE_CATEGORIES] as const).map(cat => (
-              <button key={cat} onClick={() => setFilterCat(cat as VehicleCategory | 'All')}
-                className="flex-1 text-[9px] font-black py-1.5 rounded-lg transition-all"
-                style={filterCat === cat ? { ...glassBtnActive, color: ACCENT } : { ...glassBtn, color: '#52525b' }}
+              <GlassButton key={cat} onClick={() => setFilterCat(cat as VehicleCategory | 'All')}
+                active={filterCat === cat}
+                className="flex-1 text-[9px] font-black py-1.5 rounded-lg"
+                style={{ color: filterCat === cat ? ACCENT : '#52525b' }}
               >
                 {cat}
-              </button>
+              </GlassButton>
             ))}
           </div>
 
@@ -711,7 +754,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           ) : (
             <div className="space-y-1.5 mt-1 max-h-48 overflow-y-auto pr-0.5">
               {presets.map(preset => (
-                <div key={preset.id} className="group flex items-center gap-1.5 rounded-xl overflow-hidden transition-all" style={glassBtn}>
+                <div key={preset.id} className="group flex items-center gap-1.5 rounded-xl overflow-hidden" style={glassBtn}>
                   <button className="flex-1 text-left px-2.5 py-2 min-w-0" onClick={() => handleLoadPreset(preset)}>
                     <p className="text-[10px] font-bold text-zinc-300 truncate">{preset.name}</p>
                     <p className="text-[9px] text-zinc-700 truncate">
@@ -732,7 +775,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         <Section title="Vehicle Color" icon={Palette} defaultOpen={true}>
           <div className="flex items-center gap-3">
             <ColorPicker color={vehicleColor} onChange={handleColorChange} />
-            <div className="flex items-center flex-1 rounded-xl text-[11px] px-3 py-2 gap-1 transition-all"
+            <div className="flex items-center flex-1 rounded-xl text-[11px] px-3 py-2 gap-1"
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <span className="text-zinc-600 font-mono">#</span>
               <input value={hexSidebarInput} onChange={e => handleSidebarHexInput(e.target.value)}
@@ -744,7 +787,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             {['#000000','#1a1a2e','#c0392b','#27ae60','#2980b9','#8e44ad','#f39c12','#ecf0f1','#2c2c2c'].map(c => (
               <button key={c} onClick={() => handleColorChange(c)}
                 style={{ background: c }}
-                className="w-6 h-6 rounded-lg border-2 border-white/10 hover:scale-110 hover:border-[#c4ff0d]/50 transition-all shadow-md" title={c} />
+                className="w-6 h-6 rounded-lg border-2 border-white/10 hover:scale-110 hover:border-[#c4ff0d]/60 transition-all shadow-md" title={c} />
             ))}
           </div>
         </Section>
@@ -772,7 +815,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     <div className="flex-1 flex items-center gap-2 rounded-xl px-2.5 py-1.5"
                       style={{ background: 'rgba(196,255,13,0.06)', border: '1px solid rgba(196,255,13,0.18)' }}>
                       <span className="flex-1 text-[9px] font-bold truncate" style={{ color: ACCENT }}>✓ Loaded</span>
-                      <button onClick={() => handleRemoveTexture(panel)} className="text-red-500 hover:text-red-300 text-xs font-bold">✕</button>
+                      <button onClick={() => handleRemoveTexture(panel)} className="text-red-500 hover:text-red-300 text-xs font-bold transition-colors">✕</button>
                     </div>
                   ) : (
                     <label className="flex-1 cursor-pointer rounded-xl px-2.5 py-1.5 text-[9px] text-zinc-600 hover:text-zinc-300 flex items-center gap-1.5 transition-all border-dashed"
@@ -791,5 +834,35 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         </Section>
       </div>
     </div>
+  );
+}
+
+// ─── Capture button — separate to keep hook rules clean ───────────────────────
+
+function CaptureButton({ onClick }: { onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative overflow-hidden flex items-center justify-center gap-2 bg-[#c4ff0d] text-black text-[11px] font-black tracking-widest uppercase px-5 py-2.5 rounded-xl transition-all w-full"
+      style={{
+        boxShadow: hovered ? '0 6px 28px rgba(196,255,13,0.4)' : '0 4px 20px rgba(196,255,13,0.2)',
+        transform: hovered ? 'scale(1.02)' : 'scale(1)',
+      }}
+    >
+      <span
+        className="pointer-events-none absolute inset-y-0 right-0 transition-all duration-300"
+        style={{
+          width: hovered ? '50%' : '0%',
+          background: 'linear-gradient(to left, rgba(255,255,255,0.25) 0%, transparent 100%)',
+        }}
+      />
+      <span className="relative z-10 flex items-center gap-2">
+        <Camera size={13} />
+        Capture
+      </span>
+    </button>
   );
 }

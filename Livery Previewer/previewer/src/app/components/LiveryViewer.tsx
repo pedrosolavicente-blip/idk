@@ -393,128 +393,169 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           />
         )}
 
-        {/* Menu button */}
-        <div className="absolute top-4 right-4 z-20">
-          <button
-            onClick={() => setShowMenu(s => !s)}
-            className="flex items-center gap-2 bg-black/70 hover:bg-black/90 border border-white/10 hover:border-[#c4ff0d]/50 text-zinc-300 hover:text-[#c4ff0d] text-xs font-bold px-3 py-2 rounded-lg transition-all backdrop-blur-sm"
-          >
-            <MoreHorizontal size={13} />
-            Menu
-          </button>
+        {/* ── Glassmorphism Navbar ── */}
+        <nav
+          className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6"
+          style={{
+            paddingTop: '10px',
+            paddingBottom: '10px',
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
+          }}
+        >
+          {/* Left: logo */}
+          <img src="/itzz.svg" alt="itzz" className="h-7 w-auto" />
 
-          {showMenu && (
-            <div className="animate-settings-in absolute right-0 top-full mt-2 w-48 bg-[#0a0a0a]/95 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl">
+          {/* Center: Settings panel inline */}
+          <div className="flex items-center gap-2">
+
+            {/* Settings toggle */}
+            <div className="relative">
               <button
-                onClick={() => { setShowShowcases(true); setShowMenu(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
+                onClick={() => { setShowSettings(s => !s); setShowMenu(false); }}
+                className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all ${
+                  showSettings
+                    ? 'text-[#c4ff0d] bg-[#c4ff0d]/10 border border-[#c4ff0d]/40'
+                    : 'text-zinc-400 hover:text-white bg-white/4 border border-white/8'
+                }`}
               >
-                <Users size={13} style={{ color: ACCENT }} />
-                Showcases
+                <Settings size={12} />
+                Settings
               </button>
-              <button
-                onClick={() => { setShowCredits(true); setShowMenu(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
-              >
-                <Star size={13} style={{ color: ACCENT }} />
-                Credits
-              </button>
-              <button
-                onClick={() => { onShowDisclaimer(); setShowMenu(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
-              >
-                <FileText size={13} style={{ color: ACCENT }} />
-                Disclaimer
-              </button>
-            </div>
-          )}
-        </div>
 
-        {/* Settings button */}
-        <div className="absolute top-4 left-4 z-20">
-          <button
-            onClick={() => setShowSettings(s => !s)}
-            className="flex items-center gap-2 bg-black/70 hover:bg-black/90 border border-white/10 hover:border-[#c4ff0d]/50 text-zinc-300 hover:text-[#c4ff0d] text-xs font-bold px-3 py-2 rounded-lg transition-all backdrop-blur-sm"
-          >
-            <Settings size={13} />
-            Settings
-          </button>
+              {showSettings && (
+                <div className="animate-settings-in absolute left-0 top-full mt-2 w-72 bg-[#0a0a0a]/95 border border-white/10 rounded-xl p-4 backdrop-blur-sm shadow-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Scene Settings</p>
+                    <button
+                      onClick={handleResetSettings}
+                      className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-[#c4ff0d] transition-colors"
+                    >
+                      <RotateCcw size={10} />
+                      Reset
+                    </button>
+                  </div>
 
-          {showSettings && (
-            <div className="animate-settings-in mt-2 w-72 bg-[#0a0a0a]/95 border border-white/10 rounded-xl p-4 backdrop-blur-sm shadow-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Scene Settings</p>
-                <button
-                  onClick={handleResetSettings}
-                  className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-[#c4ff0d] transition-colors"
-                >
-                  <RotateCcw size={10} />
-                  Reset
-                </button>
-              </div>
-
-              {/* Brightness */}
-              <div className="mb-4">
-                <Label>Brightness — {settings.brightness.toFixed(2)}</Label>
-                <input
-                  type="range" min={0.1} max={3} step={0.05}
-                  value={settings.brightness}
-                  onChange={e => setSettings(s => ({ ...s, brightness: parseFloat(e.target.value) }))}
-                  className="w-full accent-[#c4ff0d]"
-                />
-              </div>
-
-              {/* Sky Rotation */}
-              <div className="mb-4 space-y-2">
-                <Label>Sky Rotation</Label>
-                {([
-                  { key: 'skyRotX' as const, label: 'X', min: -180, max: 180 },
-                  { key: 'skyRotY' as const, label: 'Y', min: -180, max: 180 },
-                  { key: 'skyRotZ' as const, label: 'Z', min: -180, max: 180 },
-                ]).map(({ key, label, min, max }) => (
-                  <div key={key}>
-                    <p className="text-[10px] text-zinc-600 mb-1">{label} — {settings[key].toFixed(1)}°</p>
+                  {/* Brightness */}
+                  <div className="mb-4">
+                    <Label>Brightness — {settings.brightness.toFixed(2)}</Label>
                     <input
-                      type="range" min={min} max={max} step={0.5}
-                      value={settings[key]}
-                      onChange={e => setSettings(s => ({ ...s, [key]: parseFloat(e.target.value) }))}
+                      type="range" min={0.1} max={3} step={0.05}
+                      value={settings.brightness}
+                      onChange={e => setSettings(s => ({ ...s, brightness: parseFloat(e.target.value) }))}
                       className="w-full accent-[#c4ff0d]"
                     />
                   </div>
-                ))}
-              </div>
 
-              {/* Background */}
-              <div>
-                <Label>Skybox</Label>
-                <div className="grid grid-cols-3 gap-1.5 mb-2">
-                  {(['default', 'sunset', 'night'] as const).map(bg => (
-                    <button
-                      key={bg}
-                      onClick={() => setSettings(s => ({ ...s, background: bg, ...SKYBOX_LIGHTING[bg] }))}
-                      className={`text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all capitalize ${
-                        settings.background === bg
-                          ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
-                          : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
-                      }`}
-                    >
-                      {bg === 'default' ? 'Default' : bg === 'sunset' ? 'Sunset' : 'Night'}
-                    </button>
-                  ))}
+                  {/* Sky Rotation */}
+                  <div className="mb-4 space-y-2">
+                    <Label>Sky Rotation</Label>
+                    {([
+                      { key: 'skyRotX' as const, label: 'X', min: -180, max: 180 },
+                      { key: 'skyRotY' as const, label: 'Y', min: -180, max: 180 },
+                      { key: 'skyRotZ' as const, label: 'Z', min: -180, max: 180 },
+                    ]).map(({ key, label, min, max }) => (
+                      <div key={key}>
+                        <p className="text-[10px] text-zinc-600 mb-1">{label} — {settings[key].toFixed(1)}°</p>
+                        <input
+                          type="range" min={min} max={max} step={0.5}
+                          value={settings[key]}
+                          onChange={e => setSettings(s => ({ ...s, [key]: parseFloat(e.target.value) }))}
+                          className="w-full accent-[#c4ff0d]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Background */}
+                  <div>
+                    <Label>Skybox</Label>
+                    <div className="grid grid-cols-3 gap-1.5 mb-2">
+                      {(['default', 'sunset', 'night'] as const).map(bg => (
+                        <button
+                          key={bg}
+                          onClick={() => setSettings(s => ({ ...s, background: bg, ...SKYBOX_LIGHTING[bg] }))}
+                          className={`text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all capitalize ${
+                            settings.background === bg
+                              ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
+                              : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+                          }`}
+                        >
+                          {bg === 'default' ? 'Default' : bg === 'sunset' ? 'Sunset' : 'Night'}
+                        </button>
+                      ))}
+                    </div>
+                    <label className={`w-full text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all cursor-pointer text-center block ${
+                      settings.background === 'custom'
+                        ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
+                        : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+                    }`}>
+                      Custom
+                      <input type="file" accept="image/*,.exr" className="hidden"
+                        onChange={e => e.target.files?.[0] && handleBgCustomUpload(e.target.files[0])} />
+                    </label>
+                  </div>
                 </div>
-                <label className={`w-full text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all cursor-pointer text-center block ${
-                  settings.background === 'custom'
-                    ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
-                    : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
-                }`}>
-                  Custom
-                  <input type="file" accept="image/*,.exr" className="hidden"
-                    onChange={e => e.target.files?.[0] && handleBgCustomUpload(e.target.files[0])} />
-                </label>
-              </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Showcases */}
+            <button
+              onClick={() => { setShowShowcases(true); setShowMenu(false); }}
+              className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white bg-white/4 border border-white/8"
+            >
+              <Users size={12} />
+              Showcases
+            </button>
+
+          </div>
+
+          {/* Right: menu */}
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={() => { setShowMenu(s => !s); setShowSettings(false); }}
+                className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all ${
+                  showMenu
+                    ? 'text-[#c4ff0d] bg-[#c4ff0d]/10 border border-[#c4ff0d]/40'
+                    : 'text-zinc-400 hover:text-white bg-white/4 border border-white/8'
+                }`}
+              >
+                <MoreHorizontal size={12} />
+                Menu
+              </button>
+
+              {showMenu && (
+                <div className="animate-settings-in absolute right-0 top-full mt-2 w-48 bg-[#0a0a0a]/95 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl">
+                  <button
+                    onClick={() => { setShowCredits(true); setShowMenu(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
+                  >
+                    <Star size={13} style={{ color: ACCENT }} />
+                    Credits
+                  </button>
+                  <button
+                    onClick={() => { onShowDisclaimer(); setShowMenu(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
+                  >
+                    <FileText size={13} style={{ color: ACCENT }} />
+                    Disclaimer
+                  </button>
+                  <button
+                    onClick={() => { clearAuth(); onLogout(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-red-400 hover:bg-white/5 transition-all"
+                  >
+                    <LogOut size={13} className="text-red-500" />
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </nav>
 
         {/* Loading overlay */}
         {loading && (
@@ -608,17 +649,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
       <div className="w-64 flex flex-col border-l border-[#c4ff0d]/10 bg-[#0a0a0a] overflow-y-auto">
 
         {/* Header */}
-        <div className="px-4 py-6 border-b border-[#c4ff0d]/20 bg-gradient-to-b from-[#c4ff0d]/5 to-transparent">
-          <div className="flex items-center gap-2.5 mb-2">
-            <img src="/Previewer.svg" alt="Livery Previewer" className="h-10 w-auto drop-shadow-[0_0_8px_rgba(196,255,13,0.4)]" />
-            <button
-              onClick={() => { clearAuth(); onLogout(); }}
-              title="Log out"
-              className="text-zinc-600 hover:text-zinc-400 transition-colors"
-            >
-              <LogOut size={13} />
-            </button>
-          </div>
+        <div className="px-4 py-4 border-b border-[#c4ff0d]/20 bg-gradient-to-b from-[#c4ff0d]/5 to-transparent">
           <div className="h-0.5 bg-gradient-to-r from-[#c4ff0d] to-transparent mb-2" />
           <p className="text-[10px] text-zinc-400 tracking-wider uppercase font-medium">
             {user ? (user.global_name ?? user.username) : 'ERLC Vehicle Previewer'}

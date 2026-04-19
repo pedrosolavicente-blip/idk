@@ -18,7 +18,7 @@ import type { LiveryConfig } from '../../lib/showcaseApi';
 
 const PANELS   = ['Left', 'Right', 'Top', 'Front', 'Back'] as const;
 type PanelFace = typeof PANELS[number];
-const ACCENT   = '#39FF14'; // Bright neon green
+const ACCENT   = '#D8FF63'; // Neon yellow-green
 
 const DEFAULT_SETTINGS: SceneSettings = {
   brightness: 1.1, skyRotX: 0, skyRotY: 0, skyRotZ: 0,
@@ -98,13 +98,13 @@ const GLOBAL_STYLES = `
   *, *::before, *::after { font-family: 'Inter', sans-serif !important; }
 
   :root {
-    --accent: #39FF14;
+    --accent: #D8FF63;
     --surface0: #080808;
     --surface1: #0e0e0e;
     --surface2: #161616;
     --surface3: #1e1e1e;
     --border: rgba(255,255,255,0.07);
-    --border-accent: rgba(57,255,20,0.28);
+    --border-accent: rgba(216,255,99,0.28);
     --text-1: #f4f4f5;
     --text-2: #a1a1aa;
     --text-3: #71717a;
@@ -118,8 +118,8 @@ const GLOBAL_STYLES = `
 
   .lv-sidebar::-webkit-scrollbar       { width: 2px; }
   .lv-sidebar::-webkit-scrollbar-track { background: transparent; }
-  .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(57,255,20,0.2); border-radius: 99px; }
-  .lv-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(57,255,20,0.45); }
+  .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(216,255,99,0.2); border-radius: 99px; }
+  .lv-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(216,255,99,0.45); }
 
   .lv-list::-webkit-scrollbar       { width: 2px; }
   .lv-list::-webkit-scrollbar-track { background: transparent; }
@@ -139,13 +139,13 @@ const GLOBAL_STYLES = `
     border-radius: 50%;
     background: var(--accent);
     border: 2px solid #080808;
-    box-shadow: 0 0 8px rgba(57,255,20,0.5);
+    box-shadow: 0 0 8px rgba(216,255,99,0.5);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .lv-range::-webkit-slider-thumb:hover {
     transform: scale(1.2);
-    box-shadow: 0 0 14px rgba(57,255,20,0.7);
+    box-shadow: 0 0 14px rgba(216,255,99,0.7);
   }
 
   .hue-range {
@@ -186,8 +186,8 @@ const GLOBAL_STYLES = `
     transition: all 0.15s ease;
     white-space: nowrap;
   }
-  .nav-item:hover { border-color: rgba(57,255,20,0.2); color: var(--text-2); }
-  .nav-item.active { border-color: var(--border-accent); background: rgba(57,255,20,0.08); color: #39FF14; box-shadow: 0 0 12px rgba(57,255,20,0.08); }
+  .nav-item:hover { border-color: rgba(216,255,99,0.2); color: var(--text-2); }
+  .nav-item.active { border-color: rgba(216,255,99,0.3); background: rgba(216,255,99,0.08); color: #D8FF63; box-shadow: 0 0 12px rgba(216,255,99,0.08); }
 
   .vehicle-row {
     display: flex; align-items: center;
@@ -200,10 +200,10 @@ const GLOBAL_STYLES = `
   }
   .vehicle-row:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); transition: all 0.3s ease-out; }
   .vehicle-row:hover { transform: scale(1.02); }
-  .vehicle-row.sel   { background: rgba(57,255,20,0.07); border-color: rgba(57,255,20,0.2); transition: all 0.3s ease-out; }
+  .vehicle-row.sel   { background: rgba(216,255,99,0.07); border-color: rgba(216,255,99,0.2); transition: all 0.3s ease-out; }
 
   .vehicle-card {
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease-out;
     border: 1px solid rgba(255,255,255,0.06);
@@ -212,18 +212,18 @@ const GLOBAL_STYLES = `
     aspect-ratio: 4/3;
     display: flex; flex-direction: column;
   }
-  .vehicle-card:hover { border-color: rgba(57,255,20,0.2); transform: translateY(-1px) scale(1.02); }
-  .vehicle-card.sel   { border-color: rgba(57,255,20,0.5); box-shadow: 0 0 16px rgba(57,255,20,0.12); }
+  .vehicle-card:hover { border-color: rgba(216,255,99,0.2); transform: translateY(-1px) scale(1.02); }
+  .vehicle-card.sel   { border-color: rgba(216,255,99,0.5); box-shadow: 0 0 16px rgba(216,255,99,0.12); }
 
   .panel-card {
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface1);
     overflow: hidden;
     transition: border-color 0.15s ease;
   }
-  .panel-card.loaded { border-color: rgba(57,255,20,0.25); background: rgba(57,255,20,0.04); }
-  .panel-card:hover  { border-color: rgba(57,255,20,0.2); }
+  .panel-card.loaded { border-color: rgba(216,255,99,0.25); background: rgba(216,255,99,0.04); }
+  .panel-card:hover  { border-color: rgba(216,255,99,0.2); }
 
   .drop-zone {
     border: 1.5px dashed rgba(255,255,255,0.1);
@@ -231,18 +231,18 @@ const GLOBAL_STYLES = `
     transition: all 0.15s ease;
     cursor: pointer;
   }
-  .drop-zone:hover { border-color: rgba(57,255,20,0.35); background: rgba(57,255,20,0.03); }
-  .drop-zone.dragover { border-color: var(--accent); background: rgba(57,255,20,0.06); }
+  .drop-zone:hover { border-color: rgba(216,255,99,0.35); background: rgba(216,255,99,0.03); }
+  .drop-zone.dragover { border-color: var(--accent); background: rgba(216,255,99,0.06); }
 
   .preset-card {
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface1);
     transition: all 0.15s ease;
     cursor: pointer;
     overflow: hidden;
   }
-  .preset-card:hover { border-color: rgba(57,255,20,0.2); background: var(--surface2); transform: translateY(-1px); }
+  .preset-card:hover { border-color: rgba(216,255,99,0.2); background: var(--surface2); transform: translateY(-1px); }
 
   .pill-btn {
     padding: 5px 10px;
@@ -257,12 +257,12 @@ const GLOBAL_STYLES = `
     transition: all 0.13s ease;
   }
   .pill-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: #D8FF63;
+    border-color: #D8FF63;
     color: #000;
-    box-shadow: 0 0 14px rgba(57,255,20,0.3);
+    box-shadow: 0 0 14px rgba(216,255,99,0.3);
   }
-  .pill-btn:not(.active):hover { border-color: rgba(57,255,20,0.15); color: var(--text-2); background: linear-gradient(to right, rgba(57,255,20,0.1), rgba(57,255,20,0.02)); transform: translateY(-1px); }
+  .pill-btn:not(.active):hover { border-color: rgba(216,255,99,0.15); color: var(--text-2); background: linear-gradient(to right, rgba(216,255,99,0.1), rgba(216,255,99,0.02)); transform: translateY(-1px); }
 
   .section-toggle {
     width: 100%;
@@ -271,12 +271,12 @@ const GLOBAL_STYLES = `
     background: transparent;
     border: none;
     cursor: pointer;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 0.5px solid rgba(255,255,255,0.03);
     transition: background 0.13s ease;
   }
   .section-toggle:hover { background: rgba(255,255,255,0.02); }
 
-  .capture-btn { background: linear-gradient(135deg, rgba(57,255,20,0.12) 0%, rgba(57,255,20,0.08) 100%); border: 1px solid rgba(57,255,20,0.3); color: #39FF14; box-shadow: 0 0 16px rgba(57,255,20,0.08); transition: all 0.3s ease; border-radius: 8px; }
+  .capture-btn { background: linear-gradient(135deg, rgba(216,255,99,0.12) 0%, rgba(216,255,99,0.08) 100%); border: 1px solid rgba(216,255,99,0.3); color: #D8FF63; box-shadow: 0 0 16px rgba(216,255,99,0.08); transition: all 0.3s ease; border-radius: 8px; }
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -294,7 +294,7 @@ const GLOBAL_STYLES = `
     transition: transform 0.5s ease;
   }
   .capture-btn:hover::before { transform: translateX(120%); }
-  .capture-btn:hover { box-shadow: 0 6px 24px rgba(251,191,36,0.4); transform: translateY(-1px); }
+  .capture-btn:hover { box-shadow: 0 6px 24px rgba(216,255,99,0.4); transform: translateY(-1px); }
   .capture-btn:active { transform: translateY(0); }
 
   .toggle-switch {
@@ -334,7 +334,7 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+    <div style={{ borderBottom: '0.5px solid rgba(255,255,255,0.03)' }}>
       <button className="section-toggle" onClick={() => setOpen(o => !o)}>
         <Icon size={11} style={{ color: accent ? ACCENT : 'var(--text-4)', flexShrink: 0 }} />
         <span className="flex-1 text-left text-[10px] font-semibold tracking-widest uppercase" style={{ color: open ? 'var(--text-2)' : 'var(--text-4)' }}>
@@ -439,7 +439,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
   const cursorX = `${hsl[1]}%`;
   const cursorY = `${100 - (hsl[2] / 50) * 100}%`;
 
-  const SWATCHES = ['#000000','#1a1a2e','#c0392b','#27ae60','#2980b9','#8e44ad','#f39c12','#ecf0f1','#fbbf24','#2c2c2c'];
+  const SWATCHES = ['#000000','#1a1a2e','#c0392b','#27ae60','#2980b9','#8e44ad','#f39c12','#ecf0f1','#D8FF63','#2c2c2c'];
 
   return (
     <div>
@@ -449,8 +449,8 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
           <button key={m} onClick={() => setMode(m)}
             className="pill-btn flex-1"
             style={{
-              background: mode === m ? 'rgba(251,191,36,0.1)' : 'var(--surface2)',
-              borderColor: mode === m ? 'rgba(251,191,36,0.3)' : 'var(--border)',
+              background: mode === m ? 'rgba(216,255,99,0.1)' : 'var(--surface2)',
+              borderColor: mode === m ? 'rgba(216,255,99,0.3)' : 'var(--border)',
               color: mode === m ? ACCENT : 'var(--text-3)',
             }}
           >
@@ -463,10 +463,10 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
         <div className="space-y-3">
           {/* Color preview + hex */}
           <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-lg shrink-0 overflow-hidden" style={{ border: '2px solid rgba(255,255,255,0.1)' }}>
+            <div className="relative w-10 h-10 rounded-md shrink-0 overflow-hidden" style={{ border: '2px solid rgba(255,255,255,0.1)' }}>
               <div className="absolute inset-0" style={{ background: color }} />
             </div>
-            <div className="flex items-center flex-1 rounded-lg px-3 py-2 gap-1.5"
+            <div className="flex items-center flex-1 rounded-md px-3 py-2 gap-1.5"
               style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
               <span className="font-mono text-[11px]" style={{ color: 'var(--text-4)' }}>#</span>
               <input
@@ -491,7 +491,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
                 style={{
                   background: c,
                   border: color.toLowerCase() === c.toLowerCase() ? `2px solid ${ACCENT}` : '1.5px solid rgba(255,255,255,0.1)',
-                  boxShadow: color.toLowerCase() === c.toLowerCase() ? `0 0 8px rgba(251,191,36,0.4)` : 'none',
+                  boxShadow: color.toLowerCase() === c.toLowerCase() ? `0 0 8px rgba(216,255,99,0.4)` : 'none',
                 }}
               />
             ))}
@@ -500,7 +500,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
       ) : (
         <div className="space-y-3">
           {/* SL Canvas */}
-          <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: '2/1', cursor: 'crosshair' }}>
+          <div className="relative rounded-md overflow-hidden" style={{ aspectRatio: '2/1', cursor: 'crosshair' }}>
             <canvas
               ref={canvasRef}
               width={240} height={120}
@@ -556,7 +556,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
               { label: 'RGB', value: rgb.join(', ') },
               { label: 'HSL', value: `${hsl[0]}° ${hsl[1]}% ${hsl[2]}%` },
             ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg px-2 py-2 text-center" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+              <div key={label} className="rounded-md px-2 py-2 text-center" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
                 <p className="text-[8px] font-bold uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-4)' }}>{label}</p>
                 <p className="text-[9px] font-semibold font-mono truncate" style={{ color: 'var(--text-2)' }}>{value}</p>
               </div>
@@ -586,14 +586,14 @@ function PanelCard({
   const [dragOver, setDragOver] = useState<string|null>(null);
 
   return (
-    <div className="panel-card" style={{ borderColor: loadedCount > 0 ? 'rgba(251,191,36,0.2)' : 'var(--border)' }}>
+    <div className="panel-card" style={{ borderColor: loadedCount > 0 ? 'rgba(216,255,99,0.2)' : 'var(--border)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: loadedCount > 0 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)' }}>
+      <div className="flex items-center justify-between px-3 py-2.5" style={{ borderBottom: '0.5px solid rgba(255,255,255,0.05)', background: loadedCount > 0 ? 'rgba(216,255,99,0.04)' : 'rgba(255,255,255,0.02)' }}>
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: loadedCount > 0 ? ACCENT : '#3f3f46' }} />
           <span className="text-[11px] font-semibold" style={{ color: loadedCount > 0 ? 'var(--text-1)' : 'var(--text-3)' }}>{face}</span>
           {loadedCount > 0 && (
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(251,191,36,0.1)', color: ACCENT }}>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(216,255,99,0.1)', color: ACCENT }}>
               {loadedCount}/{totalPanels}
             </span>
           )}
@@ -614,13 +614,13 @@ function PanelCard({
           <div key={panel}>
             {textures[panel] ? (
               /* Loaded state */
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)' }}>
-                <div className="w-7 h-7 rounded shrink-0 overflow-hidden" style={{ border: '1px solid rgba(251,191,36,0.2)' }}>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-md" style={{ background: 'rgba(216,255,99,0.06)', border: '1px solid rgba(216,255,99,0.15)' }}>
+                <div className="w-7 h-7 rounded shrink-0 overflow-hidden" style={{ border: '1px solid rgba(216,255,99,0.2)' }}>
                   <img src={textures[panel]} className="w-full h-full object-cover" alt={panel} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-semibold truncate" style={{ color: ACCENT }}>{panel}</p>
-                  <p className="text-[8px]" style={{ color: 'rgba(251,191,36,0.5)' }}>Texture loaded</p>
+                  <p className="text-[8px]" style={{ color: 'rgba(216,255,99,0.5)' }}>Texture loaded</p>
                 </div>
                 <button onClick={() => onRemove(panel)} className="shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all hover:scale-110"
                   style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
@@ -725,12 +725,12 @@ function SceneSettingsPanel({ settings, onUpdate, onReset }: {
           ] as const).map(({ id, label, icon: Icon }) => (
             <button key={id}
               onClick={() => onUpdate({ background: id, ...SKYBOX_LIGHTING[id] })}
-              className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl transition-all"
+              className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg transition-all"
               style={{
-                background: settings.background === id ? 'rgba(251,191,36,0.08)' : 'var(--surface2)',
-                border: `1px solid ${settings.background === id ? 'rgba(251,191,36,0.3)' : 'var(--border)'}`,
+                background: settings.background === id ? 'rgba(216,255,99,0.08)' : 'var(--surface2)',
+                border: `1px solid ${settings.background === id ? 'rgba(216,255,99,0.3)' : 'var(--border)'}`,
                 color: settings.background === id ? ACCENT : 'var(--text-3)',
-                boxShadow: settings.background === id ? '0 0 12px rgba(251,191,36,0.1)' : 'none',
+                boxShadow: settings.background === id ? '0 0 12px rgba(216,255,99,0.1)' : 'none',
               }}
             >
               <Icon size={14} />
@@ -739,10 +739,10 @@ function SceneSettingsPanel({ settings, onUpdate, onReset }: {
           ))}
         </div>
         <label
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl cursor-pointer transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer transition-all"
           style={{
-            background: settings.background === 'custom' ? 'rgba(251,191,36,0.08)' : 'var(--surface2)',
-            border: `1px solid ${settings.background === 'custom' ? 'rgba(251,191,36,0.3)' : 'var(--border)'}`,
+            background: settings.background === 'custom' ? 'rgba(216,255,99,0.08)' : 'var(--surface2)',
+            border: `1px solid ${settings.background === 'custom' ? 'rgba(216,255,99,0.3)' : 'var(--border)'}`,
             color: settings.background === 'custom' ? ACCENT : 'var(--text-3)',
           }}
         >
@@ -886,13 +886,13 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Ambient */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          <div className="absolute -top-48 -right-48 rounded-full" style={{ width:800, height:800, opacity:0.1, background:'radial-gradient(circle,#fbbf24 0%,transparent 60%)' }} />
-          <div className="absolute -bottom-32 -left-32 rounded-full" style={{ width:600, height:600, opacity:0.05, background:'radial-gradient(circle,#fbbf24 0%,transparent 65%)' }} />
+          <div className="absolute -top-48 -right-48 rounded-full" style={{ width:800, height:800, opacity:0.1, background:'radial-gradient(circle,#D8FF63 0%,transparent 60%)' }} />
+          <div className="absolute -bottom-32 -left-32 rounded-full" style={{ width:600, height:600, opacity:0.05, background:'radial-gradient(circle,#D8FF63 0%,transparent 65%)' }} />
         </div>
 
         {/* ── Navbar ── */}
         <nav className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-6"
-          style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',          borderBottom: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(251,191,36,0.06)' }}>
+          style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',          borderBottom: '0.5px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(216,255,99,0.06)' }}>
 
           <img src="/itzz.svg" alt="itzz" style={{ height: 28, width: 'auto' }} />
 
@@ -903,7 +903,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <Settings size={11} /> Settings
               </button>
               {showSettings && (
-                <div className="absolute left-0 top-full mt-2 w-80 rounded-2xl p-5 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
+                <div className="absolute left-0 top-full mt-2 w-80 rounded-xl p-5 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
                   <SceneSettingsPanel settings={settings} onUpdate={u => setSettings(s=>({...s,...u}))} onReset={() => setSettings({...DEFAULT_SETTINGS})} />
                 </div>
               )}
@@ -916,7 +916,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
           <div className="flex items-center gap-2">
             {user && (
-              <div className="flex items-center gap-2 px-3 rounded-lg" style={{ height:32, background:'rgba(255,255,255,0.03)', border:'1px solid var(--border)' }}>
+              <div className="flex items-center gap-2 px-3 rounded-md" style={{ height:32, background:'rgba(255,255,255,0.03)', border:'1px solid var(--border)' }}>
                 <div className="relative">
                   <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`} alt="" className="w-5 h-5 rounded-full" onError={e=>{(e.target as HTMLImageElement).style.display='none';}} />
                   <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full" style={{ background:ACCENT, border:'1.5px solid #080808' }} />
@@ -933,7 +933,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <MoreHorizontal size={11} /> Menu
               </button>
               {showMenu && (
-                <div className="absolute right-0 top-full mt-2 w-44 rounded-2xl overflow-hidden z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
+                <div className="absolute right-0 top-full mt-2 w-44 rounded-xl overflow-hidden z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
                   {[
                     { label:'Credits',    icon:Star,     action:()=>{ setShowCredits(true); setShowMenu(false); }, danger:false },
                     { label:'Disclaimer', icon:FileText,  action:()=>{ onShowDisclaimer(); setShowMenu(false); }, danger:false },
@@ -941,7 +941,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                   ].map((item, i, arr) => (
                     <button key={item.label} onClick={item.action}
                       className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-semibold transition-colors"
-                      style={{ background:'transparent', border:'none', borderBottom: i<arr.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none', color:'var(--text-3)', borderRadius:0 }}
+                      style={{ background:'transparent', border:'none', borderBottom: i<arr.length-1 ? '0.5px solid rgba(255,255,255,0.04)' : 'none', color:'var(--text-3)', borderRadius:0 }}
                       onMouseEnter={e=>{ (e.currentTarget as HTMLButtonElement).style.color=item.danger?'#f87171':'var(--text-1)'; (e.currentTarget as HTMLButtonElement).style.background=item.danger?'rgba(248,113,113,0.04)':'rgba(255,255,255,0.03)'; }}
                       onMouseLeave={e=>{ (e.currentTarget as HTMLButtonElement).style.color='var(--text-3)'; (e.currentTarget as HTMLButtonElement).style.background='transparent'; }}
                     >
@@ -959,7 +959,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-4" style={{ background:'rgba(0,0,0,0.6)', backdropFilter:'blur(4px)' }}>
             <div className="relative w-8 h-8">
-              <div className="absolute inset-0 rounded-full" style={{ border:'2px solid rgba(251,191,36,0.15)' }} />
+              <div className="absolute inset-0 rounded-full" style={{ border:'2px solid rgba(216,255,99,0.15)' }} />
               <div className="absolute inset-0 rounded-full animate-spin" style={{ border:'2px solid transparent', borderTopColor:ACCENT }} />
             </div>
             <p className="text-[10px] font-semibold tracking-widest uppercase" style={{ color:'var(--text-4)' }}>{loading}</p>
@@ -968,7 +968,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Error */}
         {error && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl z-10 text-[11px] font-semibold"
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-lg z-10 text-[11px] font-semibold"
             style={{ background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', animation:'slideDown 0.2s ease both' }}>
             {error}
           </div>
@@ -977,7 +977,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {/* Empty */}
         {!glbUrl && !loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3 z-10">
-            <Box size={40} strokeWidth={0.75} style={{ color:'rgba(251,191,36,0.15)' }} />
+            <Box size={40} strokeWidth={0.75} style={{ color:'rgba(216,255,99,0.15)' }} />
             <p className="text-[11px] font-bold tracking-widest uppercase" style={{ color:'#27272a' }}>Select a Vehicle</p>
             <p className="text-[10px]" style={{ color:'#1f1f23' }}>Choose a model from the panel</p>
           </div>
@@ -992,7 +992,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <ChevronDown size={9} style={{ transform:showAngleMenu?'rotate(180deg)':'none', transition:'transform 0.2s' }} />
               </button>
               {showAngleMenu && (
-                <div className="absolute bottom-full mb-2 right-0 rounded-2xl overflow-hidden w-48 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideUp 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
+                <div className="absolute bottom-full mb-2 right-0 rounded-xl overflow-hidden w-48 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideUp 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
                   {([
                     { group:'Sides' },
                     { side:'front', label:'Front' },{ side:'back', label:'Back' },{ side:'left', label:'Left' },{ side:'right', label:'Right' },
@@ -1006,7 +1006,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     <button key={e.side} onClick={() => { handleShowcase(e.side as ShowcaseSide); setShowAngleMenu(false); }}
                       className="w-full text-left px-4 py-2 text-[11px] font-medium transition-colors"
                       style={{ color:'var(--text-3)', background:'transparent', border:'none' }}
-                      onMouseEnter={e=>{ (e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.05)'; (e.currentTarget as HTMLButtonElement).style.color='var(--text-1)'; }}
+                      onMouseEnter={e=>{ (e.currentTarget as HTMLButtonElement).style.background='rgba(216,255,99,0.05)'; (e.currentTarget as HTMLButtonElement).style.color='var(--text-1)'; }}
                       onMouseLeave={ev=>{ (ev.currentTarget as HTMLButtonElement).style.background='transparent'; (ev.currentTarget as HTMLButtonElement).style.color='var(--text-3)'; }}
                     >{e.label}</button>
                   ))}
@@ -1024,16 +1024,16 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="absolute bottom-12 left-6 z-20 pointer-events-auto">
             <button 
               onClick={() => setShowLiveryPanel(true)}
-              className="px-4 py-2.5 flex items-center justify-center gap-2 rounded-lg transition-all capture-btn"
+              className="px-4 py-2.5 flex items-center justify-center gap-2 rounded-md transition-all capture-btn"
               style={{ 
-                background: 'rgba(57,255,20,0.1)', 
-                border: '1px solid rgba(57,255,20,0.3)',
+                background: 'rgba(216,255,99,0.1)', 
+                border: '1px solid rgba(216,255,99,0.3)',
                 color: ACCENT,
                 animation:'fadeIn 1s ease 0.5s both',
                 opacity:0
               }}
-              onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(57,255,20,0.2)'}
-              onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(57,255,20,0.1)'}
+              onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+              onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
             >
               <ImageIcon size={12} />
               <span className="text-[10px] font-semibold">Open Livery Panel</span>
@@ -1043,7 +1043,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Footer */}
         <div className="absolute bottom-5 left-6 z-20 pointer-events-none flex items-center gap-2" style={{ animation:'fadeIn 1s ease 0.5s both', opacity:0 }}>
-          <div style={{ width:16, height:1, background:'linear-gradient(to right, transparent, rgba(57,255,20,0.4), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
+          <div style={{ width:16, height:1, background:'linear-gradient(to right, transparent, rgba(216,255,99,0.4), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
           <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color:'var(--text-4)' }}>Developed by itzz industries</p>
         </div>
 
@@ -1051,21 +1051,21 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {showCredits && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)' }}
             onMouseDown={e=>{ if (e.target===e.currentTarget) setShowCredits(false); }}>
-            <div className="w-full max-w-sm rounded-2xl overflow-hidden" style={{ background:'#0a0a0a', border:'1px solid rgba(255,255,255,0.08)', animation:'slideDown 0.25s cubic-bezier(0.16,1,0.3,1) both', boxShadow:'0 32px 80px rgba(0,0,0,0.9)' }}>
-              <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+            <div className="w-full max-w-sm rounded-lg overflow-hidden" style={{ background:'#0a0a0a', border:'1px solid rgba(255,255,255,0.08)', animation:'slideDown 0.25s cubic-bezier(0.16,1,0.3,1) both', boxShadow:'0 32px 80px rgba(0,0,0,0.9)' }}>
+              <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom:'0.5px solid rgba(255,255,255,0.05)' }}>
                 <p className="text-sm font-bold tracking-widest uppercase" style={{ color:'var(--text-2)' }}>Credits</p>
-                <button onClick={()=>setShowCredits(false)} className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ color:'var(--text-4)' }}>
+                <button onClick={()=>setShowCredits(false)} className="w-7 h-7 rounded-md flex items-center justify-center transition-colors" style={{ color:'var(--text-4)' }}>
                   <X size={12} />
                 </button>
               </div>
               <div className="px-6 py-5 space-y-3">
                 {[{ name:'Sonarsilly', role:'Backend Development' },{ name:'Link', role:'Frontend Development' }].map(p => (
-                  <div key={p.name} className="flex items-center justify-between px-4 py-4 rounded-xl" style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.06)' }}>
+                  <div key={p.name} className="flex items-center justify-between px-4 py-4 rounded-md" style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.06)' }}>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background:'rgba(57,255,20,0.1)', color:'#39FF14', border:'1px solid rgba(57,255,20,0.2)' }}>{p.name[0]}</div>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background:'rgba(216,255,99,0.1)', color:'#D8FF63', border:'1px solid rgba(216,255,99,0.2)' }}>{p.name[0]}</div>
                       <p className="text-sm font-semibold" style={{ color:'var(--text-1)' }}>{p.name}</p>
                     </div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color:'#39FF14' }}>{p.role}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color:'#D8FF63' }}>{p.role}</p>
                   </div>
                 ))}
               </div>
@@ -1097,26 +1097,26 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           className="fixed left-0 top-0 h-full w-80 z-30 flex flex-col overflow-hidden"
           style={{
             background: 'rgba(0,0,0,0.98)',
-            borderRight: '1px solid rgba(57,255,20,0.2)',
-            boxShadow: '4px 0 24px rgba(57,255,20,0.15)',
+            borderRight: '1px solid rgba(216,255,99,0.2)',
+            boxShadow: '4px 0 24px rgba(216,255,99,0.15)',
             transform: showLiveryPanel ? 'translateX(0)' : 'translateX(-100%)',
             transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1)'
           }}
         >
           {/* Panel Header */}
-          <div className="relative flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(57,255,20,0.15)', background: 'rgba(57,255,20,0.05)' }}>
+          <div className="relative flex items-center justify-between px-6 py-5" style={{ borderBottom: '0.5px solid rgba(216,255,99,0.08)', background: 'rgba(216,255,99,0.05)' }}>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(57,255,20,0.15)', border: '1px solid rgba(57,255,20,0.3)' }}>
-                <ImageIcon size={14} style={{ color: '#39FF14' }} />
+              <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: 'rgba(216,255,99,0.15)', border: '1px solid rgba(216,255,99,0.3)' }}>
+                <ImageIcon size={14} style={{ color: '#D8FF63' }} />
               </div>
               <div>
                 <h3 className="text-sm font-bold" style={{ color: 'var(--text-1)' }}>{selectedModel.name}</h3>
-                <p className="text-[10px]" style={{ color: '#39FF14' }}>Livery Panel</p>
+                <p className="text-[10px]" style={{ color: '#D8FF63' }}>Livery Panel</p>
               </div>
             </div>
             <button 
               onClick={() => setShowLiveryPanel(false)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+              className="w-8 h-8 rounded-md flex items-center justify-center transition-all hover:scale-110"
               style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
               onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'}
               onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'}
@@ -1130,37 +1130,37 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             {/* Panel Number Controls */}
             <div>
               <Label>Panel Numbers</Label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-5 gap-4">
                 {PANELS.map(face => (
-                  <div key={face} className="flex flex-col items-center gap-3 p-4 rounded-xl" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-2)' }}>{face}</span>
-                    <div className="flex items-center gap-2 bg-black/40 rounded-xl p-2" style={{ border: '1px solid rgba(57,255,20,0.3)', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                  <div key={face} className="flex flex-col items-center gap-2 p-3 rounded-md" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-2)' }}>{face}</span>
+                    <div className="flex items-center gap-1 bg-black/40 rounded-md p-1.5" style={{ border: '1px solid rgba(216,255,99,0.3)', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
                       <button 
                         onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all capture-btn"
+                        className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-all capture-btn"
                         style={{ 
-                          background: 'rgba(57,255,20,0.15)', 
-                          border: '1px solid rgba(57,255,20,0.4)', 
-                          color: '#39FF14',
-                          minWidth: '32px',
-                          minHeight: '32px'
+                          background: 'rgba(216,255,99,0.15)', 
+                          border: '1px solid rgba(216,255,99,0.4)', 
+                          color: '#D8FF63',
+                          minWidth: '24px',
+                          minHeight: '24px'
                         }}
-                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(57,255,20,0.25)'}
-                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(57,255,20,0.15)'}
+                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.25)'}
+                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.15)'}
                       >-</button>
-                      <span className="text-[12px] font-bold min-w-[28px] text-center" style={{ color: '#39FF14', margin: '0 6px', textShadow: '0 0 8px rgba(57,255,20,0.5)' }}>{panelNums[face]}</span>
+                      <span className="text-[10px] font-bold min-w-[20px] text-center" style={{ color: '#D8FF63', margin: '0 3px', textShadow: '0 0 6px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
                       <button 
                         onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all capture-btn"
+                        className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-all capture-btn"
                         style={{ 
-                          background: 'rgba(57,255,20,0.15)', 
-                          border: '1px solid rgba(57,255,20,0.4)', 
-                          color: '#39FF14',
-                          minWidth: '32px',
-                          minHeight: '32px'
+                          background: 'rgba(216,255,99,0.15)', 
+                          border: '1px solid rgba(216,255,99,0.4)', 
+                          color: '#D8FF63',
+                          minWidth: '24px',
+                          minHeight: '24px'
                         }}
-                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(57,255,20,0.25)'}
-                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(57,255,20,0.15)'}
+                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.25)'}
+                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.15)'}
                       >+</button>
                     </div>
                   </div>
@@ -1174,10 +1174,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div className="space-y-3">
                 {PANELS.map(face => (
                   <div key={face} className="space-y-2">
-                    <div className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-md" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
                       <span className="text-[11px] font-semibold" style={{ color: 'var(--text-2)' }}>{face} Panels</span>
                       <div className="flex gap-2">
-                        <button className="px-3 py-1.5 rounded text-[10px] font-semibold transition-all capture-btn" style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#0ff880' }}>
+                        <button className="px-3 py-1.5 rounded text-[10px] font-semibold transition-all capture-btn" style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: '#D8FF63' }}>
                           <Upload size={10} /> Upload
                         </button>
                         <button 
@@ -1205,13 +1205,13 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                       {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
                         <div key={panel} className="relative group">
                           {textures[panel] ? (
-                            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'rgba(0,255,136,0.06)', border: '1px solid rgba(0,255,136,0.15)' }}>
-                              <div className="w-6 h-6 rounded overflow-hidden" style={{ border: '1px solid rgba(0,255,136,0.2)' }}>
+                            <div className="flex items-center gap-2 px-3 py-2 rounded-md" style={{ background: 'rgba(216,255,99,0.06)', border: '1px solid rgba(216,255,99,0.15)' }}>
+                              <div className="w-6 h-6 rounded overflow-hidden" style={{ border: '1px solid rgba(216,255,99,0.2)' }}>
                                 <img src={textures[panel]} className="w-full h-full object-cover" alt={panel} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-semibold truncate" style={{ color: '#0ff880' }}>{panel}</p>
-                                <p className="text-[8px]" style={{ color: 'rgba(0,255,136,0.5)' }}>Texture loaded</p>
+                                <p className="text-[10px] font-semibold truncate" style={{ color: '#D8FF63' }}>{panel}</p>
+                                <p className="text-[8px]" style={{ color: 'rgba(216,255,99,0.5)' }}>Texture loaded</p>
                               </div>
                               <button 
                                 onClick={() => handleRemoveTexture(panel)}
@@ -1223,7 +1223,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                               </button>
                             </div>
                           ) : (
-                            <label className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all drop-zone" style={{ background: 'var(--surface2)', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                            <label className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-all drop-zone" style={{ background: 'var(--surface2)', border: '1px dashed rgba(255,255,255,0.1)' }}>
                               <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.1)' }}>
                                 <Upload size={8} style={{ color: 'var(--text-4)' }} />
                               </div>
@@ -1279,13 +1279,13 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
           {/* Search */}
           <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={10} style={{ color: '#39FF14' }} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={10} style={{ color: '#D8FF63' }} />
             <input type="text" placeholder="Search vehicles…" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
-              className="w-full rounded-lg text-[11px] pl-8 pr-8 py-2.5 outline-none"
+              className="w-full rounded-md text-[11px] pl-8 pr-8 py-2.5 outline-none"
               style={{ background:'var(--surface2)', border:'1px solid var(--border)', color:'var(--text-2)' }}
-              onFocus={e=>(e.target.style.borderColor='rgba(57,255,20,0.35)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+              onFocus={e=>(e.target.style.borderColor='rgba(216,255,99,0.35)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
             {searchQuery && (
-              <button onClick={()=>setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#39FF14' }}>
+              <button onClick={()=>setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#D8FF63' }}>
                 <X size={9} />
               </button>
             )}
@@ -1298,7 +1298,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               {([['list', List], ['grid', Grid]] as const).map(([mode, Icon]) => (
                 <button key={mode} onClick={() => setVehicleViewMode(mode)}
                   className="w-6 h-6 rounded flex items-center justify-center transition-all"
-                  style={{ background: vehicleViewMode===mode ? 'rgba(57,255,20,0.1)' : 'transparent', border: `1px solid ${vehicleViewMode===mode ? 'rgba(57,255,20,0.25)' : 'transparent'}`, color: vehicleViewMode===mode ? '#39FF14' : '#39FF14' }}>
+                  style={{ background: vehicleViewMode===mode ? 'rgba(216,255,99,0.1)' : 'transparent', border: `1px solid ${vehicleViewMode===mode ? 'rgba(216,255,99,0.25)' : 'transparent'}`, color: vehicleViewMode===mode ? '#D8FF63' : '#D8FF63' }}>
                   <Icon size={10} />
                 </button>
               ))}
@@ -1330,7 +1330,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     className={`vehicle-card text-left ${selectedModel?.id===m.id ? 'sel' : ''}`}>
                     <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
                       <img 
-                        src={`/Livery Previewer/previewer/public/${m.name}-front-left.png`}
+                        src={`/${m.name}-front-left.png`}
                         alt={m.name}
                         className="w-full h-full object-cover"
                         style={{ opacity: selectedModel?.id===m.id ? 1 : 0.7 }}
@@ -1367,9 +1367,9 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="flex gap-2 mb-3">
             <input placeholder="Name this preset…" value={presetName} onChange={e=>setPresetName(e.target.value)}
               onKeyDown={e=>e.key==='Enter'&&handleSavePreset()}
-              className="flex-1 rounded-lg text-[11px] px-3 py-2 outline-none min-w-0"
+              className="flex-1 rounded-md text-[11px] px-3 py-2 outline-none min-w-0"
               style={{ background:'var(--surface2)', border:'1px solid var(--border)', color:'var(--text-2)' }}
-              onFocus={e=>(e.target.style.borderColor='rgba(251,191,36,0.35)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+              onFocus={e=>(e.target.style.borderColor='var(--accent)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
             <button onClick={handleSavePreset} disabled={!presetName.trim()||savingPreset}
               className="capture-btn flex items-center justify-center gap-1 shrink-0 disabled:opacity-30"
               style={{ width:36, height:36, borderRadius:8 }}>
@@ -1388,7 +1388,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <div key={p.id} className="preset-card group" onClick={()=>handleLoadPreset(p)}>
                   <div className="flex items-center gap-3 px-3 py-3">
                     {/* Color dot */}
-                    <div className="w-7 h-7 rounded-lg shrink-0" style={{ background: p.vehicleColor, border:'1.5px solid rgba(255,255,255,0.1)' }} />
+                    <div className="w-7 h-7 rounded-md shrink-0" style={{ background: p.vehicleColor, border:'1.5px solid rgba(255,255,255,0.1)' }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-semibold truncate" style={{ color:'var(--text-1)' }}>{p.name}</p>
                       <p className="text-[9px] truncate mt-0.5" style={{ color:'var(--text-4)' }}>

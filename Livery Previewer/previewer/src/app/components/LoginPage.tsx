@@ -1,6 +1,4 @@
-import { useEffect, useRef } from 'react';
-
-const [showCookies, setShowCookies] = useState(false);
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   onLogin: () => void;
@@ -67,47 +65,40 @@ function CarSpinner() {
         (gltf: any) => {
           const model = gltf.scene;
 
-          // Compute tight bounding box
           const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
 
-          // Normalize scale so largest dimension = 4 units
           const scale = 4 / maxDim;
           model.scale.setScalar(scale);
 
-          // Recompute after scale
           const box2 = new THREE.Box3().setFromObject(model);
           const center2 = box2.getCenter(new THREE.Vector3());
           const size2 = box2.getSize(new THREE.Vector3());
 
-          // Center horizontally, sit on ground
           model.position.set(-center2.x, -box2.min.y, -center2.z);
 
-          // Wrap in pivot for rotation
           pivot = new THREE.Object3D();
           pivot.add(model);
           scene.add(pivot);
 
-          // Position camera based on actual model size
-const dist = size2.z * 1.1;
-const height = size2.y * 0.8;
-camera.position.set(-0.5, height, dist);
-camera.lookAt(-0.5, size2.y * 0.4, 0);
+          const dist = size2.z * 1.1;
+          const height = size2.y * 0.8;
+          camera.position.set(-0.5, height, dist);
+          camera.lookAt(-0.5, size2.y * 0.4, 0);
 
-model.traverse((child: any) => {
-  if (child.isMesh) {
-    child.castShadow = true;
-    child.receiveShadow = true;
-    child.material = new THREE.MeshBasicMaterial({
-      color: '#c4ff0d',
-      wireframe: true,
-      transparent: true,
-      opacity: 0.4,
-    });
-  }
-});
+          model.traverse((child: any) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              child.material = new THREE.MeshBasicMaterial({
+                color: '#c4ff0d',
+                wireframe: true,
+                transparent: true,
+                opacity: 0.4,
+              });
+            }
+          });
         },
         undefined,
         (err: any) => console.warn('Model load failed', err),
@@ -152,13 +143,13 @@ model.traverse((child: any) => {
 }
 
 export default function LoginPage({ onLogin, onDisclaimer }: Props) {
+  const [showCookies, setShowCookies] = useState(false);
+
   return (
     <div className="relative flex h-screen bg-[#080808] text-white overflow-hidden">
 
       {/* ── Background layer ── */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-
-        {/* Vector SVG watermark */}
         <img
           src="/Vector_(7).svg"
           alt=""
@@ -175,14 +166,9 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
             pointerEvents: 'none',
           }}
         />
-
-        {/* Lime glow top-right */}
         <div className="absolute -top-32 -right-32 rounded-full" style={{ width: 700, height: 700, opacity: 0.2, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 65%)' }} />
-        {/* Lime glow bottom-left */}
         <div className="absolute -bottom-24 -left-24 rounded-full" style={{ width: 500, height: 500, opacity: 0.12, background: 'radial-gradient(circle, #88ff00 0%, transparent 65%)' }} />
-        {/* Center glow */}
         <div className="absolute rounded-full" style={{ width: 620, height: 620, top: '50%', left: '58%', transform: 'translate(-50%,-50%)', opacity: 0.09, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 60%)' }} />
-        {/* Scatter */}
         <div className="absolute rounded-full" style={{ width: 280, height: 280, top: '33%', left: '22%', opacity: 0.07, background: 'radial-gradient(circle, #aaff00 0%, transparent 70%)' }} />
       </div>
 
@@ -202,7 +188,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         <img src="/itzz.svg" alt="itzz" className="h-7 w-auto" />
 
         <div className="flex items-center gap-2">
-          {/* Contact Us — lime accent */}
           <button
             onClick={() => window.open('https://discord.gg/itzz', '_blank')}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
@@ -214,7 +199,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           >
             Contact Us
           </button>
-          {/* Legal */}
           <button
             onClick={onDisclaimer}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
@@ -225,7 +209,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           >
             Legal
           </button>
-          {/* Cookie */}
           <button
             onClick={() => setShowCookies(true)}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
@@ -239,7 +222,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         </div>
       </nav>
 
-      {/* Cookie modal */}
+      {/* ── Cookie modal ── */}
       {showCookies && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
@@ -287,11 +270,10 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           </div>
         </div>
       )}
-      
+
       {/* ── Left: login content ── */}
       <div className="relative z-10 flex flex-col justify-center px-16 w-[44%] gap-7">
 
-        {/* Group_15 heading — large, no black bg */}
         <img
           src="/Group_15.svg"
           alt="Livery Previewer"
@@ -303,7 +285,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           }}
         />
 
-        {/* Description */}
         <p
           className="text-[13px] text-zinc-400 leading-relaxed max-w-xs pl-4"
           style={{ borderLeft: '2px solid rgba(196,255,13,0.4)' }}
@@ -312,7 +293,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           <span className="text-zinc-600">Built exclusively for itzz community members.</span>
         </p>
 
-        {/* Stats */}
         <div className="flex items-stretch gap-3">
           <div
             className="flex flex-col justify-center rounded-xl px-5 py-3 min-w-[85px]"
@@ -340,7 +320,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           </div>
         </div>
 
-        {/* Discord CTA */}
         <button
           onClick={onLogin}
           className="flex items-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] text-white text-[11px] font-bold tracking-widest uppercase px-6 py-3.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.99] w-fit"
@@ -352,7 +331,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           Login with Discord
         </button>
 
-        {/* Access note */}
         <div className="flex items-center gap-2">
           <div className="h-px w-4 bg-white/10" />
           <p className="text-[10px] text-zinc-600 tracking-[0.2em] uppercase">
@@ -366,7 +344,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         className="absolute right-0 top-0 bottom-0 w-[62%] z-10"
         style={{ background: 'transparent' }}
       >
-        {/* Bottom fade */}
         <div
           className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none"
           style={{
@@ -374,7 +351,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
             background: 'linear-gradient(to top, #080808 0%, transparent 100%)',
           }}
         />
-        {/* Top fade */}
         <div
           className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
           style={{
@@ -382,7 +358,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
             background: 'linear-gradient(to bottom, #080808 0%, transparent 100%)',
           }}
         />
-        {/* Lime spotlight glow */}
         <div
           className="absolute inset-0 pointer-events-none z-0"
           style={{

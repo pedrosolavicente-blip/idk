@@ -1174,12 +1174,39 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div className="space-y-3">
                 {PANELS.map(face => (
                   <div key={face} className="space-y-2">
-                    <div className="flex items-center justify-between px-3 py-2 rounded-md" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                      <span className="text-[11px] font-semibold" style={{ color: 'var(--text-2)' }}>{face} Panels</span>
+                    <div className="flex items-center justify-between px-4 py-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                      <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-2)' }}>{face} Panels</span>
                       <div className="flex gap-2">
-                        <button className="px-3 py-1.5 rounded text-[10px] font-semibold transition-all capture-btn" style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: '#D8FF63' }}>
-                          <Upload size={10} /> Upload
-                        </button>
+                        <label className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-all"
+                          style={{ 
+                            background: 'rgba(216,255,99,0.08)', 
+                            border: '1px solid rgba(216,255,99,0.25)', 
+                            color: '#D8FF63',
+                            fontSize: '10px',
+                            fontWeight: '600'
+                          }}
+                          onMouseEnter={e => (e.target as HTMLLabelElement).style.background = 'rgba(216,255,99,0.12)'}
+                          onMouseLeave={e => (e.target as HTMLLabelElement).style.background = 'rgba(216,255,99,0.08)'}
+                        >
+                          <Upload size={9} />
+                          <span>Upload</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            multiple
+                            className="hidden"
+                            onChange={e => {
+                              const files = Array.from(e.target.files || []);
+                              files.forEach(file => {
+                                const availableSlots = Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`)
+                                  .filter(slot => !textures[slot]);
+                                if (availableSlots.length > 0) {
+                                  handleTextureUpload(availableSlots[0], file);
+                                }
+                              });
+                            }} 
+                          />
+                        </label>
                         <button 
                           onClick={() => {
                             // Remove all textures for this face
@@ -1190,12 +1217,19 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                             setTextures(nextTextures);
                             if (glbUrl) applyLivery(glbUrl, vehicleColor, nextTextures);
                           }}
-                          className="px-3 py-1.5 rounded text-[10px] font-semibold transition-all"
-                          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}
-                          onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.2)'}
-                          onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'}
+                          className="flex items-center gap-2 px-3 py-2 rounded-md transition-all"
+                          style={{ 
+                            background: 'rgba(239,68,68,0.08)', 
+                            border: '1px solid rgba(239,68,68,0.25)', 
+                            color: '#ef4444',
+                            fontSize: '10px',
+                            fontWeight: '600'
+                          }}
+                          onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)'}
+                          onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)'}
                         >
-                          <Trash2 size={10} /> Remove All
+                          <Trash2 size={9} />
+                          <span>Clear All</span>
                         </button>
                       </div>
                     </div>
@@ -1205,31 +1239,31 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                       {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
                         <div key={panel} className="relative group">
                           {textures[panel] ? (
-                            <div className="flex items-center gap-2 px-3 py-2 rounded-md" style={{ background: 'rgba(216,255,99,0.06)', border: '1px solid rgba(216,255,99,0.15)' }}>
-                              <div className="w-6 h-6 rounded overflow-hidden" style={{ border: '1px solid rgba(216,255,99,0.2)' }}>
+                            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: 'rgba(216,255,99,0.04)', border: '1px solid rgba(216,255,99,0.12)' }}>
+                              <div className="w-7 h-7 rounded-md overflow-hidden flex-shrink-0" style={{ border: '1px solid rgba(216,255,99,0.18)' }}>
                                 <img src={textures[panel]} className="w-full h-full object-cover" alt={panel} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-semibold truncate" style={{ color: '#D8FF63' }}>{panel}</p>
-                                <p className="text-[8px]" style={{ color: 'rgba(216,255,99,0.5)' }}>Texture loaded</p>
+                                <p className="text-[10px] font-bold truncate" style={{ color: '#D8FF63' }}>{panel}</p>
+                                <p className="text-[8px] font-medium" style={{ color: 'rgba(216,255,99,0.6)' }}>Loaded</p>
                               </div>
                               <button 
                                 onClick={() => handleRemoveTexture(panel)}
-                                className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center transition-all"
-                                style={{ color:'var(--text-4)', background:'rgba(255,255,255,0.04)' }}
-                                onMouseEnter={e=>{ (e.currentTarget.style.color='#f87171'); (e.currentTarget.style.background='rgba(239,68,68,0.08)'); }}
-                                onMouseLeave={e=>{ (e.currentTarget.style.color='var(--text-4)'); (e.currentTarget.style.background='rgba(255,255,255,0.04)'); }}>
-                                <X size={8} />
+                                className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-md flex items-center justify-center transition-all flex-shrink-0"
+                                style={{ color:'var(--text-4)', background:'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                                onMouseEnter={e=>{ (e.currentTarget.style.color='#f87171'); (e.currentTarget.style.background='rgba(239,68,68,0.08)'); (e.currentTarget.style.borderColor='rgba(239,68,68,0.15)'); }}
+                                onMouseLeave={e=>{ (e.currentTarget.style.color='var(--text-4)'); (e.currentTarget.style.background='rgba(255,255,255,0.03)'); (e.currentTarget.style.borderColor='rgba(255,255,255,0.08)'); }}>
+                                <X size={9} />
                               </button>
                             </div>
                           ) : (
-                            <label className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-all drop-zone" style={{ background: 'var(--surface2)', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                              <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                                <Upload size={8} style={{ color: 'var(--text-4)' }} />
+                            <label className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all drop-zone" style={{ background: 'var(--surface2)', border: '1.5px dashed rgba(255,255,255,0.15)' }}>
+                              <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.03)', border: '1.5px dashed rgba(255,255,255,0.15)' }}>
+                                <Upload size={9} style={{ color: 'var(--text-4)' }} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-medium" style={{ color: 'var(--text-3)' }}>{panel}</p>
-                                <p className="text-[8px]" style={{ color: 'var(--text-4)' }}>Click to upload</p>
+                                <p className="text-[10px] font-semibold" style={{ color: 'var(--text-3)' }}>{panel}</p>
+                                <p className="text-[8px] font-medium" style={{ color: 'var(--text-4)' }}>Click to upload</p>
                               </div>
                               <input 
                                 type="file" 

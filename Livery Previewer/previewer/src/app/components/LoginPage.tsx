@@ -102,6 +102,8 @@ model.traverse((child: any) => {
     mats.forEach((m: any) => {
       m.wireframe = true;
       m.color.set('#c4ff0d');
+      m.transparent = true;
+      m.opacity = 0.4;
     });
   }
 });

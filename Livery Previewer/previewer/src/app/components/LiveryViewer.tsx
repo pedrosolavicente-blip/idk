@@ -18,7 +18,7 @@ import type { LiveryConfig } from '../../lib/showcaseApi';
 
 const PANELS   = ['Left', 'Right', 'Top', 'Front', 'Back'] as const;
 type PanelFace = typeof PANELS[number];
-const ACCENT   = '#fbbf24';
+const ACCENT   = '#D8FF63'; // Neon yellow
 
 const DEFAULT_SETTINGS: SceneSettings = {
   brightness: 1.1, skyRotX: 0, skyRotY: 0, skyRotZ: 0,
@@ -98,13 +98,13 @@ const GLOBAL_STYLES = `
   *, *::before, *::after { font-family: 'Inter', sans-serif !important; }
 
   :root {
-    --accent: #fbbf24;
+    --accent: #D8FF63;
     --surface0: #080808;
     --surface1: #0e0e0e;
     --surface2: #161616;
     --surface3: #1e1e1e;
     --border: rgba(255,255,255,0.07);
-    --border-accent: rgba(251,191,36,0.28);
+    --border-accent: rgba(216,255,99,0.28);
     --text-1: #f4f4f5;
     --text-2: #a1a1aa;
     --text-3: #71717a;
@@ -118,8 +118,8 @@ const GLOBAL_STYLES = `
 
   .lv-sidebar::-webkit-scrollbar       { width: 2px; }
   .lv-sidebar::-webkit-scrollbar-track { background: transparent; }
-  .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(251,191,36,0.2); border-radius: 99px; }
-  .lv-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(251,191,36,0.45); }
+  .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(216,255,99,0.2); border-radius: 99px; }
+  .lv-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(216,255,99,0.45); }
 
   .lv-list::-webkit-scrollbar       { width: 2px; }
   .lv-list::-webkit-scrollbar-track { background: transparent; }
@@ -139,13 +139,13 @@ const GLOBAL_STYLES = `
     border-radius: 50%;
     background: var(--accent);
     border: 2px solid #080808;
-    box-shadow: 0 0 8px rgba(251,191,36,0.5);
+    box-shadow: 0 0 8px rgba(216,255,99,0.5);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .lv-range::-webkit-slider-thumb:hover {
     transform: scale(1.2);
-    box-shadow: 0 0 14px rgba(251,191,36,0.7);
+    box-shadow: 0 0 14px rgba(216,255,99,0.7);
   }
 
   .hue-range {
@@ -186,8 +186,8 @@ const GLOBAL_STYLES = `
     transition: all 0.15s ease;
     white-space: nowrap;
   }
-  .nav-item:hover { border-color: rgba(251,191,36,0.2); color: var(--text-2); }
-  .nav-item.active { border-color: var(--border-accent); background: rgba(251,191,36,0.08); color: var(--accent); box-shadow: 0 0 12px rgba(251,191,36,0.08); }
+  .nav-item:hover { border-color: rgba(216,255,99,0.2); color: var(--text-2); }
+  .nav-item.active { border-color: var(--border-accent); background: rgba(216,255,99,0.08); color: var(--accent); box-shadow: 0 0 12px rgba(216,255,99,0.08); }
 
   .vehicle-row {
     display: flex; align-items: center;
@@ -200,7 +200,7 @@ const GLOBAL_STYLES = `
   }
   .vehicle-row:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); transition: all 0.3s ease-out; }
   .vehicle-row:hover { transform: scale(1.02); }
-  .vehicle-row.sel   { background: rgba(251,191,36,0.07); border-color: rgba(251,191,36,0.2); transition: all 0.3s ease-out; }
+  .vehicle-row.sel   { background: rgba(216,255,99,0.07); border-color: rgba(216,255,99,0.2); transition: all 0.3s ease-out; }
 
   .vehicle-card {
     border-radius: 10px;
@@ -212,8 +212,8 @@ const GLOBAL_STYLES = `
     aspect-ratio: 4/3;
     display: flex; flex-direction: column;
   }
-  .vehicle-card:hover { border-color: rgba(251,191,36,0.2); transform: translateY(-1px) scale(1.02); }
-  .vehicle-card.sel   { border-color: rgba(251,191,36,0.5); box-shadow: 0 0 16px rgba(251,191,36,0.12); }
+  .vehicle-card:hover { border-color: rgba(216,255,99,0.2); transform: translateY(-1px) scale(1.02); }
+  .vehicle-card.sel   { border-color: rgba(216,255,99,0.5); box-shadow: 0 0 16px rgba(216,255,99,0.12); }
 
   .panel-card {
     border-radius: 10px;
@@ -222,8 +222,8 @@ const GLOBAL_STYLES = `
     overflow: hidden;
     transition: border-color 0.15s ease;
   }
-  .panel-card.loaded { border-color: rgba(251,191,36,0.25); background: rgba(251,191,36,0.04); }
-  .panel-card:hover  { border-color: rgba(251,191,36,0.2); }
+  .panel-card.loaded { border-color: rgba(216,255,99,0.25); background: rgba(216,255,99,0.04); }
+  .panel-card:hover  { border-color: rgba(216,255,99,0.2); }
 
   .drop-zone {
     border: 1.5px dashed rgba(255,255,255,0.1);
@@ -262,7 +262,7 @@ const GLOBAL_STYLES = `
     color: #000;
     box-shadow: 0 0 14px rgba(251,191,36,0.3);
   }
-  .pill-btn:not(.active):hover { border-color: rgba(251,191,36,0.25); color: var(--text-2); }
+  .pill-btn:not(.active):hover { border-color: rgba(216,255,99,0.15); color: var(--text-2); background: linear-gradient(to right, rgba(216,255,99,0.1), rgba(216,255,99,0.02)); }
 
   .section-toggle {
     width: 100%;
@@ -277,8 +277,9 @@ const GLOBAL_STYLES = `
   .section-toggle:hover { background: rgba(255,255,255,0.02); }
 
   .capture-btn {
-    background: var(--accent);
-    color: #000;
+    background: linear-gradient(135deg, rgba(216,255,99,0.12) 0%, rgba(216,255,99,0.08) 100%);
+    border: 1px solid rgba(216,255,99,0.3);
+    color: #D8FF63;
     border: none;
     border-radius: 10px;
     font-size: 12px;
@@ -1023,10 +1024,32 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         )}
 
+        {/* Livery Panel Trigger */}
+        {selectedModel && (
+          <div className="absolute bottom-12 left-6 z-20 pointer-events-auto">
+            <button 
+              onClick={() => setShowLiveryPanel(true)}
+              className="px-4 py-2.5 flex items-center justify-center gap-2 rounded-lg transition-all capture-btn"
+              style={{ 
+                background: 'rgba(216,255,99,0.1)', 
+                border: '1px solid rgba(216,255,99,0.3)',
+                color: ACCENT,
+                animation:'fadeIn 1s ease 0.5s both',
+                opacity:0
+              }}
+              onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+              onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
+            >
+              <ImageIcon size={12} />
+              <span className="text-[10px] font-semibold">Open Livery Panel</span>
+            </button>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="absolute bottom-5 left-6 z-20 pointer-events-none flex items-center gap-2" style={{ animation:'fadeIn 1s ease 0.5s both', opacity:0 }}>
-          <div style={{ width:16, height:1, background:'rgba(251,191,36,0.2)' }} />
-          <p className="text-[9px] font-medium tracking-widest uppercase" style={{ color:'var(--text-4)' }}>Developed by itzz industries</p>
+          <div style={{ width:16, height:1, background:'linear-gradient(to right, transparent, rgba(216,255,99,0.4), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
+          <p className="text-[9px] font-medium tracking-wider uppercase" style={{ color:'var(--text-4)' }}>Developed by itzz industries</p>
         </div>
 
         {/* Credits modal */}
@@ -1036,7 +1059,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             <div className="w-full max-w-sm rounded-2xl overflow-hidden" style={{ background:'#0a0a0a', border:'1px solid rgba(255,255,255,0.08)', animation:'slideDown 0.25s cubic-bezier(0.16,1,0.3,1) both', boxShadow:'0 32px 80px rgba(0,0,0,0.9)' }}>
               <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
                 <p className="text-sm font-bold tracking-widest uppercase" style={{ color:'var(--text-2)' }}>Credits</p>
-                <button onClick={()=>setShowCredits(false)} className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ background:'rgba(255,255,255,0.05)', color:'var(--text-3)' }} onMouseEnter={e=>(e.currentTarget.style.color='white')} onMouseLeave={e=>(e.currentTarget.style.color='var(--text-3)')}>
+                <button onClick={()=>setShowCredits(false)} className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ color:'var(--text-4)' }}>
                   <X size={12} />
                 </button>
               </div>
@@ -1114,24 +1137,26 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <Label>Panel Numbers</Label>
               <div className="grid grid-cols-5 gap-2">
                 {PANELS.map(face => (
-                  <div key={face} className="flex flex-col items-center gap-1.5 p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                  <div key={face} className="flex flex-col items-center gap-2 p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
                     <span className="text-[10px] font-semibold" style={{ color: 'var(--text-2)' }}>{face}</span>
-                    <div className="flex items-center gap-1">
-                      <button 
-                        onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
-                        className="w-5 h-5 rounded flex items-center justify-center text-xs font-bold transition-all"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-4)' }}
-                        onMouseEnter={e => (e.target as HTMLButtonElement).style.color = ACCENT}
-                        onMouseLeave={e => (e.target as HTMLButtonElement).style.color = 'var(--text-4)'}
-                      >−</button>
-                      <span className="text-[10px] font-bold min-w-[20px] text-center" style={{ color: 'var(--text-1)' }}>{panelNums[face]}</span>
-                      <button 
-                        onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
-                        className="w-5 h-5 rounded flex items-center justify-center text-xs font-bold transition-all"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-4)' }}
-                        onMouseEnter={e => (e.target as HTMLButtonElement).style.color = ACCENT}
-                        onMouseLeave={e => (e.target as HTMLButtonElement).style.color = 'var(--text-4)'}
-                      >+</button>
+                    <div className="flex flex-col items-center gap-1">
+                      <div className="flex items-center bg-black/30 rounded-lg p-1" style={{ border: '1px solid rgba(216,255,99,0.2)' }}>
+                        <button 
+                          onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
+                          className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-all"
+                          style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: ACCENT }}
+                          onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                          onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
+                        >-</button>
+                        <span className="text-[11px] font-bold min-w-[24px] text-center" style={{ color: ACCENT, margin: '0 4px' }}>{panelNums[face]}</span>
+                        <button 
+                          onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
+                          className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-all"
+                          style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: ACCENT }}
+                          onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                          onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
+                        >+</button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1250,13 +1275,13 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
           {/* Search */}
           <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={10} style={{ color:'var(--text-4)' }} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={10} style={{ color: ACCENT }} />
             <input type="text" placeholder="Search vehicles…" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
               className="w-full rounded-lg text-[11px] pl-8 pr-8 py-2.5 outline-none"
               style={{ background:'var(--surface2)', border:'1px solid var(--border)', color:'var(--text-2)' }}
               onFocus={e=>(e.target.style.borderColor='rgba(251,191,36,0.35)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
             {searchQuery && (
-              <button onClick={()=>setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color:'var(--text-4)' }}>
+              <button onClick={()=>setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: ACCENT }}>
                 <X size={9} />
               </button>
             )}
@@ -1269,7 +1294,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               {([['list', List], ['grid', Grid]] as const).map(([mode, Icon]) => (
                 <button key={mode} onClick={() => setVehicleViewMode(mode)}
                   className="w-6 h-6 rounded flex items-center justify-center transition-all"
-                  style={{ background: vehicleViewMode===mode ? 'rgba(251,191,36,0.1)' : 'transparent', border: `1px solid ${vehicleViewMode===mode ? 'rgba(251,191,36,0.25)' : 'transparent'}`, color: vehicleViewMode===mode ? ACCENT : 'var(--text-4)' }}>
+                  style={{ background: vehicleViewMode===mode ? 'rgba(216,255,99,0.1)' : 'transparent', border: `1px solid ${vehicleViewMode===mode ? 'rgba(216,255,99,0.25)' : 'transparent'}`, color: vehicleViewMode===mode ? ACCENT : ACCENT }}>
                   <Icon size={10} />
                 </button>
               ))}
@@ -1280,7 +1305,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="lv-list overflow-y-auto" style={{ maxHeight:260 }}>
             {filteredModels.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2">
-                <Box size={20} strokeWidth={1.5} style={{ color:'var(--text-4)' }} />
+                <Box size={20} strokeWidth={1.5} style={{ color: ACCENT }} />
                 <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color:'var(--text-4)' }}>No vehicles found</p>
               </div>
             ) : vehicleViewMode === 'list' ? (
@@ -1301,7 +1326,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     className={`vehicle-card text-left ${selectedModel?.id===m.id ? 'sel' : ''}`}>
                     <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
                       <img 
-                        src={`/${m.name.toLowerCase().replace(/\s+/g, '-')}-front-left.png`}
+                        src={`/Livery Previewer/previewer/public/${m.name}-front-left.png`}
                         alt={m.name}
                         className="w-full h-full object-cover"
                         style={{ opacity: selectedModel?.id===m.id ? 1 : 0.7 }}
@@ -1385,26 +1410,9 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <AdvancedColorPicker color={vehicleColor} onChange={handleColorChange} />
         </Section>
 
-        {/* Livery Panel Trigger */}
-        {selectedModel && (
-          <button 
-            onClick={() => setShowLiveryPanel(true)}
-            className="w-full px-4 py-3 flex items-center justify-center gap-2 rounded-lg transition-all capture-btn"
-            style={{ 
-              background: 'rgba(251,191,36,0.1)', 
-              border: '1px solid rgba(251,191,36,0.3)',
-              color: ACCENT,
-              marginTop: '8px'
-            }}
-            onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(251,191,36,0.2)'}
-            onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(251,191,36,0.1)'}
-          >
-            <ImageIcon size={14} />
-            <span className="text-[11px] font-semibold">Open Livery Panel</span>
-          </button>
-        )}
-
+        
               </div>
     </div>
   );
 }
+

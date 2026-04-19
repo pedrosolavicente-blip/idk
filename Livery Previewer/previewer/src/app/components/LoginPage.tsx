@@ -57,14 +57,6 @@ function CarSpinner() {
       fill.position.set(4, 1, 1);
       scene.add(fill);
 
-      const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(20, 20),
-        new THREE.ShadowMaterial({ opacity: 0.3 }),
-      );
-      ground.rotation.x = -Math.PI / 2;
-      ground.receiveShadow = true;
-      scene.add(ground);
-
       const loader = new GLTFLoader();
       let pivot: any = null;
 

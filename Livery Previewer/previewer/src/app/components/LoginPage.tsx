@@ -89,22 +89,24 @@ function CarSpinner() {
           scene.add(pivot);
 
           // Position camera based on actual model size
-const dist = size2.z * 0.90;
-const height = size2.y * 0.35;
-camera.position.set(0, height, dist);
-camera.lookAt(0, size2.y * 0.2, 0);
+const dist = size2.z * 1.1;
+const height = size2.y * 0.8;
+camera.position.set(-0.5, height, dist);
+camera.lookAt(-0.5, size2.y * 0.4, 0);
 
-          model.traverse((child: any) => {
-            if (child.isMesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-              const mats = Array.isArray(child.material) ? child.material : [child.material];
-              mats.forEach((m: any) => {
-                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.55);
-                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.4);
-              });
-            }
-          });
+model.traverse((child: any) => {
+  if (child.isMesh) {
+    child.castShadow = true;
+    child.receiveShadow = true;
+    const mats = Array.isArray(child.material) ? child.material : [child.material];
+    mats.forEach((m: any) => {
+      m.wireframe = true;
+      m.color.set('#c4ff0d');
+      m.transparent = true;
+      m.opacity = 0.4;
+    });
+  }
+});
         },
         undefined,
         (err: any) => console.warn('Model load failed', err),

@@ -314,14 +314,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         className="absolute right-0 top-0 bottom-0 w-[62%] z-10"
         style={{ background: 'transparent' }}
       >
-        {/* Left fade — wide and smooth, kills the hard cut */}
-        <div
-          className="absolute inset-y-0 left-0 z-10 pointer-events-none"
-          style={{
-            width: '48%',
-            background: 'linear-gradient(to right, #080808 0%, #080808 15%, rgba(8,8,8,0.7) 60%, transparent 100%)',
-          }}
-        />
         {/* Bottom fade */}
         <div
           className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none"

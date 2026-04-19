@@ -76,13 +76,20 @@ function ModelListItem({ model, selected, onClick }: { model: VehicleModel; sele
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left rounded-lg px-3 py-2.5 transition-all ${
+      className={`w-full text-left rounded-lg px-3 py-2.5 transition-all relative overflow-hidden group ${
         selected
-          ? 'bg-gradient-to-r from-[#c4ff0d]/20 to-transparent border border-[#c4ff0d]/50 text-white shadow-lg shadow-[#c4ff0d]/10'
-          : 'border border-white/5 bg-white/5 hover:bg-white/10 hover:border-[#c4ff0d]/30 text-zinc-400 hover:text-zinc-200'
+          ? 'border border-[#c4ff0d]/50 text-white'
+          : 'border border-white/5 bg-white/5 hover:border-[#c4ff0d]/30 text-zinc-400 hover:text-white'
       }`}
+      style={selected ? {
+        background: 'linear-gradient(to right, rgba(196,255,13,0.15), transparent)',
+        boxShadow: '4px 0 16px rgba(196,255,13,0.1) inset, 0 0 12px rgba(196,255,13,0.08)',
+      } : {}}
     >
-      <p className={`text-xs font-semibold truncate ${selected ? 'text-white' : ''}`}>{model.name}</p>
+      {!selected && (
+        <span className="absolute inset-y-0 right-0 w-0 group-hover:w-full transition-all duration-300 bg-gradient-to-l from-[#c4ff0d]/8 to-transparent rounded-lg" />
+      )}
+      <p className={`text-xs font-semibold truncate relative z-10 ${selected ? 'text-white' : ''}`}>{model.name}</p>
     </button>
   );
 }
@@ -399,7 +406,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           style={{
             paddingTop: '10px',
             paddingBottom: '10px',
-            background: 'rgba(0,0,0,0.85)',
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -646,15 +653,48 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
       </div>
 
       {/* ── Sidebar ── */}
-      <div className="w-64 flex flex-col border-l border-[#c4ff0d]/10 bg-[#0a0a0a] overflow-y-auto">
+      <div className="w-64 flex flex-col border-l border-[#c4ff0d]/10 bg-black overflow-y-auto relative">
+
+        {/* Big white itzz watermark */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
+          <img
+            src="/itzz.svg"
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '220%',
+              opacity: 0.03,
+              filter: 'brightness(0) invert(1)',
+            }}
+          />
+          <div style={{ position: 'absolute', top: '10%', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, #c4ff0d 0%, transparent 70%)', opacity: 0.06 }} />
+          <div style={{ position: 'absolute', bottom: '20%', left: '-40px', width: '150px', height: '150px', borderRadius: '50%', background: 'radial-gradient(circle, #c4ff0d 0%, transparent 70%)', opacity: 0.05 }} />
+          <div style={{ position: 'absolute', top: '50%', right: '0px', width: '120px', height: '120px', borderRadius: '50%', background: 'radial-gradient(circle, #c4ff0d 0%, transparent 70%)', opacity: 0.04 }} />
+        </div>
 
         {/* Header */}
-        <div className="px-4 py-6 border-b border-[#c4ff0d]/20 bg-gradient-to-b from-[#c4ff0d]/5 to-transparent">
-<img src="/Group_15.svg" alt="Livery Previewer" className="h-16 w-auto mb-2" />
-          <div className="h-0.5 bg-gradient-to-r from-[#c4ff0d] to-transparent mb-2" />
-          <p className="text-[10px] text-zinc-400 tracking-wider uppercase font-medium">
-            {user ? (user.global_name ?? user.username) : 'ERLC Vehicle Previewer'}
-          </p>
+        <div className="relative z-10 px-4 py-5 border-b border-white/5">
+          <div className="flex items-center gap-3 mb-1">
+            {user && (
+              <img
+                src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`}
+                alt=""
+                className="w-8 h-8 rounded-full object-cover border border-white/10"
+                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            )}
+            <div>
+              <p className="text-xs font-bold text-white tracking-wide">
+                {user ? (user.global_name ?? user.username) : 'ERLC Vehicle Previewer'}
+              </p>
+              {user && <p className="text-[9px] text-[#c4ff0d]/60 uppercase tracking-widest">Member</p>}
+            </div>
+          </div>
+          <div className="h-px bg-gradient-to-r from-[#c4ff0d]/40 to-transparent mt-3" />
         </div>
 
         {/* ── Model section ── */}
@@ -663,25 +703,29 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="flex gap-1 mb-2">
             <button
               onClick={() => setFilterCat('All')}
-              className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${
+              className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all relative overflow-hidden group ${
                 filterCat === 'All'
                   ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
-                  : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+                  : 'border-white/10 bg-white/5 text-zinc-400 hover:text-[#c4ff0d] hover:border-[#c4ff0d]/30'
               }`}
+              style={filterCat === 'All' ? { boxShadow: '0 0 14px rgba(196,255,13,0.2)' } : {}}
             >
-              All
+              <span className="relative z-10">All</span>
+              {filterCat !== 'All' && <span className="absolute inset-y-0 right-0 w-0 group-hover:w-full transition-all duration-300 bg-gradient-to-l from-[#c4ff0d]/10 to-transparent rounded-lg" />}
             </button>
             {AVAILABLE_CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setFilterCat(cat)}
-                className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${
+                className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all relative overflow-hidden group ${
                   filterCat === cat
                     ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
-                    : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+                    : 'border-white/10 bg-white/5 text-zinc-400 hover:text-[#c4ff0d] hover:border-[#c4ff0d]/30'
                 }`}
+                style={filterCat === cat ? { boxShadow: '0 0 14px rgba(196,255,13,0.2)' } : {}}
               >
-                {cat}
+                <span className="relative z-10">{cat}</span>
+                {filterCat !== cat && <span className="absolute inset-y-0 right-0 w-0 group-hover:w-full transition-all duration-300 bg-gradient-to-l from-[#c4ff0d]/10 to-transparent rounded-lg" />}
               </button>
             ))}
           </div>

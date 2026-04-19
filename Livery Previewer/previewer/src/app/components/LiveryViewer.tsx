@@ -67,15 +67,6 @@ async function blobUrlToDataUrl(url: string): Promise<string> {
   });
 }
 
-// ─── Liquid glass button style helper ────────────────────────────────────────
-
-const glassBtn = (active = false) =>
-  `flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-xl transition-all duration-200 border backdrop-blur-md ${
-    active
-      ? 'text-[#c4ff0d] bg-[#c4ff0d]/12 border-[#c4ff0d]/40 shadow-[0_0_16px_rgba(196,255,13,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]'
-      : 'text-zinc-400 hover:text-white bg-white/4 border-white/10 hover:bg-white/8 hover:border-white/20 shadow-[0_2px_12px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.06)]'
-  }`;
-
 // ─── Liquid Glass panel ───────────────────────────────────────────────────────
 
 function GlassPanel({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -340,7 +331,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {/* Background Big Image */}
         <img src="/Vector_(7).png" alt="" className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none mix-blend-screen" />
 
-        {/* Developer Credits - More Visible */}
+        {/* Developer Credits - Bottom Left */}
         <div className="absolute bottom-4 left-6 z-10 pointer-events-none">
           <p className="text-xs font-medium tracking-wide text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             developed by itzz industries | sonar & itzz_link
@@ -354,7 +345,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             onMouseDown={e => { if (e.target === e.currentTarget) setShowCredits(false); }}
           >
             <div className="bg-[#0f0f0f]/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-              {/* Header */}
               <div className="px-6 pt-6 pb-4 text-center border-b border-white/5">
                 <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Built by</p>
                 <p className="text-lg font-black tracking-widest uppercase text-white">itzz industries</p>
@@ -362,12 +352,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               </div>
 
               <div className="px-6 py-5 space-y-3">
-                {/* Sonarsilly */}
                 <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
                   <p className="text-sm font-bold text-white">Sonarsilly</p>
                   <p className="text-[10px] text-[#c4ff0d] font-semibold uppercase tracking-widest mt-1">Backend Development</p>
                 </div>
-                {/* Link */}
                 <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
                   <p className="text-sm font-bold text-white">Link</p>
                   <p className="text-[10px] text-[#c4ff0d] font-semibold uppercase tracking-widest mt-1">Frontend Development</p>
@@ -414,17 +402,15 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           />
         )}
 
-        {/* ── Glassmorphism Navbar ── */}
-        <nav
-          className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4"
-        >
-          {/* Left: logo */}
-          <img src="/itzz.svg" alt="itzz" className="h-7 w-auto drop-shadow-lg" />
+        {/* ── Navbar ── */}
+        <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <img src="/itzz.svg" alt="itzz" className="h-8 w-auto drop-shadow-lg" />
+          </div>
 
           {/* Center: Settings panel inline */}
           <div className="flex items-center gap-3">
-
-            {/* Settings toggle */}
             <div className="relative">
               <button
                 onClick={() => { setShowSettings(s => !s); setShowMenu(false); }}
@@ -437,7 +423,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               </button>
 
               {showSettings && (
-                <div className="animate-settings-in absolute left-0 top-full mt-3 w-72 bg-[#0a0a0a]/80 border border-white/20 rounded-2xl p-5 backdrop-blur-xl shadow-2xl">
+                <GlassPanel className="absolute left-0 top-full mt-3 w-72 p-5">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Scene Settings</p>
                     <button
@@ -449,7 +435,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     </button>
                   </div>
 
-                  {/* Brightness */}
                   <div className="mb-4">
                     <Label>Brightness — {settings.brightness.toFixed(2)}</Label>
                     <input
@@ -460,7 +445,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     />
                   </div>
 
-                  {/* Sky Rotation */}
                   <div className="mb-4 space-y-2">
                     <Label>Sky Rotation</Label>
                     {([
@@ -480,7 +464,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     ))}
                   </div>
 
-                  {/* Background */}
                   <div>
                     <Label>Skybox</Label>
                     <div className="grid grid-cols-3 gap-2 mb-2">
@@ -494,7 +477,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                               : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
                           }`}
                         >
-                          {bg === 'default' ? 'Default' : bg === 'sunset' ? 'Sunset' : 'Night'}
+                          {bg}
                         </button>
                       ))}
                     </div>
@@ -508,11 +491,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                         onChange={e => e.target.files?.[0] && handleBgCustomUpload(e.target.files[0])} />
                     </label>
                   </div>
-                </div>
+                </GlassPanel>
               )}
             </div>
 
-            {/* Showcases */}
             <button
               onClick={() => { setShowShowcases(true); setShowMenu(false); }}
               className={`${glassButtonClass} text-zinc-300 hover:text-white`}
@@ -520,7 +502,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <Users size={14} />
               Showcases
             </button>
-
           </div>
 
           {/* Right: menu */}
@@ -537,7 +518,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               </button>
 
               {showMenu && (
-                <div className="animate-settings-in absolute right-0 top-full mt-3 w-48 bg-[#0a0a0a]/80 border border-white/20 rounded-2xl overflow-hidden backdrop-blur-xl shadow-2xl">
+                <GlassPanel className="absolute right-0 top-full mt-3 w-48">
                   <button
                     onClick={() => { setShowCredits(true); setShowMenu(false); }}
                     className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-zinc-300 hover:text-white hover:bg-white/10 transition-all border-b border-white/10"
@@ -559,7 +540,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     <LogOut size={14} className="text-red-500" />
                     Log Out
                   </button>
-                </div>
+                </GlassPanel>
               )}
             </div>
           </div>
@@ -580,26 +561,9 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         )}
 
-        {/* Empty state */}
-        {!glbUrl && !loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-4">
-            <div className="relative">
-               <Box size={56} className="text-zinc-700 drop-shadow-md" strokeWidth={1.5} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 bg-[#c4ff0d]/10 rounded-full blur-2xl" />
-              </div>
-            </div>
-            <div className="text-center">
-               <p className="text-sm font-bold tracking-wider uppercase text-zinc-400 mb-1 drop-shadow-md">Select a Vehicle</p>
-              <p className="text-[11px] font-medium tracking-wider text-zinc-600">Choose from the sidebar to begin</p>
-            </div>
-          </div>
-        )}
-
         {/* Capture buttons */}
         {glbUrl && (
           <div className="absolute bottom-8 right-8 flex flex-col items-end gap-3 z-20">
-            {/* Angle shots dropdown */}
             <div className="relative w-full">
               <button
                 onClick={() => setShowAngleMenu(o => !o)}
@@ -629,12 +593,14 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     { side: 'top-left',    label: 'Top Left'    },
                     { side: 'top-right',   label: 'Top Right'   },
                   ].map((entry, i) => 'group' in entry ? (
-                    <p key={i} className="px-4 pt-3 pb-1 text-[9px] font-black uppercase tracking-widest text-zinc-500 bg-white/5">{entry.group}</p>
+                    <p key={i} className="px-4 pt-3 pb-1 text-[9px] font-black uppercase tracking-widest text-zinc-500 bg-white/5 border-b border-white/5">
+                      {entry.group}
+                    </p>
                   ) : (
                     <button
                       key={entry.side}
                       onClick={() => { handleShowcase(entry.side as ShowcaseSide); setShowAngleMenu(false); }}
-                      className="w-full flex items-center px-4 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#c4ff0d]/20 transition-all duration-300 text-left"
+                      className="w-full flex items-center px-4 py-2 text-[11px] font-bold text-zinc-300 hover:text-white hover:bg-[#c4ff0d]/20 transition-all duration-300 text-left border-b border-white/5 last:border-0"
                     >
                       {entry.label}
                     </button>
@@ -642,7 +608,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 </GlassPanel>
               )}
             </div>
-            {/* Freeform capture */}
              <button
               onClick={handleCapture}
               className="flex items-center justify-center gap-2 bg-gradient-to-b from-[#d4ff3d] to-[#c4ff0d] text-black text-xs font-black tracking-wide px-5 py-3 rounded-xl transition-all duration-300 border border-[#d4ff3d]/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_8px_16px_rgba(196,255,13,0.25)] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_12px_24px_rgba(196,255,13,0.4)] hover:-translate-y-1 w-full"
@@ -652,21 +617,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             </button>
           </div>
         )}
-
-        {/* Developer watermark — now visible */}
-        <p
-          className="absolute bottom-4 left-5 text-[10px] font-semibold tracking-widest uppercase select-none pointer-events-none"
-          style={{ color: 'rgba(196,255,13,0.5)' }}
-        >
-          Developed by itzz industries
-        </p>
-
       </div>
 
       {/* ── Sidebar ── */}
       <div className="w-72 flex flex-col border-l border-white/10 bg-[#080808]/95 backdrop-blur-2xl overflow-y-auto shadow-[-8px_0_24px_rgba(0,0,0,0.5)] z-30 relative">
-
-        {/* Header */}
         <div className="px-5 py-6 border-b border-white/10 bg-gradient-to-b from-white/5 to-transparent">
           <img src="/Group_15.svg" alt="Livery Previewer" className="h-16 w-auto mb-3 drop-shadow-md" />
           <div className="h-[2px] bg-gradient-to-r from-[#c4ff0d] to-transparent mb-3 rounded-full opacity-80" />
@@ -675,24 +629,12 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </p>
         </div>
 
-        {/* ── Model section ── */}
         <Section title="Model" icon={Box} defaultOpen={true}>
-          {/* Category filter */}
           <div className="flex gap-1.5 mb-3">
-            <button
-              onClick={() => setFilterCat('All')}
-              className={`flex-1 text-[10px] font-bold py-2 rounded-xl border transition-all duration-300 ${
-                filterCat === 'All'
-                  ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/15 text-[#c4ff0d] shadow-[inset_0_1px_0_rgba(196,255,13,0.2)]'
-                  : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              All
-            </button>
-            {AVAILABLE_CATEGORIES.map(cat => (
+            {['All', 'PD', 'FD', 'DOT'].map(cat => (
               <button
                 key={cat}
-                onClick={() => setFilterCat(cat)}
+                onClick={() => setFilterCat(cat as any)}
                 className={`flex-1 text-[10px] font-bold py-2 rounded-xl border transition-all duration-300 ${
                   filterCat === cat
                     ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/15 text-[#c4ff0d] shadow-[inset_0_1px_0_rgba(196,255,13,0.2)]'
@@ -704,7 +646,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             ))}
           </div>
 
-          {/* Search */}
           <div className="relative mb-3 group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#c4ff0d] transition-colors duration-300" size={14} />
             <input
@@ -717,88 +658,45 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
 
           <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
-            {filteredModels.length > 0
-              ? filteredModels.map(m => (
-                  <ModelListItem
-                    key={m.id}
-                    model={m}
-                    selected={selectedModel?.id === m.id}
-                    onClick={() => handleSelectModel(m)}
-                  />
-                ))
-              : (
-                <div className="text-center py-8 text-zinc-600 text-xs bg-white/5 rounded-xl border border-white/5">
-                  <Box size={28} className="mx-auto mb-2 opacity-40" strokeWidth={1.5} />
-                  <p className="font-bold uppercase tracking-wider text-[10px]">No vehicles found</p>
-                </div>
-              )
-            }
+            {filteredModels.map(m => (
+              <ModelListItem
+                key={m.id}
+                model={m}
+                selected={selectedModel?.id === m.id}
+                onClick={() => handleSelectModel(m)}
+              />
+            ))}
           </div>
         </Section>
 
-        {/* ── Presets section ── */}
         <Section title="Presets" icon={Bookmark} defaultOpen={false}>
           <div className="flex gap-2">
             <input
               placeholder="Preset name…"
               value={presetName}
               onChange={e => setPresetName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSavePreset()}
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl text-xs px-3 py-2.5 text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 focus:bg-white/10 transition-all duration-300 min-w-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl text-xs px-3 py-2.5 text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 focus:bg-white/10 transition-all duration-300 min-w-0"
             />
             <button
               onClick={handleSavePreset}
               disabled={!presetName.trim() || savingPreset}
-              className="text-[10px] font-bold px-3.5 py-2.5 rounded-xl bg-gradient-to-b from-[#d4ff3d] to-[#c4ff0d] text-black disabled:opacity-30 disabled:grayscale hover:brightness-110 transition-all duration-300 shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)]"
+              className="text-[10px] font-bold px-3.5 py-2.5 rounded-xl bg-gradient-to-b from-[#d4ff3d] to-[#c4ff0d] text-black disabled:opacity-30 hover:brightness-110 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)]"
             >
-              {savingPreset ? '…' : 'Save'}
+              Save
             </button>
           </div>
-
-          {presets.length === 0 ? (
-            <p className="text-[11px] text-zinc-600 font-medium italic mt-2 text-center">No presets saved yet</p>
-          ) : (
-            <div className="space-y-2 mt-3 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
-              {presets.map(preset => (
-                <div
-                  key={preset.id}
-                  className="group flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:border-[#c4ff0d]/40 hover:bg-white/10 transition-all duration-300 overflow-hidden shadow-sm"
-                >
-                  <button
-                    className="flex-1 text-left px-3 py-2.5 min-w-0"
-                    onClick={() => handleLoadPreset(preset)}
-                  >
-                    <p className="text-[11px] font-bold text-zinc-200 truncate">{preset.name}</p>
-                    <p className="text-[10px] text-zinc-500 font-medium truncate mt-0.5">
-                      {MODELS.find(m => m.id === preset.modelId)?.name ?? 'No model'} · {new Date(preset.createdAt).toLocaleDateString()}
-                    </p>
-                  </button>
-                  <button
-                    onClick={() => handleDeletePreset(preset.id)}
-                    className="shrink-0 mr-2 text-zinc-600 hover:text-white hover:bg-red-500/80 p-1.5 rounded-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
-                    title="Delete preset"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </Section>
 
-        {/* ── Vehicle Colour section ── */}
         <Section title="Vehicle Color" icon={Palette} defaultOpen={true}>
           <div className="flex items-center gap-3">
             <ColorPicker color={vehicleColor} onChange={handleColorChange} />
-            {/* Editable hex field */}
-            <div className="flex items-center flex-1 bg-white/5 border border-white/10 rounded-xl text-xs px-3 py-2.5 gap-1.5 focus-within:border-[#c4ff0d]/50 focus-within:bg-white/10 transition-all duration-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]">
+            <div className="flex items-center flex-1 bg-white/5 border border-white/10 rounded-xl text-xs px-3 py-2.5 gap-1.5 focus-within:border-[#c4ff0d]/50 transition-all duration-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]">
               <span className="text-zinc-500 font-mono font-bold">#</span>
               <input
                 value={hexSidebarInput}
                 onChange={e => handleSidebarHexInput(e.target.value)}
-                className="flex-1 bg-transparent text-zinc-200 font-mono font-bold uppercase outline-none min-w-0 tracking-wider"
+                className="flex-1 bg-transparent text-zinc-200 font-mono font-bold uppercase outline-none"
                 maxLength={6}
-                spellCheck={false}
               />
             </div>
           </div>
@@ -809,33 +707,20 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 onClick={() => handleColorChange(c)}
                 style={{ background: c }}
                 className="w-7 h-7 rounded-xl border-2 border-white/10 hover:-translate-y-1 hover:border-[#c4ff0d] transition-all duration-300 shadow-md"
-                title={c}
               />
             ))}
           </div>
         </Section>
 
-        {/* ── Livery Textures section ── */}
         <Section title="Livery Textures" icon={Image}>
-           {!glbUrl && (
-            <div className="text-center py-4 bg-white/5 rounded-xl border border-white/5">
-              <p className="text-[11px] text-zinc-500 font-medium italic">Select a vehicle first</p>
-            </div>
-          )}
           {glbUrl && PANELS.map(face => (
             <div key={face} className="mb-4 bg-black/20 p-3 rounded-xl border border-white/5">
               <div className="flex items-center justify-between mb-3">
                  <Label>{face}</Label>
                 <div className="flex items-center gap-2 bg-white/10 rounded-lg px-2 py-1 border border-white/10 backdrop-blur-sm">
-                  <button
-                    onClick={() => setPanelNums(p => ({ ...p, [face]: Math.max(1, p[face] - 1) }))}
-                    className="text-zinc-400 hover:text-[#c4ff0d] text-xs w-5 h-5 flex items-center justify-center font-bold transition-colors bg-white/5 rounded-md"
-                  >−</button>
+                  <button onClick={() => setPanelNums(p => ({ ...p, [face]: Math.max(1, p[face] - 1) }))} className="text-zinc-400 hover:text-[#c4ff0d] text-xs w-5 h-5 flex items-center justify-center font-bold bg-white/5 rounded-md">−</button>
                   <span className="text-[11px] text-zinc-200 font-bold min-w-[14px] text-center">{panelNums[face]}</span>
-                  <button
-                    onClick={() => setPanelNums(p => ({ ...p, [face]: p[face] + 1 }))}
-                     className="text-zinc-400 hover:text-[#c4ff0d] text-xs w-5 h-5 flex items-center justify-center font-bold transition-colors bg-white/5 rounded-md"
-                  >+</button>
+                  <button onClick={() => setPanelNums(p => ({ ...p, [face]: p[face] + 1 }))} className="text-zinc-400 hover:text-[#c4ff0d] text-xs w-5 h-5 flex items-center justify-center font-bold bg-white/5 rounded-md">+</button>
                 </div>
               </div>
               {getPanelKeys(face).map(panel => (
@@ -847,16 +732,12 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                       <button onClick={() => handleRemoveTexture(panel)} className="text-red-400 hover:text-white hover:bg-red-500/80 p-1 rounded transition-all duration-300">
                         <X size={12} strokeWidth={3} />
                       </button>
-                     </div>
+                    </div>
                   ) : (
                     <label className="flex-1 cursor-pointer bg-white/5 hover:bg-white/10 border border-white/20 hover:border-[#c4ff0d]/50 border-dashed rounded-xl px-3 py-2 text-[11px] text-zinc-400 hover:text-white flex items-center justify-center gap-2 transition-all duration-300 group">
                       <Upload size={12} className="group-hover:-translate-y-0.5 transition-transform duration-300" />
                        <span className="font-semibold tracking-wide">Upload</span>
-                      <input
-                        type="file" accept="image/*"
-                        onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])}
-                        className="hidden"
-                      />
+                      <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])} className="hidden" />
                     </label>
                   )}
                 </div>
@@ -864,7 +745,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             </div>
           ))}
         </Section>
-
       </div>
     </div>
   );

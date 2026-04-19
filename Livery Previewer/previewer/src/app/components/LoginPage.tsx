@@ -15,6 +15,7 @@ function CarSpinner() {
 
     let frameId: number;
     let renderer: any;
+    let stopped = false;
 
     async function init() {
       const THREE = await import('three');
@@ -28,59 +29,73 @@ function CarSpinner() {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.2;
+      renderer.toneMappingExposure = 1.3;
       el!.appendChild(renderer.domElement);
 
       const scene  = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 200);
-      camera.position.set(0, 1.4, 7);
-      camera.lookAt(0, 0.3, 0);
+      // Close camera, wide FOV = car fills frame
+      const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 200);
+      camera.position.set(0, 0.6, 3.2);
+      camera.lookAt(0, 0, 0);
 
-      // Lights
-      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-      const key = new THREE.DirectionalLight(0xc4ff0d, 2.0);
-      key.position.set(4, 6, 5);
+      // Lights — key light from front-left with lime tint
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const key = new THREE.DirectionalLight(0xddffa0, 2.5);
+      key.position.set(-3, 4, 4);
       scene.add(key);
-      const fill = new THREE.DirectionalLight(0x8899cc, 0.8);
-      fill.position.set(-5, 2, -3);
+      const fill = new THREE.DirectionalLight(0x6688cc, 1.0);
+      fill.position.set(5, 1, -2);
       scene.add(fill);
-      const rim = new THREE.DirectionalLight(0xffffff, 0.4);
-      rim.position.set(0, -3, -6);
-      scene.add(rim);
+      const under = new THREE.DirectionalLight(0xffffff, 0.3);
+      under.position.set(0, -4, 2);
+      scene.add(under);
 
-      const pivot = new THREE.Group();
-      scene.add(pivot);
-
+      // Model sits directly in scene — rotates on its own Y axis
       const loader = new GLTFLoader();
+      let model: any = null;
+
       loader.load(
         '/api/models/Falcon%20Interceptor%20Utility%202024.glb',
         (gltf: any) => {
-          const model = gltf.scene;
+          model = gltf.scene;
+
+          // Centre the model so it spins on its own axis
           const box    = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size   = box.getSize(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
-          model.position.sub(center);
-          model.scale.setScalar(4.5 / maxDim);
+
+          // Offset so centroid is at world origin
+          model.position.set(-center.x, -center.y, -center.z);
+
+          // Scale so longest dimension = 2.8 units (fills camera nicely)
+          model.scale.setScalar(2.8 / maxDim);
+
+          // Boost reflectivity
           model.traverse((child: any) => {
             if (child.isMesh) {
               const mats = Array.isArray(child.material) ? child.material : [child.material];
               mats.forEach((m: any) => {
-                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.4);
-                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.55);
+                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.5);
+                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.45);
               });
             }
           });
-          pivot.add(model);
+
+          scene.add(model);
         },
         undefined,
         (err: any) => console.warn('Model load failed', err),
       );
 
-      const clock = new THREE.Clock();
+      // Pivot group for smooth spin — model added to scene but we rotate scene's Y? 
+      // Actually we rotate the model itself once it loads
+      let angle = 0;
       function animate() {
+        if (stopped) return;
         frameId = requestAnimationFrame(animate);
-        pivot.rotation.y += clock.getDelta() * 0.4;
+        angle += 0.004;
+        if (model) model.rotation.y = angle;
         renderer.render(scene, camera);
       }
       animate();
@@ -99,6 +114,7 @@ function CarSpinner() {
     init().catch(console.error);
 
     return () => {
+      stopped = true;
       cancelAnimationFrame(frameId);
       if (renderer) {
         renderer.dispose();
@@ -167,7 +183,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
       </nav>
 
       {/* ── Left: text content ── */}
-      <div className="relative z-10 flex flex-col justify-center px-16 w-1/2 gap-8">
+      <div className="relative z-10 flex flex-col justify-center px-16 w-[45%] gap-8">
         <div className="flex items-center gap-2">
           <div className="h-px w-8 bg-[#c4ff0d]" />
           <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#c4ff0d]">ITZZ Industries</span>
@@ -220,11 +236,17 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         </p>
       </div>
 
-      {/* ── Right: spinning car ── */}
-      <div className="absolute right-0 top-0 bottom-0 w-[55%] z-10">
+      {/* ── Right: spinning car, large and close ── */}
+      <div className="absolute right-0 top-0 bottom-0 w-[60%] z-10">
+        {/* Fade left edge into bg */}
         <div
-          className="absolute inset-y-0 left-0 w-40 z-10 pointer-events-none"
+          className="absolute inset-y-0 left-0 w-48 z-10 pointer-events-none"
           style={{ background: 'linear-gradient(to right, #080808, transparent)' }}
+        />
+        {/* Lime glow behind car */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{ background: 'radial-gradient(ellipse 70% 50% at 60% 55%, rgba(196,255,13,0.07) 0%, transparent 70%)' }}
         />
         <CarSpinner />
       </div>

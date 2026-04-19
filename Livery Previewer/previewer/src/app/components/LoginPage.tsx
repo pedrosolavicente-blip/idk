@@ -338,14 +338,6 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
             background: 'linear-gradient(to bottom, #080808 0%, transparent 100%)',
           }}
         />
-        {/* Right fade */}
-        <div
-          className="absolute inset-y-0 right-0 z-10 pointer-events-none"
-          style={{
-            width: '12%',
-            background: 'linear-gradient(to left, #080808 0%, transparent 100%)',
-          }}
-        />
         {/* Lime spotlight glow */}
         <div
           className="absolute inset-0 pointer-events-none z-0"

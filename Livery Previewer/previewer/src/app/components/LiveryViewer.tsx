@@ -1168,100 +1168,99 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               </div>
             </div>
 
-            {/* Texture Management */}
+            {/* Texture Upload */}
             <div>
-              <Label>Texture Management</Label>
-              <div className="space-y-4">
-                {PANELS.map(face => (
-                  <div key={face} className="p-4 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-[12px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</h4>
-                      <div className="flex gap-2">
-                        <label className="flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer transition-all"
-                          style={{ 
-                            background: 'rgba(216,255,99,0.1)', 
-                            border: '1px solid rgba(216,255,99,0.3)', 
-                            color: '#D8FF63',
-                            fontSize: '10px',
-                            fontWeight: '600'
-                          }}>
-                          <Upload size={8} />
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            multiple
-                            className="hidden"
-                            onChange={e => {
-                              const files = Array.from(e.target.files || []);
-                              files.forEach(file => {
-                                const availableSlots = Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`)
-                                  .filter(slot => !textures[slot]);
-                                if (availableSlots.length > 0) {
-                                  handleTextureUpload(availableSlots[0], file);
-                                }
-                              });
-                            }} 
-                          />
-                        </label>
+              <Label>Upload Textures</Label>
+              <div className="mb-4">
+                <label className="block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all hover:border-d8ff63"
+                  style={{ 
+                    borderColor: 'rgba(216,255,99,0.3)', 
+                    background: 'rgba(216,255,99,0.02)',
+                    borderStyle: 'dashed'
+                  }}>
+                  <div className="text-center">
+                    <Upload size={24} style={{ color: '#D8FF63', margin: '0 auto 8px' }} />
+                    <p className="text-sm font-medium" style={{ color: '#D8FF63' }}>Drop images here or click to upload</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-4)' }}>PNG, JPG up to 10MB</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    multiple
+                    className="hidden"
+                    onChange={e => {
+                      const files = Array.from(e.target.files || []);
+                      files.forEach(file => {
+                        // Find first available slot across all faces
+                        for (const face of PANELS) {
+                          const availableSlots = Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`)
+                            .filter(slot => !textures[slot]);
+                          if (availableSlots.length > 0) {
+                            handleTextureUpload(availableSlots[0], file);
+                            break;
+                          }
+                        }
+                      });
+                    }} 
+                  />
+                </label>
+              </div>
+
+              {/* Active Textures */}
+              <div>
+                <h4 className="text-xs font-semibold mb-3" style={{ color: 'var(--text-3)' }}>ACTIVE TEXTURES</h4>
+                <div className="space-y-2">
+                  {Object.entries(textures).length === 0 ? (
+                    <div className="text-center py-8" style={{ color: 'var(--text-4)' }}>
+                      <ImageIcon size={32} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
+                      <p className="text-xs">No textures uploaded yet</p>
+                    </div>
+                  ) : (
+                    Object.entries(textures).map(([panel, texture]) => (
+                      <div key={panel} className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                        <img src={texture} className="w-12 h-12 rounded object-cover" alt={panel} />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium" style={{ color: 'var(--text-1)' }}>{panel}</p>
+                          <p className="text-xs" style={{ color: 'var(--text-4)' }}>Texture applied</p>
+                        </div>
                         <button 
-                          onClick={() => {
-                            const nextTextures = { ...textures };
-                            for (let i = 1; i <= panelNums[face]; i++) {
-                              delete nextTextures[`${face}${i}`];
-                            }
-                            setTextures(nextTextures);
-                            if (glbUrl) applyLivery(glbUrl, vehicleColor, nextTextures);
-                          }}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded transition-all"
+                          onClick={() => handleRemoveTexture(panel)}
+                          className="p-2 rounded-lg transition-all"
                           style={{ 
                             background: 'rgba(239,68,68,0.1)', 
-                            border: '1px solid rgba(239,68,68,0.3)', 
-                            color: '#ef4444',
-                            fontSize: '10px',
-                            fontWeight: '600'
-                          }}>
-                          <Trash2 size={8} />
+                            border: '1px solid rgba(239,68,68,0.2)', 
+                            color: '#ef4444'
+                          }}
+                          onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.2)'}
+                          onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'}>
+                          <X size={16} />
                         </button>
                       </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-2">
-                      {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
-                        <div key={panel}>
-                          {textures[panel] ? (
-                            <div className="flex items-center gap-2 p-2 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
-                              <img src={textures[panel]} className="w-8 h-8 rounded object-cover" alt={panel} />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[9px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
-                              </div>
-                              <button 
-                                onClick={() => handleRemoveTexture(panel)}
-                                className="w-5 h-5 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                                style={{ color:'#ef4444', background:'rgba(239,68,68,0.1)' }}>
-                                <X size={8} />
-                              </button>
-                            </div>
-                          ) : (
-                            <label className="flex items-center gap-2 p-2 rounded cursor-pointer transition-all border border-dashed" 
-                              style={{ borderColor: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.02)' }}>
-                              <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                <Upload size={8} style={{ color: 'var(--text-4)' }} />
-                              </div>
-                              <p className="text-[9px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
-                              <input 
-                                type="file" 
-                                accept="image/*" 
-                                className="hidden"
-                                onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])} 
-                              />
-                            </label>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                    ))
+                  )}
+                </div>
               </div>
+
+              {/* Clear All Button */}
+              {Object.entries(textures).length > 0 && (
+                <div className="mt-4">
+                  <button 
+                    onClick={() => {
+                      setTextures({});
+                      if (glbUrl) applyLivery(glbUrl, vehicleColor, {});
+                    }}
+                    className="w-full p-3 rounded-lg font-medium transition-all"
+                    style={{ 
+                      background: 'rgba(239,68,68,0.1)', 
+                      border: '1px solid rgba(239,68,68,0.3)', 
+                      color: '#ef4444'
+                    }}
+                    onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.2)'}
+                    onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'}>
+                    Clear All Textures
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

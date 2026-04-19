@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import itzzLogo from '../../imports/itzz-logo.png';
+import itzzLogo from '@/imports/itzz-logo.png';
 
 interface Props {
   onLogin: () => void;

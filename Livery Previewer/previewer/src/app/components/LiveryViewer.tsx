@@ -608,10 +608,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <span className="flex items-center gap-2"><Image size={12} />Angle Shots</span>
                 <ChevronDown size={12} className={`transition-transform duration-300 ${showAngleMenu ? 'rotate-180' : ''}`} />
               </button>
-             {showAngleMenu && (
-                {/* Change this opening tag from <div ...> to <GlassPanel ...> */}
+              
+              {showAngleMenu && (
                 <GlassPanel className="absolute bottom-full mb-2 right-0 w-52">
-                  {([
+                  {[
                     { group: 'Sides' },
                     { side: 'front',       label: 'Front'       },
                     { side: 'back',        label: 'Back'        },
@@ -638,7 +638,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     >
                       {entry.label}
                     </button>
-                  )))}
+                  ))}
                 </GlassPanel>
               )}
             </div>

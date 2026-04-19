@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import LiveryViewer from './components/LiveryViewer';
 import LoginPage from './components/LoginPage';
-import itzzLogo from '../imports/itzz-logo.png';
 import {
   handleAuthCallback,
   validateStoredToken,
@@ -55,7 +54,6 @@ function DisclaimerModal({ onClose }: { onClose: () => void }) {
       onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
           <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Legal Disclaimer</p>
           <button
@@ -65,15 +63,11 @@ function DisclaimerModal({ onClose }: { onClose: () => void }) {
             ✕
           </button>
         </div>
-
-        {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
           <pre className="text-[10.5px] text-zinc-400 leading-relaxed whitespace-pre-wrap font-sans">
             {DISCLAIMER_TEXT}
           </pre>
         </div>
-
-        {/* Footer */}
         <div className="px-5 py-4 border-t border-white/10 flex gap-2 shrink-0">
           <button
             onClick={downloadDisclaimer}
@@ -92,7 +86,6 @@ function DisclaimerModal({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
-);
 
 export default function App() {
   const [authState, setAuthState]           = useState<AuthState>('checking');
@@ -130,7 +123,6 @@ export default function App() {
     setAuthState('login');
   };
 
-  // ── Checking ──────────────────────────────────────────────────────────────
   if (authState === 'checking') {
     return (
       <div className="flex h-screen bg-[#0d0d0d] items-center justify-center">
@@ -139,7 +131,6 @@ export default function App() {
     );
   }
 
-  // ── Denied ────────────────────────────────────────────────────────────────
   if (authState === 'denied') {
     return (
       <div className="flex h-screen bg-[#0d0d0d] items-center justify-center text-white">
@@ -157,7 +148,6 @@ export default function App() {
     );
   }
 
-  // ── Login ─────────────────────────────────────────────────────────────────
   if (authState === 'login') {
     return (
       <>
@@ -170,7 +160,6 @@ export default function App() {
     );
   }
 
-  // ── Authed ────────────────────────────────────────────────────────────────
   return (
     <>
       {showDisclaimer && <DisclaimerModal onClose={() => setShowDisclaimer(false)} />}

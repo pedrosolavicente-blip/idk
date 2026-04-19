@@ -160,13 +160,12 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
 
         <div className="flex items-center gap-3">
           
-            href="https://discord.gg/itzz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-semibold tracking-wider uppercase text-zinc-400 hover:text-white transition-colors px-4 py-2"
-          >
-            Contact Us
-          </a>
+            <button
+  onClick={() => window.open('https://discord.gg/itzz', '_blank')}
+  className="text-xs font-semibold tracking-wider uppercase text-zinc-400 hover:text-white transition-colors px-4 py-2"
+>
+  Contact Us
+</button>
           <button
             onClick={onDisclaimer}
             className="border border-white/10 hover:border-white/30 text-zinc-400 hover:text-white text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-xl transition-all"
@@ -259,7 +258,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
 
       {/* Footer */}
       <p className="absolute bottom-4 left-8 text-[11px] text-zinc-400 tracking-wider z-20 pointer-events-none">
-        developed by itzz industries | sonar & itzz_link
+        developed by itzz industries | sonar &amp; itzz_link
       </p>
     </div>
   );

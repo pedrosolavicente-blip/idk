@@ -14,13 +14,13 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "showcase-db",
-      "database_id": "104bf083-064d-4606-85ee-a5d74f904b63"
-    }
-  ],
+ "d1_databases": [
+  {
+    "binding": "DB",
+    "database_name": "showcase-db",
+    "database_id": "1367c1e7-af58-4616-bf77-4d4baa32dd17"  // ← new correct ID
+  }
+],
   "r2_buckets": [
     {
       "binding": "SHOWCASE_IMAGES",

@@ -98,15 +98,11 @@ model.traverse((child: any) => {
   if (child.isMesh) {
     child.castShadow = true;
     child.receiveShadow = true;
-    child.renderOrder = 1;
-    const mats = Array.isArray(child.material) ? child.material : [child.material];
-    mats.forEach((m: any) => {
-      m.wireframe = true;
-      m.color.set('#c4ff0d');
-      m.transparent = true;
-      m.opacity = 0.4;
-      m.depthWrite = false;
-      m.needsUpdate = true;
+    child.material = new THREE.MeshBasicMaterial({
+      color: '#c4ff0d',
+      wireframe: true,
+      transparent: true,
+      opacity: 0.4,
     });
   }
 });

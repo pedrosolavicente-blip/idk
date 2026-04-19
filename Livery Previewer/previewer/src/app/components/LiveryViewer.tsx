@@ -650,16 +650,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Header */}
         <div className="px-4 py-6 border-b border-[#c4ff0d]/20 bg-gradient-to-b from-[#c4ff0d]/5 to-transparent">
-          <div className="flex items-center gap-2.5 mb-2">
-            <img src="/Group_15.svg" alt="Livery Previewer" className="h-10 w-auto drop-shadow-[0_0_8px_rgba(196,255,13,0.4)]" />
-            <button
-              onClick={() => { clearAuth(); onLogout(); }}
-              title="Log out"
-              className="text-zinc-600 hover:text-zinc-400 transition-colors"
-            >
-              <LogOut size={13} />
-            </button>
-          </div>
+<img src="/Previewer.svg" alt="Livery Previewer" className="h-16 w-auto drop-shadow-[0_0_8px_rgba(196,255,13,0.4)] mb-2" />
           <div className="h-0.5 bg-gradient-to-r from-[#c4ff0d] to-transparent mb-2" />
           <p className="text-[10px] text-zinc-400 tracking-wider uppercase font-medium">
             {user ? (user.global_name ?? user.username) : 'ERLC Vehicle Previewer'}

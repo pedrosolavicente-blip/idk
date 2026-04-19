@@ -399,7 +399,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           style={{
             paddingTop: '10px',
             paddingBottom: '10px',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+            background: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             borderBottom: '1px solid rgba(255,255,255,0.06)',

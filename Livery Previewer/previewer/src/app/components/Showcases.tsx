@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { DiscordUser } from '../../lib/discordAuth';
 import {
   type ShowcasePost, type ShowcaseComment, type LiveryConfig, type Analytics, type PostType,

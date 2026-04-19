@@ -102,7 +102,32 @@ const dropdownStyle = {
   WebkitBackdropFilter: 'blur(24px)',
 } as const;
 
-// ─── GlassButton component — handles hover green-sweep effect ─────────────────
+// ─── Animations ───────────────────────────────────────────────────────────────
+
+const sidebarAnimStyles = `
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes expandWidth {
+    from { transform: scaleX(0); opacity: 0; }
+    to   { transform: scaleX(1); opacity: 1; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes accentPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(196,255,13,0); }
+    50%       { box-shadow: 0 0 12px 2px rgba(196,255,13,0.18); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+`;
+
+// ─── GlassButton component ────────────────────────────────────────────────────
 
 interface GlassBtnProps {
   onClick?: () => void;
@@ -138,7 +163,6 @@ function GlassButton({ onClick, active, lime, className = '', children, style = 
         transform: hovered ? 'scale(1.01)' : 'scale(1)',
       }}
     >
-      {/* Green sweep from right on hover */}
       <span
         className="pointer-events-none absolute inset-y-0 right-0 transition-all duration-300"
         style={{
@@ -193,6 +217,62 @@ function Label({ children }: { children: ReactNode }) {
     <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-1.5">
       {children}
     </p>
+  );
+}
+
+// ─── Sidebar Header ───────────────────────────────────────────────────────────
+
+function SidebarHeader({ user }: { user: DiscordUser | null }) {
+  return (
+    <div
+      className="px-4 py-5 flex flex-col items-center text-center relative overflow-hidden"
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+    >
+      <style>{sidebarAnimStyles}</style>
+
+      {/* Subtle lime glow behind logo */}
+      <div
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          width: 160, height: 80,
+          background: 'radial-gradient(ellipse, rgba(196,255,13,0.12) 0%, transparent 70%)',
+          animation: 'fadeIn 1s ease 0.4s both',
+        }}
+      />
+
+      {/* Logo */}
+      <div style={{ animation: 'fadeSlideDown 0.55s cubic-bezier(0.16,1,0.3,1) both' }}>
+        <img
+          src="/Group_15.svg"
+          alt="Livery Previewer"
+          className="h-14 w-auto"
+          style={{ mixBlendMode: 'lighten' }}
+        />
+      </div>
+
+      {/* Divider — expands from center */}
+      <div
+        className="w-full mt-3 mb-3"
+        style={{
+          height: 1,
+          background: 'linear-gradient(to right, transparent, rgba(196,255,13,0.5), transparent)',
+          transformOrigin: 'center',
+          animation: 'expandWidth 0.7s cubic-bezier(0.16,1,0.3,1) 0.25s both',
+        }}
+      />
+
+      {/* Username / subtitle */}
+      <p
+        className="text-[9px] tracking-widest uppercase font-bold"
+        style={{
+          color: user ? ACCENT : '#3f3f46',
+          animation: 'fadeSlideDown 0.55s cubic-bezier(0.16,1,0.3,1) 0.35s both',
+          letterSpacing: '0.2em',
+        }}
+      >
+        {user ? (user.global_name ?? user.username) : 'ERLC Vehicle Previewer'}
+      </p>
+    </div>
   );
 }
 
@@ -453,7 +533,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
           {/* Center */}
           <div className="flex items-center gap-2">
-            {/* Settings */}
             <div className="relative">
               <GlassButton
                 onClick={() => { setShowSettings(s => !s); setShowMenu(false); }}
@@ -524,7 +603,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               )}
             </div>
 
-            {/* Showcases */}
             <GlassButton
               onClick={() => { setShowShowcases(true); setShowMenu(false); }}
               className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg"
@@ -660,8 +738,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 </div>
               )}
             </div>
-
-            {/* Capture — lime version with right-sweep in white */}
             <CaptureButton onClick={handleCapture} />
           </div>
         )}
@@ -670,8 +746,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         <div className="absolute bottom-5 left-8 z-20 pointer-events-none flex items-center gap-2">
           <div className="h-px w-4 bg-[#c4ff0d]/30" />
           <p className="text-[10px] text-zinc-600 tracking-[0.18em] uppercase">Developed by itzz industries</p>
-          <span className="text-zinc-700 text-[10px]">·</span>
-          <p className="text-[10px] text-zinc-700 tracking-[0.12em] uppercase">sonar &amp; itzz_link</p>
         </div>
       </div>
 
@@ -680,14 +754,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         className="w-60 flex flex-col overflow-y-auto shrink-0"
         style={{ background: 'rgba(6,6,6,0.98)', borderLeft: '1px solid rgba(255,255,255,0.05)' }}
       >
-        {/* Header */}
-        <div className="px-4 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <img src="/Group_15.svg" alt="Livery Previewer" className="h-14 w-auto mb-3" style={{ mixBlendMode: 'lighten' }} />
-          <div className="h-px bg-gradient-to-r from-[#c4ff0d]/40 to-transparent mb-2.5" />
-          <p className="text-[9px] text-zinc-600 tracking-widest uppercase font-semibold">
-            {user ? (user.global_name ?? user.username) : 'ERLC Vehicle Previewer'}
-          </p>
-        </div>
+        <SidebarHeader user={user} />
 
         {/* Model */}
         <Section title="Model" icon={Box} defaultOpen={true}>
@@ -837,7 +904,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   );
 }
 
-// ─── Capture button — separate to keep hook rules clean ───────────────────────
+// ─── Capture button ───────────────────────────────────────────────────────────
 
 function CaptureButton({ onClick }: { onClick: () => void }) {
   const [hovered, setHovered] = useState(false);

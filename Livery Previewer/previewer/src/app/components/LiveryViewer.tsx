@@ -1168,28 +1168,24 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               </div>
             </div>
 
-            {/* Texture Upload/Remove */}
+            {/* Texture Management */}
             <div>
               <Label>Texture Management</Label>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {PANELS.map(face => (
-                  <div key={face} className="space-y-2">
-                    <div className="flex items-center justify-between px-4 py-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                      <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-2)' }}>{face} Panels</span>
+                  <div key={face} className="p-4 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-[12px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</h4>
                       <div className="flex gap-2">
-                        <label className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-all"
+                        <label className="flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer transition-all"
                           style={{ 
-                            background: 'rgba(216,255,99,0.08)', 
-                            border: '1px solid rgba(216,255,99,0.25)', 
+                            background: 'rgba(216,255,99,0.1)', 
+                            border: '1px solid rgba(216,255,99,0.3)', 
                             color: '#D8FF63',
                             fontSize: '10px',
                             fontWeight: '600'
-                          }}
-                          onMouseEnter={e => (e.target as HTMLLabelElement).style.background = 'rgba(216,255,99,0.12)'}
-                          onMouseLeave={e => (e.target as HTMLLabelElement).style.background = 'rgba(216,255,99,0.08)'}
-                        >
-                          <Upload size={9} />
-                          <span>Upload</span>
+                          }}>
+                          <Upload size={8} />
                           <input 
                             type="file" 
                             accept="image/*" 
@@ -1209,7 +1205,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                         </label>
                         <button 
                           onClick={() => {
-                            // Remove all textures for this face
                             const nextTextures = { ...textures };
                             for (let i = 1; i <= panelNums[face]; i++) {
                               delete nextTextures[`${face}${i}`];
@@ -1217,54 +1212,42 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                             setTextures(nextTextures);
                             if (glbUrl) applyLivery(glbUrl, vehicleColor, nextTextures);
                           }}
-                          className="flex items-center gap-2 px-3 py-2 rounded-md transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded transition-all"
                           style={{ 
-                            background: 'rgba(239,68,68,0.08)', 
-                            border: '1px solid rgba(239,68,68,0.25)', 
+                            background: 'rgba(239,68,68,0.1)', 
+                            border: '1px solid rgba(239,68,68,0.3)', 
                             color: '#ef4444',
                             fontSize: '10px',
                             fontWeight: '600'
-                          }}
-                          onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)'}
-                          onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)'}
-                        >
-                          <Trash2 size={9} />
-                          <span>Clear All</span>
+                          }}>
+                          <Trash2 size={8} />
                         </button>
                       </div>
                     </div>
                     
-                    {/* Individual panel slots */}
                     <div className="grid grid-cols-2 gap-2">
                       {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
-                        <div key={panel} className="relative group">
+                        <div key={panel}>
                           {textures[panel] ? (
-                            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: 'rgba(216,255,99,0.04)', border: '1px solid rgba(216,255,99,0.12)' }}>
-                              <div className="w-7 h-7 rounded-md overflow-hidden flex-shrink-0" style={{ border: '1px solid rgba(216,255,99,0.18)' }}>
-                                <img src={textures[panel]} className="w-full h-full object-cover" alt={panel} />
-                              </div>
+                            <div className="flex items-center gap-2 p-2 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
+                              <img src={textures[panel]} className="w-8 h-8 rounded object-cover" alt={panel} />
                               <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-bold truncate" style={{ color: '#D8FF63' }}>{panel}</p>
-                                <p className="text-[8px] font-medium" style={{ color: 'rgba(216,255,99,0.6)' }}>Loaded</p>
+                                <p className="text-[9px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
                               </div>
                               <button 
                                 onClick={() => handleRemoveTexture(panel)}
-                                className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-md flex items-center justify-center transition-all flex-shrink-0"
-                                style={{ color:'var(--text-4)', background:'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
-                                onMouseEnter={e=>{ (e.currentTarget.style.color='#f87171'); (e.currentTarget.style.background='rgba(239,68,68,0.08)'); (e.currentTarget.style.borderColor='rgba(239,68,68,0.15)'); }}
-                                onMouseLeave={e=>{ (e.currentTarget.style.color='var(--text-4)'); (e.currentTarget.style.background='rgba(255,255,255,0.03)'); (e.currentTarget.style.borderColor='rgba(255,255,255,0.08)'); }}>
-                                <X size={9} />
+                                className="w-5 h-5 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                                style={{ color:'#ef4444', background:'rgba(239,68,68,0.1)' }}>
+                                <X size={8} />
                               </button>
                             </div>
                           ) : (
-                            <label className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all drop-zone" style={{ background: 'var(--surface2)', border: '1.5px dashed rgba(255,255,255,0.15)' }}>
-                              <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.03)', border: '1.5px dashed rgba(255,255,255,0.15)' }}>
-                                <Upload size={9} style={{ color: 'var(--text-4)' }} />
+                            <label className="flex items-center gap-2 p-2 rounded cursor-pointer transition-all border border-dashed" 
+                              style={{ borderColor: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.02)' }}>
+                              <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                <Upload size={8} style={{ color: 'var(--text-4)' }} />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-semibold" style={{ color: 'var(--text-3)' }}>{panel}</p>
-                                <p className="text-[8px] font-medium" style={{ color: 'var(--text-4)' }}>Click to upload</p>
-                              </div>
+                              <p className="text-[9px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
                               <input 
                                 type="file" 
                                 accept="image/*" 

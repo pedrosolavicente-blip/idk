@@ -257,8 +257,37 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Server Access</p>
-                <p>As part of the OAuth2 login process, our bot has the technical capability to add you to our Discord server. This is used only to gr
-
+                <p>As part of the OAuth2 login process, our bot has the technical capability to add you to our Discord server. This is used only to grant verified members access and will never be used without your knowledge.</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">What We Don't Collect</p>
+                <p>We do not collect passwords, email addresses, payment information, or any data unrelated to Discord membership verification.</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">How We Use Your Data</p>
+                <p>Your data is used only to verify membership and grant access to the Livery Previewer. We do not sell, share, or distribute your data to any third parties.</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Data Retention</p>
+                <p>Your data is not stored permanently. We only use it at the time of login to verify access.</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Contact</p>
+                <p>Questions? Reach us on Discord at <span className="text-[#c4ff0d]">discord.gg/itzz</span>.</p>
+              </div>
+            </div>
+            <div className="px-5 pb-4">
+              <button
+                onClick={() => setShowCookies(false)}
+                className="w-full text-xs font-bold bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black py-2.5 rounded-xl transition-all"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* ── Left: login content ── */}
       <div className="relative z-10 flex flex-col justify-center px-16 w-[44%] gap-7">
 

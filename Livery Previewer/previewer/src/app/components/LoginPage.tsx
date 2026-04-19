@@ -89,7 +89,7 @@ function CarSpinner() {
           scene.add(pivot);
 
           // Position camera based on actual model size
-const dist = size2.z * 0.75;
+const dist = size2.z * 0.90;
 const height = size2.y * 0.35;
 camera.position.set(0, height, dist);
 camera.lookAt(0, size2.y * 0.2, 0);

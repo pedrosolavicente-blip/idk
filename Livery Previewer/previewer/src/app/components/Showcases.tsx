@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import type { DiscordUser } from '../../lib/discordAuth';
 import {
   type ShowcasePost, type ShowcaseComment, type LiveryConfig, type Analytics, type PostType,
   type RuleId, RELEASE_RULES,
-  fetchPosts, fetchPost, createPost, deletePost, editPost, fetchLiveryConfig,
-  fetchComments, addComment, deleteComment, editComment,
+  fetchPosts, fetchPost, createPost, deletePost, fetchLiveryConfig,
+  fetchComments, addComment, deleteComment,
   reactToPost, removeReaction, recordView, fetchAnalytics,
   avatarUrl, imageUrl, relativeTime,
 } from '../../lib/showcaseApi';
@@ -12,7 +12,7 @@ import { initLiveryViewer, type LiveryViewer as Viewer, type SceneSettings } fro
 import {
   X, Upload, Send, Trash2, MessageSquare, Image, ArrowLeft,
   ThumbsUp, ThumbsDown, Eye, Settings2, BarChart2, Box,
-  CornerDownRight, Search, Share2, Edit2, Check, Hash,
+  CornerDownRight, Search, Share2, Hash,
 } from 'lucide-react';
 
 const ACCENT = '#c4ff0d';
@@ -20,7 +20,8 @@ const ACCENT = '#c4ff0d';
 // ─── Badges ───────────────────────────────────────────────────────────────────
 
 const BADGES: Record<string, { label: string; shortLabel: string; color: string }> = {
-  '1256593664856162384': { label: 'Site Owner', shortLabel: 'OWNER', color: '#f59e0b' },
+  '1256593664856162384': { label: 'Developer & Creator', shortLabel: 'CREATOR', color: '#f59e0b' },
+  '1195666796099948597': { label: 'Developer', shortLabel: 'DEV', color: '#3b82f6' },
 };
 
 function UserBadge({ userId }: { userId: string }) {
@@ -170,6 +171,7 @@ function PostCard({ post, currentUserId, onClick, onDeleted, onTagClick }: {
             </div>
             <TypeBadge type={post.post_type} />
           </div>
+          {post.title && <p className="text-sm font-bold text-white truncate">{post.title}</p>}
           {post.caption && <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{post.caption.replace(/#\w+/g, '').trim()}</p>}
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1" onClick={e => e.stopPropagation()}>
@@ -205,9 +207,6 @@ function PostSettings({ post: initialPost, onClose, onDeleted }: {
   const [analytics, setAnalytics]  = useState<Analytics | null>(null);
   const [loading, setLoading]      = useState(false);
   const [deleting, setDeleting]    = useState(false);
-  const [editingCaption, setEditingCaption] = useState(false);
-  const [captionDraft, setCaptionDraft]     = useState(post.caption);
-  const [savingCaption, setSavingCaption]   = useState(false);
 
   useEffect(() => { if (tab === 'analytics') { setLoading(true); fetchAnalytics(post.id).then(setAnalytics).catch(() => {}).finally(() => setLoading(false)); } }, [tab]);
 
@@ -216,16 +215,6 @@ function PostSettings({ post: initialPost, onClose, onDeleted }: {
     setDeleting(true);
     try { await deletePost(post.id); onDeleted(); }
     catch (e) { alert(e instanceof Error ? e.message : 'Failed'); setDeleting(false); }
-  };
-
-  const handleSaveCaption = async () => {
-    setSavingCaption(true);
-    try {
-      await editPost(post.id, captionDraft);
-      setPost(p => ({ ...p, caption: captionDraft }));
-      setEditingCaption(false);
-    } catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
-    finally { setSavingCaption(false); }
   };
 
   return (
@@ -255,26 +244,7 @@ function PostSettings({ post: initialPost, onClose, onDeleted }: {
                 <TypeBadge type={post.post_type} />
                 <p className="text-xs text-zinc-400">{new Date(post.created_at).toLocaleDateString()}</p>
               </div>
-              {/* Editable description */}
-              {editingCaption ? (
-                <div className="space-y-2">
-                  <textarea value={captionDraft} onChange={e => setCaptionDraft(e.target.value)} rows={3}
-                    className="w-full bg-black/40 border border-[#c4ff0d]/30 rounded-lg text-xs px-3 py-2 text-zinc-300 outline-none focus:border-[#c4ff0d]/60 resize-none" />
-                  <div className="flex gap-2">
-                    <button onClick={handleSaveCaption} disabled={savingCaption}
-                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold bg-[#c4ff0d] text-black py-1.5 rounded-lg disabled:opacity-40">
-                      <Check size={11} />{savingCaption ? 'Saving…' : 'Save'}
-                    </button>
-                    <button onClick={() => { setEditingCaption(false); setCaptionDraft(post.caption); }}
-                      className="flex-1 text-xs font-bold bg-white/5 border border-white/10 text-zinc-400 py-1.5 rounded-lg">Cancel</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-start gap-2">
-                  <p className="text-xs text-zinc-400 leading-relaxed flex-1">{post.caption || <span className="text-zinc-600 italic">No description</span>}</p>
-                  <button onClick={() => setEditingCaption(true)} className="text-zinc-600 hover:text-[#c4ff0d] transition-colors shrink-0 mt-0.5"><Edit2 size={11} /></button>
-                </div>
-              )}
+              <p className="text-xs text-zinc-400 leading-relaxed">{post.caption || <span className="text-zinc-600 italic">No description</span>}</p>
               <div className="flex gap-4 text-xs text-zinc-500 pt-1">
                 <span className="flex items-center gap-1"><Eye size={11} /> {post.view_count}</span>
                 <span className="flex items-center gap-1"><ThumbsUp size={11} /> {post.like_count}</span>
@@ -403,9 +373,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText]       = useState('');
   const [sendingReply, setSendingReply] = useState(false);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editCommentText, setEditCommentText]   = useState('');
-  const [savingComment, setSavingComment]       = useState(false);
   const [wordList, setWordList]         = useState<string[]>([]);
   const [copied, setCopied]             = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -488,18 +455,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
       setReplyingToId(null);
     } catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
     finally { setSendingReply(false); }
-  };
-
-  const handleSaveEdit = async (c: ShowcaseComment) => {
-    if (!editCommentText.trim() || savingComment) return;
-    if (filter(editCommentText)) { alert('Your comment contains a word that is not allowed.'); return; }
-    setSavingComment(true);
-    try {
-      await editComment(post.id, c.id, editCommentText.trim());
-      setComments(prev => prev.map(x => x.id === c.id ? { ...x, body: editCommentText.trim(), edited_at: Date.now() } : x));
-      setEditingCommentId(null);
-    } catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
-    finally { setSavingComment(false); }
   };
 
   const handleDeleteComment = async (c: ShowcaseComment) => {
@@ -600,6 +555,7 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 
             {/* Description + tags + reactions */}
             <div className="px-5 py-4 border-t border-white/8 space-y-3">
+              {post.title && <p className="text-lg font-black text-white leading-tight">{post.title}</p>}
               {liveryConfig?.modelName && (
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{liveryConfig.modelName}</p>
               )}
@@ -648,7 +604,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                   {comments.map(c => {
                     const isCreator = c.user_id === post.user_id;
                     const isReplying = replyingToId === c.id;
-                    const isEditing  = editingCommentId === c.id;
                     const parsed = parseReply(c.body);
                     return (
                       <div key={c.id} className="space-y-2">
@@ -668,27 +623,10 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                                 <CornerDownRight size={9} />@{parsed.replyTo}
                               </div>
                             )}
-                            {isEditing ? (
-                              <div className="space-y-1.5">
-                                <input autoFocus value={editCommentText} onChange={e => setEditCommentText(e.target.value)}
-                                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSaveEdit(c)}
-                                  className="w-full bg-black/40 border border-[#c4ff0d]/30 rounded-lg text-xs px-3 py-1.5 text-zinc-300 outline-none focus:border-[#c4ff0d]/60" />
-                                <div className="flex gap-2">
-                                  <button onClick={() => handleSaveEdit(c)} disabled={savingComment}
-                                    className="text-xs font-bold text-[#c4ff0d] hover:text-white transition-colors disabled:opacity-40">
-                                    {savingComment ? 'Saving…' : 'Save'}
-                                  </button>
-                                  <button onClick={() => setEditingCommentId(null)} className="text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors">Cancel</button>
-                                </div>
-                              </div>
-                            ) : (
-                              <p className="text-xs text-zinc-300 leading-relaxed break-words">
+                            <p className="text-xs text-zinc-300 leading-relaxed break-words">
                                 {parsed ? parsed.text : c.body}
-                                {c.edited_at && <span className="text-[10px] text-zinc-600 ml-1.5 font-normal">(edited)</span>}
-                              </p>
-                            )}
-                            {!isEditing && (
-                              <div className="flex items-center gap-3 mt-1">
+                            </p>
+                            <div className="flex items-center gap-3 mt-1">
                                 {currentUserId && (
                                   <button onClick={() => { setReplyingToId(isReplying ? null : c.id); setReplyText(''); }}
                                     className="text-[10px] font-bold text-zinc-500 hover:text-[#c4ff0d] transition-colors">
@@ -696,12 +634,8 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                                   </button>
                                 )}
                                 {currentUserId === c.user_id && (
-                                  <>
-                                    <button onClick={() => { setEditingCommentId(c.id); setEditCommentText(parsed ? parsed.text : c.body); }}
-                                      className="text-[10px] font-bold text-zinc-500 hover:text-zinc-300 transition-colors">Edit</button>
-                                    <button onClick={() => handleDeleteComment(c)}
-                                      className="text-[10px] font-bold text-zinc-500 hover:text-red-400 transition-colors">Delete</button>
-                                  </>
+                                  <button onClick={() => handleDeleteComment(c)}
+                                    className="text-[10px] font-bold text-zinc-500 hover:text-red-400 transition-colors">Delete</button>
                                 )}
                               </div>
                             )}
@@ -769,6 +703,7 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
   const [postType, setPostType]   = useState<PostType>('image');
   const [file, setFile]           = useState<File | null>(null);
   const [preview, setPreview]     = useState<string | null>(null);
+  const [title, setTitle]         = useState('');
   const [caption, setCaption]     = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState<string | null>(null);
@@ -820,7 +755,7 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
           rules: postType === 'release' ? rules : undefined,
         };
       }
-      onUploaded(await createPost(file, caption, postType, livery));
+      onUploaded(await createPost(file, caption, postType, livery, title.trim() || undefined));
     } catch (e) { setUploadErr(e instanceof Error ? e.message : 'Upload failed'); }
     finally { setUploading(false); }
   };
@@ -837,16 +772,15 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
         <div className="flex gap-1.5 p-4 pb-0">
           {([
             { type: 'image', label: 'Image Post' },
-            { type: 'showcase', label: '3D Showcase', disabled: !has3D },
-            { type: 'release', label: 'Free Release', disabled: !has3D },
-          ] as { type: PostType; label: string; disabled?: boolean }[]).map(({ type, label, disabled }) => (
-            <button key={type} onClick={() => !disabled && setPostType(type)} disabled={disabled}
-              className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${postType === type ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]' : 'border-white/10 bg-white/3 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'}`}>
+            { type: 'showcase', label: '3D Showcase' },
+            { type: 'release', label: 'Free Release' },
+          ] as { type: PostType }[]).map(({ type, label }: any) => (
+            <button key={type} onClick={() => setPostType(type)}
+              className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${postType === type ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]' : 'border-white/10 bg-white/3 text-zinc-400 hover:text-white'}`}>
               {label}
             </button>
           ))}
         </div>
-        {!has3D && <p className="text-[9px] text-zinc-600 px-4 pt-1">Load a vehicle to unlock 3D Showcase & Free Release</p>}
 
         <div className="p-4 space-y-3">
           {postType === 'image' ? (
@@ -864,6 +798,14 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
               <input ref={inputRef} type="file" accept="image/*" className="hidden"
                 onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
             </div>
+          ) : !has3D ? (
+            <div className="aspect-video flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-white/10 bg-zinc-950">
+              <Box size={28} className="text-zinc-700" strokeWidth={1.5} />
+              <div className="text-center">
+                <p className="text-xs font-bold text-zinc-400">No vehicle loaded</p>
+                <p className="text-[10px] text-zinc-600 mt-0.5">Choose a car in the Livery Previewer first</p>
+              </div>
+            </div>
           ) : (
             <div className="rounded-xl border border-[#c4ff0d]/30 overflow-hidden">
               {preview
@@ -874,6 +816,11 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
             </div>
           )}
 
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1.5">Post Name</p>
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. LSPD Bullhorn Prancer"
+              className="w-full bg-black/40 border border-white/10 rounded-lg text-xs px-3 py-2 text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 transition-all" />
+          </div>
           <div>
             <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1.5">Description (optional) — use #tags</p>
             <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="Describe your livery… #sports #clean #roblox"
@@ -927,7 +874,7 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
 
         <div className="px-4 pb-4 flex gap-2">
           <button onClick={onClose} className="flex-1 text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 py-2.5 rounded-xl transition-all">Cancel</button>
-          <button onClick={handleSubmit} disabled={!file || uploading}
+          <button onClick={handleSubmit} disabled={!file || uploading || ((postType === 'showcase' || postType === 'release') && !has3D)}
             className="flex-1 flex items-center justify-center gap-2 text-xs font-bold bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black py-2.5 rounded-xl transition-all disabled:opacity-40 shadow-lg shadow-[#c4ff0d]/20">
             {uploading ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : <><Upload size={13} />Post</>}
           </button>

@@ -23,9 +23,8 @@ function CarSpinner() {
       const w = el!.clientWidth;
       const h = el!.clientHeight;
 
-      // alpha: true keeps background transparent
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setClearColor(0x000000, 0); // fully transparent clear
+      renderer.setClearColor(0x000000, 0);
       renderer.setSize(w, h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -35,12 +34,9 @@ function CarSpinner() {
       el!.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
-      // No scene background — stays transparent
-      const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 200);
-      camera.position.set(0, 0.8, 3.6);
-      camera.lookAt(0, 0, 0);
+      const camera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
 
-      scene.add(new THREE.AmbientLight(0x0a1800, 1.0));
+      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
 
       const spot = new THREE.SpotLight(0xd4ff5a, 120, 30, Math.PI / 5, 0.4, 1.5);
       spot.position.set(0, 8, 4);
@@ -57,45 +53,69 @@ function CarSpinner() {
       under.position.set(0, -1.2, 0);
       scene.add(under);
 
-      const fill = new THREE.PointLight(0xffd080, 1.5, 10);
+      const fill = new THREE.PointLight(0xffd080, 2.0, 10);
       fill.position.set(4, 1, 1);
       scene.add(fill);
 
-      // Remove solid ground plane — use transparent shadow-only plane instead
       const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(20, 20),
-        new THREE.ShadowMaterial({ opacity: 0.35 }),
+        new THREE.ShadowMaterial({ opacity: 0.3 }),
       );
       ground.rotation.x = -Math.PI / 2;
-      ground.position.y = -0.82;
       ground.receiveShadow = true;
       scene.add(ground);
 
       const loader = new GLTFLoader();
-      let model: any = null;
+      let pivot: any = null;
 
       loader.load(
         'https://pub-13c1fc73579544bdb2eb07e28434bd74.r2.dev/Falcon%20Interceptor%20Utility%202024.glb',
         (gltf: any) => {
-          model = gltf.scene;
+          const model = gltf.scene;
+
+          // Compute tight bounding box
           const box = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
-          model.position.set(-center.x, -center.y - size.y * 0.08, -center.z);
-          model.scale.setScalar(2.6 / maxDim);
+
+          // Normalize scale so largest dimension = 4 units
+          const scale = 4 / maxDim;
+          model.scale.setScalar(scale);
+
+          // Recompute after scale
+          const box2 = new THREE.Box3().setFromObject(model);
+          const center2 = box2.getCenter(new THREE.Vector3());
+          const size2 = box2.getSize(new THREE.Vector3());
+
+          // Center horizontally, sit on ground
+          model.position.set(-center2.x, -box2.min.y, -center2.z);
+
+          // Move ground plane to y=0
+          ground.position.y = 0;
+
+          // Wrap in pivot for rotation
+          pivot = new THREE.Object3D();
+          pivot.add(model);
+          scene.add(pivot);
+
+          // Position camera based on actual model size
+          const dist = size2.z * 2.2;
+          const height = size2.y * 0.55;
+          camera.position.set(0, height, dist);
+          camera.lookAt(0, size2.y * 0.3, 0);
+
           model.traverse((child: any) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
               const mats = Array.isArray(child.material) ? child.material : [child.material];
               mats.forEach((m: any) => {
-                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.6);
-                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.38);
+                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.55);
+                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.4);
               });
             }
           });
-          scene.add(model);
         },
         undefined,
         (err: any) => console.warn('Model load failed', err),
@@ -106,7 +126,7 @@ function CarSpinner() {
         if (stopped) return;
         frameId = requestAnimationFrame(animate);
         angle += 0.003;
-        if (model) model.rotation.y = angle;
+        if (pivot) pivot.rotation.y = angle;
         renderer.render(scene, camera);
       }
       animate();
@@ -135,14 +155,7 @@ function CarSpinner() {
   }, []);
 
   return (
-    <div
-      ref={mountRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        background: 'transparent',
-      }}
-    />
+    <div ref={mountRef} style={{ width: '100%', height: '100%', background: 'transparent' }} />
   );
 }
 
@@ -172,48 +185,44 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         />
 
         {/* Lime glow top-right */}
-        <div
-          className="absolute -top-32 -right-32 rounded-full"
-          style={{ width: 700, height: 700, opacity: 0.2, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 65%)' }}
-        />
+        <div className="absolute -top-32 -right-32 rounded-full" style={{ width: 700, height: 700, opacity: 0.2, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 65%)' }} />
         {/* Lime glow bottom-left */}
-        <div
-          className="absolute -bottom-24 -left-24 rounded-full"
-          style={{ width: 500, height: 500, opacity: 0.12, background: 'radial-gradient(circle, #88ff00 0%, transparent 65%)' }}
-        />
+        <div className="absolute -bottom-24 -left-24 rounded-full" style={{ width: 500, height: 500, opacity: 0.12, background: 'radial-gradient(circle, #88ff00 0%, transparent 65%)' }} />
         {/* Center glow */}
-        <div
-          className="absolute rounded-full"
-          style={{ width: 620, height: 620, top: '50%', left: '58%', transform: 'translate(-50%,-50%)', opacity: 0.09, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 60%)' }}
-        />
+        <div className="absolute rounded-full" style={{ width: 620, height: 620, top: '50%', left: '58%', transform: 'translate(-50%,-50%)', opacity: 0.09, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 60%)' }} />
         {/* Scatter */}
-        <div
-          className="absolute rounded-full"
-          style={{ width: 280, height: 280, top: '33%', left: '22%', opacity: 0.07, background: 'radial-gradient(circle, #aaff00 0%, transparent 70%)' }}
-        />
+        <div className="absolute rounded-full" style={{ width: 280, height: 280, top: '33%', left: '22%', opacity: 0.07, background: 'radial-gradient(circle, #aaff00 0%, transparent 70%)' }} />
       </div>
 
-      {/* ── Navbar — glassmorphism bar ── */}
+      {/* ── Navbar ── */}
       <nav
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-4"
+        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8"
         style={{
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 1px 0 0 rgba(196,255,13,0.04), inset 0 1px 0 0 rgba(255,255,255,0.05)',
+          boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
         }}
       >
         <img src="/itzz.svg" alt="itzz" className="h-7 w-auto" />
 
         <div className="flex items-center gap-2">
+          {/* Contact Us — lime accent */}
           <button
             onClick={() => window.open('https://discord.gg/itzz', '_blank')}
-            className="text-[10px] font-semibold tracking-widest uppercase text-zinc-500 hover:text-white transition-colors px-3 py-2"
+            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
+            style={{
+              color: '#c4ff0d',
+              background: 'rgba(196,255,13,0.07)',
+              border: '1px solid rgba(196,255,13,0.22)',
+            }}
           >
             Contact Us
           </button>
-          <div className="w-px h-3 bg-white/10" />
+          {/* Legal */}
           <button
             onClick={onDisclaimer}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
@@ -224,6 +233,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           >
             Legal
           </button>
+          {/* Cookie */}
           <button
             onClick={onDisclaimer}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
@@ -310,27 +320,49 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
         </div>
       </div>
 
-      {/* ── Right: spinning car — fully transparent, blends into bg ── */}
-      <div className="absolute right-0 top-0 bottom-0 w-[60%] z-10" style={{ background: 'transparent' }}>
-        {/* Left fade to blend car into page */}
+      {/* ── Right: spinning car ── */}
+      <div
+        className="absolute right-0 top-0 bottom-0 w-[62%] z-10"
+        style={{ background: 'transparent' }}
+      >
+        {/* Left fade — wide and smooth, kills the hard cut */}
         <div
-          className="absolute inset-y-0 left-0 w-64 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to right, #080808 0%, transparent 100%)' }}
+          className="absolute inset-y-0 left-0 z-10 pointer-events-none"
+          style={{
+            width: '48%',
+            background: 'linear-gradient(to right, #080808 0%, #080808 15%, rgba(8,8,8,0.7) 60%, transparent 100%)',
+          }}
         />
-        {/* Bottom fade so car doesn't hard-cut at bottom */}
+        {/* Bottom fade */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-40 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to top, #080808 0%, transparent 100%)' }}
+          className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none"
+          style={{
+            height: '30%',
+            background: 'linear-gradient(to top, #080808 0%, transparent 100%)',
+          }}
         />
         {/* Top fade */}
         <div
-          className="absolute top-0 left-0 right-0 h-24 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to bottom, #080808 0%, transparent 100%)' }}
+          className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
+          style={{
+            height: '15%',
+            background: 'linear-gradient(to bottom, #080808 0%, transparent 100%)',
+          }}
         />
-        {/* Lime spotlight glow behind car */}
+        {/* Right fade */}
+        <div
+          className="absolute inset-y-0 right-0 z-10 pointer-events-none"
+          style={{
+            width: '12%',
+            background: 'linear-gradient(to left, #080808 0%, transparent 100%)',
+          }}
+        />
+        {/* Lime spotlight glow */}
         <div
           className="absolute inset-0 pointer-events-none z-0"
-          style={{ background: 'radial-gradient(ellipse 50% 60% at 55% 50%, rgba(196,255,13,0.08) 0%, transparent 70%)' }}
+          style={{
+            background: 'radial-gradient(ellipse 55% 55% at 58% 52%, rgba(196,255,13,0.07) 0%, transparent 70%)',
+          }}
         />
         <CarSpinner />
       </div>

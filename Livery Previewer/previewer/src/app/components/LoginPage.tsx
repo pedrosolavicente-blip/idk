@@ -94,17 +94,17 @@ const height = size2.y * 0.8;
 camera.position.set(-0.5, height, dist);
 camera.lookAt(-0.5, size2.y * 0.4, 0);
 
-          model.traverse((child: any) => {
-            if (child.isMesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-              const mats = Array.isArray(child.material) ? child.material : [child.material];
-              mats.forEach((m: any) => {
-                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.55);
-                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.4);
-              });
-            }
-          });
+model.traverse((child: any) => {
+  if (child.isMesh) {
+    child.castShadow = true;
+    child.receiveShadow = true;
+    const mats = Array.isArray(child.material) ? child.material : [child.material];
+    mats.forEach((m: any) => {
+      m.wireframe = true;
+      m.color.set('#c4ff0d');
+    });
+  }
+});
         },
         undefined,
         (err: any) => console.warn('Model load failed', err),

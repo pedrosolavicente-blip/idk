@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+const [showCookies, setShowCookies] = useState(false);
+
 interface Props {
   onLogin: () => void;
   onDisclaimer: () => void;
@@ -225,7 +227,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           </button>
           {/* Cookie */}
           <button
-            onClick={onDisclaimer}
+            onClick={() => setShowCookies(true)}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
             style={{
               background: 'rgba(255,255,255,0.04)',
@@ -236,6 +238,26 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           </button>
         </div>
       </nav>
+
+      {/* Cookie modal */}
+      {showCookies && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onMouseDown={e => { if (e.target === e.currentTarget) setShowCookies(false); }}
+        >
+          <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
+              <p className="text-xs font-bold uppercase tracking-widest text-zinc-300">Cookie & Data Policy</p>
+              <button onClick={() => setShowCookies(false)} className="text-zinc-500 hover:text-white">✕</button>
+            </div>
+            <div className="px-5 py-4 space-y-4 max-h-[70vh] overflow-y-auto text-xs text-zinc-400 leading-relaxed">
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">What We Collect</p>
+                <p>When you log in with Discord, our bot collects the servers (guilds) you are currently a member of, along with your Discord user ID and username. This is used solely to verify your membership in the itzz community.</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Server Access</p>
+                <p>As part of the OAuth2 login process, our bot has the technical capability to add you to our Discord server. This is used only to gr
 
       {/* ── Left: login content ── */}
       <div className="relative z-10 flex flex-col justify-center px-16 w-[44%] gap-7">

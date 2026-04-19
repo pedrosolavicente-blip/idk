@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import itzzLogo from '@/imports/itzz-logo.png';
+import itzzLogo from '../../imports/itzz-logo.png';
 
 interface Props {
   onLogin: () => void;
@@ -13,99 +13,99 @@ function CarSpinner() {
     const el = mountRef.current;
     if (!el) return;
 
-    const w = el.clientWidth;
-    const h = el.clientHeight;
-
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-    el.appendChild(renderer.domElement);
-
-    // Scene + camera
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 200);
-    camera.position.set(0, 1.4, 7);
-    camera.lookAt(0, 0.3, 0);
-
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const key = new THREE.DirectionalLight(0xc4ff0d, 2.0);
-    key.position.set(4, 6, 5);
-    scene.add(key);
-    const fill = new THREE.DirectionalLight(0x8899cc, 0.8);
-    fill.position.set(-5, 2, -3);
-    scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xffffff, 0.4);
-    rim.position.set(0, -3, -6);
-    scene.add(rim);
-
-    // Pivot for rotation
-    const pivot = new THREE.Group();
-    scene.add(pivot);
-
-    // Load model
-    const loader = new GLTFLoader();
-    loader.load(
-      '/api/models/Falcon%20Interceptor%20Utility%202024.glb',
-      (gltf) => {
-        const model = gltf.scene;
-
-        // Centre + fit
-        const box    = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size   = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        model.position.sub(center);
-        model.scale.setScalar(4.5 / maxDim);
-
-        // Boost material quality
-        model.traverse((child) => {
-          if ((child as THREE.Mesh).isMesh) {
-            const mesh = child as THREE.Mesh;
-            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-            mats.forEach((m) => {
-              const mat = m as THREE.MeshStandardMaterial;
-              if (mat.metalness !== undefined) mat.metalness = Math.max(mat.metalness, 0.4);
-              if (mat.roughness !== undefined) mat.roughness = Math.min(mat.roughness, 0.55);
-            });
-          }
-        });
-
-        pivot.add(model);
-      },
-      undefined,
-      (err) => console.warn('Model load failed', err),
-    );
-
-    // Animate
     let frameId: number;
-    const clock = new THREE.Clock();
-    function animate() {
-      frameId = requestAnimationFrame(animate);
-      pivot.rotation.y += clock.getDelta() * 0.4;
-      renderer.render(scene, camera);
-    }
-    animate();
+    let renderer: any;
 
-    // Resize
-    function onResize() {
-      const nw = el.clientWidth;
-      const nh = el.clientHeight;
-      camera.aspect = nw / nh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(nw, nh);
+    async function init() {
+      const THREE = await import('three');
+      const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+
+      const w = el!.clientWidth;
+      const h = el!.clientHeight;
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+      el!.appendChild(renderer.domElement);
+
+      const scene  = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 200);
+      camera.position.set(0, 1.4, 7);
+      camera.lookAt(0, 0.3, 0);
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+      const key = new THREE.DirectionalLight(0xc4ff0d, 2.0);
+      key.position.set(4, 6, 5);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0x8899cc, 0.8);
+      fill.position.set(-5, 2, -3);
+      scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.4);
+      rim.position.set(0, -3, -6);
+      scene.add(rim);
+
+      const pivot = new THREE.Group();
+      scene.add(pivot);
+
+      const loader = new GLTFLoader();
+      loader.load(
+        '/api/models/Falcon%20Interceptor%20Utility%202024.glb',
+        (gltf: any) => {
+          const model = gltf.scene;
+          const box    = new THREE.Box3().setFromObject(model);
+          const center = box.getCenter(new THREE.Vector3());
+          const size   = box.getSize(new THREE.Vector3());
+          const maxDim = Math.max(size.x, size.y, size.z);
+          model.position.sub(center);
+          model.scale.setScalar(4.5 / maxDim);
+          model.traverse((child: any) => {
+            if (child.isMesh) {
+              const mats = Array.isArray(child.material) ? child.material : [child.material];
+              mats.forEach((m: any) => {
+                if (m.metalness !== undefined) m.metalness = Math.max(m.metalness, 0.4);
+                if (m.roughness !== undefined) m.roughness = Math.min(m.roughness, 0.55);
+              });
+            }
+          });
+          pivot.add(model);
+        },
+        undefined,
+        (err: any) => console.warn('Model load failed', err),
+      );
+
+      const clock = new THREE.Clock();
+      function animate() {
+        frameId = requestAnimationFrame(animate);
+        pivot.rotation.y += clock.getDelta() * 0.4;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      function onResize() {
+        if (!el) return;
+        const nw = el.clientWidth;
+        const nh = el.clientHeight;
+        camera.aspect = nw / nh;
+        camera.updateProjectionMatrix();
+        renderer.setSize(nw, nh);
+      }
+      window.addEventListener('resize', onResize);
     }
-    window.addEventListener('resize', onResize);
+
+    init().catch(console.error);
 
     return () => {
       cancelAnimationFrame(frameId);
-      window.removeEventListener('resize', onResize);
-      renderer.dispose();
-      el.removeChild(renderer.domElement);
+      if (renderer) {
+        renderer.dispose();
+        if (renderer.domElement.parentNode === el) {
+          el.removeChild(renderer.domElement);
+        }
+      }
     };
   }, []);
 

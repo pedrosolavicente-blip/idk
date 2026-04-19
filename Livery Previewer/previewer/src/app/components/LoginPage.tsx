@@ -83,9 +83,6 @@ function CarSpinner() {
           // Center horizontally, sit on ground
           model.position.set(-center2.x, -box2.min.y, -center2.z);
 
-          // Move ground plane to y=0
-          ground.position.y = 0;
-
           // Wrap in pivot for rotation
           pivot = new THREE.Object3D();
           pivot.add(model);

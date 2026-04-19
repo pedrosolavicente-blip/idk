@@ -93,12 +93,6 @@ function DisclaimerModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-const Credits = () => (
-  <p className="fixed bottom-4 left-4 text-[10px] text-zinc-600 tracking-wider pointer-events-none">
-    developed by itzz industries | sonar & itzz_link
-  </p>
-);
-
 export default function App() {
   const [authState, setAuthState]           = useState<AuthState>('checking');
   const [authError, setAuthError]           = useState<string | null>(null);

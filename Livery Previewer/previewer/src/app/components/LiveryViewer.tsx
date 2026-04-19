@@ -27,7 +27,6 @@ const DEFAULT_SETTINGS: SceneSettings = {
   bgCustomIsEXR: false,
 };
 
-// Brightness + rotation presets applied automatically when switching skyboxes
 const SKYBOX_LIGHTING: Record<'default' | 'sunset' | 'night', Pick<SceneSettings, 'brightness' | 'skyRotX' | 'skyRotY' | 'skyRotZ'>> = {
   default: { brightness: 1.1,  skyRotX: 0, skyRotY: 0,   skyRotZ: 0 },
   sunset:  { brightness: 0.9,  skyRotX: 0, skyRotY: 180, skyRotZ: 0 },
@@ -43,7 +42,7 @@ interface LiveryPreset {
   modelId:     string | null;
   vehicleColor: string;
   panelNums:   Record<PanelFace, number>;
-  textures:    Record<string, string>; // base64 data-URLs
+  textures:    Record<string, string>;
 }
 
 function presetsKey(userId: string) { return `livery_presets_${userId}`; }
@@ -58,7 +57,6 @@ function savePresetsStorage(userId: string, presets: LiveryPreset[]) {
 }
 
 async function blobUrlToDataUrl(url: string): Promise<string> {
-  // data: URLs are already fine; only convert blob: URLs
   if (url.startsWith('data:')) return url;
   const res  = await fetch(url);
   const blob = await res.blob();
@@ -147,13 +145,11 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   const [showCredits, setShowCredits]     = useState(false);
   const [showShowcases, setShowShowcases] = useState(false);
 
-  // Preset state
   const userId   = user?.id ?? 'guest';
   const [presets, setPresets]         = useState<LiveryPreset[]>(() => loadPresets(userId));
   const [presetName, setPresetName]   = useState('');
   const [savingPreset, setSavingPreset] = useState(false);
 
-  // ─── Engine init ───
   useEffect(() => {
     const viewer = initLiveryViewer(containerRef.current!);
     viewerRef.current = viewer;
@@ -165,7 +161,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     viewerRef.current.updateScene(settings);
   }, [settings]);
 
-  // ─── Livery loading ───
   const applyLivery = useCallback(async (url: string, color: string, tex: Record<string, string>) => {
     if (!url || !viewerRef.current) return;
     setError(null);
@@ -184,7 +179,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     applyLivery(model.path, vehicleColor, textures);
   };
 
-  // ─── Colour ───
   const rafRef = useRef<number | null>(null);
   const handleColorChange = useCallback((color: string) => {
     setVehicleColor(color);
@@ -203,7 +197,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     if (val.length === 6) handleColorChange('#' + val);
   };
 
-  // ─── Textures ───
   const handleTextureUpload = (panel: string, file: File) => {
     const url  = URL.createObjectURL(file);
     const next = { ...textures, [panel]: url };
@@ -221,7 +214,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   const getPanelKeys = (face: PanelFace) =>
     Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`);
 
-  // ─── Capture ───
   const downloadDataUrl = (dataUrl: string, filename: string) => {
     const a = document.createElement('a');
     a.href  = dataUrl;
@@ -255,12 +247,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
   const handleResetSettings = () => setSettings({ ...DEFAULT_SETTINGS });
 
-  // ─── Presets ───
   const handleSavePreset = async () => {
     if (!presetName.trim()) return;
     setSavingPreset(true);
     try {
-      // Convert all blob URLs to data-URLs so they survive page reloads
       const persistedTextures: Record<string, string> = {};
       await Promise.all(
         Object.entries(textures).map(async ([panel, url]) => {
@@ -288,17 +278,10 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   };
 
   const handleLoadPreset = async (preset: LiveryPreset) => {
-    // Restore colour
     setVehicleColor(preset.vehicleColor);
     setHexSidebarInput(preset.vehicleColor.replace('#', '').toUpperCase());
-
-    // Restore panel counts
     setPanelNums(preset.panelNums);
-
-    // Restore textures (already data-URLs so no conversion needed)
     setTextures(preset.textures);
-
-    // Restore model
     const model = MODELS.find(m => m.id === preset.modelId) ?? null;
     if (model) {
       setSelectedModel(model);
@@ -307,8 +290,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     } else if (glbUrl) {
       await applyLivery(glbUrl, preset.vehicleColor, preset.textures);
     }
-
-    // Apply colour separately in case model was already loaded
     viewerRef.current?.updateColor(preset.vehicleColor);
   };
 
@@ -318,17 +299,30 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     savePresetsStorage(userId, next);
   };
 
-  // ─── Filtered model list ───
   const filteredModels = MODELS
     .filter(m => filterCat === 'All' || m.category === filterCat)
     .filter(m => !searchQuery || m.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  // ─── Render ───
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <div className="flex h-screen bg-black text-white overflow-hidden" style={{ fontFamily: 'Inter, sans-serif' }}>
 
       {/* ── 3-D Viewport ── */}
       <div className="relative flex-1 bg-gradient-to-br from-black via-zinc-950 to-black" ref={containerRef}>
+
+        {/* BIG ITZZ WATERMARK */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 flex items-center justify-center">
+          <img
+            src={itzzLogo}
+            alt=""
+            aria-hidden="true"
+            style={{
+              width: '85%',
+              maxWidth: '1400px',
+              opacity: 0.04,
+              filter: 'brightness(0) invert(1)',
+            }}
+          />
+        </div>
 
         {/* Credits modal */}
         {showCredits && (
@@ -337,29 +331,21 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             onMouseDown={e => { if (e.target === e.currentTarget) setShowCredits(false); }}
           >
             <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-              {/* Header */}
               <div className="px-6 pt-6 pb-4 text-center border-b border-white/5">
                 <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-1">Built by</p>
                 <p className="text-lg font-black tracking-widest uppercase text-white">itzz industries</p>
                 <div className="mt-3 h-px bg-gradient-to-r from-transparent via-[#c4ff0d]/40 to-transparent" />
               </div>
-
-              {/* People */}
               <div className="px-6 py-5 space-y-3">
-                {/* Sonarsilly */}
                 <div className="rounded-xl border border-white/8 bg-white/3 p-4">
                   <p className="text-sm font-bold text-white">Sonarsilly</p>
                   <p className="text-[10px] text-[#c4ff0d] font-semibold uppercase tracking-widest mt-1">Backend Development</p>
                 </div>
-
-                {/* Link */}
                 <div className="rounded-xl border border-white/8 bg-white/3 p-4">
                   <p className="text-sm font-bold text-white">Link</p>
                   <p className="text-[10px] text-[#c4ff0d] font-semibold uppercase tracking-widest mt-1">Frontend Development</p>
                 </div>
               </div>
-
-              {/* Footer */}
               <div className="px-6 pb-5">
                 <button
                   onClick={() => setShowCredits(false)}
@@ -400,26 +386,21 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           />
         )}
 
-        {/* ── Glassmorphism Navbar ── */}
+        {/* ── DARK NAVBAR (matching sidebar) ── */}
         <nav
           className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6"
           style={{
             paddingTop: '10px',
             paddingBottom: '10px',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+            background: 'rgba(0,0,0,0.75)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          {/* Left: logo */}
-          <img src="/itzz.svg" alt="itzz" className="h-7 w-auto" />
+          <img src={itzzLogo} alt="itzz" className="h-7 w-auto" />
 
-          {/* Center: Settings panel inline */}
           <div className="flex items-center gap-2">
-
-            {/* Settings toggle */}
             <div className="relative">
               <button
                 onClick={() => { setShowSettings(s => !s); setShowMenu(false); }}
@@ -446,7 +427,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     </button>
                   </div>
 
-                  {/* Brightness */}
                   <div className="mb-4">
                     <Label>Brightness — {settings.brightness.toFixed(2)}</Label>
                     <input
@@ -457,7 +437,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     />
                   </div>
 
-                  {/* Sky Rotation */}
                   <div className="mb-4 space-y-2">
                     <Label>Sky Rotation</Label>
                     {([
@@ -477,7 +456,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     ))}
                   </div>
 
-                  {/* Background */}
                   <div>
                     <Label>Skybox</Label>
                     <div className="grid grid-cols-3 gap-1.5 mb-2">
@@ -509,7 +487,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               )}
             </div>
 
-            {/* Showcases */}
             <button
               onClick={() => { setShowShowcases(true); setShowMenu(false); }}
               className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white bg-white/4 border border-white/8"
@@ -517,54 +494,49 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <Users size={12} />
               Showcases
             </button>
-
           </div>
 
-          {/* Right: menu */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <button
-                onClick={() => { setShowMenu(s => !s); setShowSettings(false); }}
-                className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all ${
-                  showMenu
-                    ? 'text-[#c4ff0d] bg-[#c4ff0d]/10 border border-[#c4ff0d]/40'
-                    : 'text-zinc-400 hover:text-white bg-white/4 border border-white/8'
-                }`}
-              >
-                <MoreHorizontal size={12} />
-                Menu
-              </button>
+          <div className="relative">
+            <button
+              onClick={() => { setShowMenu(s => !s); setShowSettings(false); }}
+              className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all ${
+                showMenu
+                  ? 'text-[#c4ff0d] bg-[#c4ff0d]/10 border border-[#c4ff0d]/40'
+                  : 'text-zinc-400 hover:text-white bg-white/4 border border-white/8'
+              }`}
+            >
+              <MoreHorizontal size={12} />
+              Menu
+            </button>
 
-              {showMenu && (
-                <div className="animate-settings-in absolute right-0 top-full mt-2 w-48 bg-[#0a0a0a]/95 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl">
-                  <button
-                    onClick={() => { setShowCredits(true); setShowMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
-                  >
-                    <Star size={13} style={{ color: ACCENT }} />
-                    Credits
-                  </button>
-                  <button
-                    onClick={() => { onShowDisclaimer(); setShowMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
-                  >
-                    <FileText size={13} style={{ color: ACCENT }} />
-                    Disclaimer
-                  </button>
-                  <button
-                    onClick={() => { clearAuth(); onLogout(); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-red-400 hover:bg-white/5 transition-all"
-                  >
-                    <LogOut size={13} className="text-red-500" />
-                    Log Out
-                  </button>
-                </div>
-              )}
-            </div>
+            {showMenu && (
+              <div className="animate-settings-in absolute right-0 top-full mt-2 w-48 bg-[#0a0a0a]/95 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl">
+                <button
+                  onClick={() => { setShowCredits(true); setShowMenu(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
+                >
+                  <Star size={13} style={{ color: ACCENT }} />
+                  Credits
+                </button>
+                <button
+                  onClick={() => { onShowDisclaimer(); setShowMenu(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all border-b border-white/5"
+                >
+                  <FileText size={13} style={{ color: ACCENT }} />
+                  Disclaimer
+                </button>
+                <button
+                  onClick={() => { clearAuth(); onLogout(); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-zinc-400 hover:text-red-400 hover:bg-white/5 transition-all"
+                >
+                  <LogOut size={13} className="text-red-500" />
+                  Log Out
+                </button>
+              </div>
+            )}
           </div>
         </nav>
 
-        {/* Loading overlay */}
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10 gap-3">
             <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
@@ -572,16 +544,14 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         )}
 
-        {/* Error */}
         {error && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-900/80 border border-red-500/30 text-red-300 text-xs px-4 py-2 rounded z-10">
             {error}
           </div>
         )}
 
-        {/* Empty state */}
         {!glbUrl && !loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3">
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3 z-10">
             <div className="relative">
               <Box size={48} className="text-zinc-800" strokeWidth={1.5} />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -595,10 +565,8 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         )}
 
-        {/* Capture buttons */}
         {glbUrl && (
-          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2">
-            {/* Angle shots dropdown */}
+          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 z-10">
             <div className="relative">
               <button
                 onClick={() => setShowAngleMenu(o => !o)}
@@ -640,7 +608,6 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 </div>
               )}
             </div>
-            {/* Freeform capture */}
             <button
               onClick={handleCapture}
               className="flex items-center justify-center gap-2 bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-lg shadow-[#c4ff0d]/30 hover:shadow-[#c4ff0d]/50 hover:scale-105 w-full"
@@ -652,29 +619,8 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         )}
       </div>
 
-      {/* ── Sidebar ── */}
-      <div className="w-64 flex flex-col border-l border-[#c4ff0d]/10 bg-black overflow-y-auto relative">
-
-        {/* Big white itzz watermark */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
-          <img
-            src="/itzz.svg"
-            alt=""
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '220%',
-              opacity: 0.03,
-              filter: 'brightness(0) invert(1)',
-            }}
-          />
-          <div style={{ position: 'absolute', top: '10%', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, #c4ff0d 0%, transparent 70%)', opacity: 0.06 }} />
-          <div style={{ position: 'absolute', bottom: '20%', left: '-40px', width: '150px', height: '150px', borderRadius: '50%', background: 'radial-gradient(circle, #c4ff0d 0%, transparent 70%)', opacity: 0.05 }} />
-          <div style={{ position: 'absolute', top: '50%', right: '0px', width: '120px', height: '120px', borderRadius: '50%', background: 'radial-gradient(circle, #c4ff0d 0%, transparent 70%)', opacity: 0.04 }} />
-        </div>
+      {/* ── SIDEBAR with glass bg ── */}
+      <div className="w-64 flex flex-col border-l border-[#c4ff0d]/10 bg-black/80 backdrop-blur-xl overflow-y-auto relative">
 
         {/* Header */}
         <div className="relative z-10 px-4 py-5 border-b border-white/5">
@@ -697,40 +643,34 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="h-px bg-gradient-to-r from-[#c4ff0d]/40 to-transparent mt-3" />
         </div>
 
-        {/* ── Model section ── */}
+        {/* Model */}
         <Section title="Model" icon={Box} defaultOpen={true}>
-          {/* Category filter */}
           <div className="flex gap-1 mb-2">
             <button
               onClick={() => setFilterCat('All')}
-              className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all relative overflow-hidden group ${
+              className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${
                 filterCat === 'All'
                   ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
                   : 'border-white/10 bg-white/5 text-zinc-400 hover:text-[#c4ff0d] hover:border-[#c4ff0d]/30'
               }`}
-              style={filterCat === 'All' ? { boxShadow: '0 0 14px rgba(196,255,13,0.2)' } : {}}
             >
-              <span className="relative z-10">All</span>
-              {filterCat !== 'All' && <span className="absolute inset-y-0 right-0 w-0 group-hover:w-full transition-all duration-300 bg-gradient-to-l from-[#c4ff0d]/10 to-transparent rounded-lg" />}
+              All
             </button>
             {AVAILABLE_CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setFilterCat(cat)}
-                className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all relative overflow-hidden group ${
+                className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${
                   filterCat === cat
                     ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]'
                     : 'border-white/10 bg-white/5 text-zinc-400 hover:text-[#c4ff0d] hover:border-[#c4ff0d]/30'
                 }`}
-                style={filterCat === cat ? { boxShadow: '0 0 14px rgba(196,255,13,0.2)' } : {}}
               >
-                <span className="relative z-10">{cat}</span>
-                {filterCat !== cat && <span className="absolute inset-y-0 right-0 w-0 group-hover:w-full transition-all duration-300 bg-gradient-to-l from-[#c4ff0d]/10 to-transparent rounded-lg" />}
+                {cat}
               </button>
             ))}
           </div>
 
-          {/* Search */}
           <div className="relative mb-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={13} />
             <input
@@ -762,7 +702,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         </Section>
 
-        {/* ── Presets section ── */}
+        {/* Presets */}
         <Section title="Presets" icon={Bookmark} defaultOpen={false}>
           <div className="flex gap-1.5">
             <input
@@ -812,36 +752,45 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           )}
         </Section>
 
-        {/* ── Vehicle Colour section ── */}
+        {/* Vehicle Color with CRYSTAL EFFECT */}
         <Section title="Vehicle Color" icon={Palette} defaultOpen={true}>
-          <div className="flex items-center gap-3">
-            <ColorPicker color={vehicleColor} onChange={handleColorChange} />
-            {/* Editable hex field */}
-            <div className="flex items-center flex-1 bg-black/40 border border-white/10 rounded-lg text-xs px-3 py-2 gap-1 focus-within:border-[#c4ff0d]/50 transition-all">
-              <span className="text-zinc-500 font-mono">#</span>
-              <input
-                value={hexSidebarInput}
-                onChange={e => handleSidebarHexInput(e.target.value)}
-                className="flex-1 bg-transparent text-zinc-300 font-mono uppercase outline-none min-w-0"
-                maxLength={6}
-                spellCheck={false}
-              />
+          <div
+            className="p-3 rounded-xl border border-white/10"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: 'inset 0 1px 0 0 rgba(255,255,255,0.1), 0 4px 16px rgba(0,0,0,0.3)',
+            }}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <ColorPicker color={vehicleColor} onChange={handleColorChange} />
+              <div className="flex items-center flex-1 bg-black/40 border border-white/10 rounded-lg text-xs px-3 py-2 gap-1 focus-within:border-[#c4ff0d]/50 transition-all">
+                <span className="text-zinc-500 font-mono">#</span>
+                <input
+                  value={hexSidebarInput}
+                  onChange={e => handleSidebarHexInput(e.target.value)}
+                  className="flex-1 bg-transparent text-zinc-300 font-mono uppercase outline-none min-w-0"
+                  maxLength={6}
+                  spellCheck={false}
+                />
+              </div>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {['#000000','#1a1a2e','#c0392b','#27ae60','#2980b9','#8e44ad','#f39c12','#ecf0f1','#2c2c2c'].map(c => (
-              <button
-                key={c}
-                onClick={() => handleColorChange(c)}
-                style={{ background: c }}
-                className="w-6 h-6 rounded-lg border-2 border-white/20 hover:scale-110 hover:border-[#c4ff0d]/50 transition-all shadow-md"
-                title={c}
-              />
-            ))}
+            <div className="flex flex-wrap gap-2">
+              {['#000000','#1a1a2e','#c0392b','#27ae60','#2980b9','#8e44ad','#f39c12','#ecf0f1','#2c2c2c'].map(c => (
+                <button
+                  key={c}
+                  onClick={() => handleColorChange(c)}
+                  style={{ background: c }}
+                  className="w-6 h-6 rounded-lg border-2 border-white/20 hover:scale-110 hover:border-[#c4ff0d]/50 transition-all shadow-md"
+                  title={c}
+                />
+              ))}
+            </div>
           </div>
         </Section>
 
-        {/* ── Livery Textures section ── */}
+        {/* Livery Textures */}
         <Section title="Livery Textures" icon={Image}>
           {!glbUrl && (
             <p className="text-[10px] text-zinc-600 italic">Select a vehicle first</p>

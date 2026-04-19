@@ -610,7 +610,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {/* Header */}
         <div className="px-4 py-6 border-b border-[#c4ff0d]/20 bg-gradient-to-b from-[#c4ff0d]/5 to-transparent">
           <div className="flex items-center gap-2.5 mb-2">
-            <img src="/Previewer.svg" alt="Livery Previewer" className="h-10 w-auto drop-shadow-[0_0_8px_rgba(196,255,13,0.4)]" />
+            <img src="/Group_15.svg" alt="Livery Previewer" className="h-10 w-auto drop-shadow-[0_0_8px_rgba(196,255,13,0.4)]" />
             <button
               onClick={() => { clearAuth(); onLogout(); }}
               title="Log out"

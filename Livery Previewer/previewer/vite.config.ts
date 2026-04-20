@@ -25,7 +25,7 @@ const serveGlbsPlugin = {
 };
 
 export default defineConfig({
-  base: '/previewer/',
+  base: '/',
   publicDir: path.resolve(__dirname, 'public'),
   plugins: [react(), tailwindcss(), serveGlbsPlugin, cloudflare()],
   resolve: {

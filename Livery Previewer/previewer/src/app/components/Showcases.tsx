@@ -914,6 +914,11 @@ export default function Showcases() {
   const [activeTag, setActiveTag] = useState<PostType>('all');
   const [selectedPost, setSelectedPost] = useState<ShowcasePost | null>(null);
   const [showUpload, setShowUpload] = useState(false);
+  const [sort, setSort] = useState<'new' | 'liked' | 'viewed' | 'comments'>('new');
+  const [fetchErr, setFetchErr] = useState<string | null>(null);
+  const [user, setUser] = useState<DiscordUser | null>(null);
+
+  useEffect(() => {
     setLoading(true); setFetchErr(null);
     try { setPosts(await fetchPosts(s, tag ?? undefined)); }
     catch (e) { setFetchErr(e instanceof Error ? e.message : 'Failed to load'); }

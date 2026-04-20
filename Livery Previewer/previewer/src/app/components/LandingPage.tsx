@@ -365,7 +365,7 @@ export default function LandingPage() {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollProgress = Math.min(scrollY / maxScroll, 1);
+      const scrollProgress = Math.min(currentScrollY / maxScroll, 1);
       
       const audiElement = document.getElementById('audi-render');
       if (audiElement) {
@@ -436,12 +436,12 @@ export default function LandingPage() {
       <div 
         style={{
           position: 'fixed',
-          right: '-150px',
+          right: `${scrollY > 200 ? '-150px' : '20px'}`,
           top: `${Math.random() * 60 + 20}%`,
           zIndex: 1000,
-          opacity: scrollY > 100 ? 0 : 0.8,
-          transform: `translateX(${scrollY > 100 ? 0 : Math.sin(scrollY * 0.01) * 20}px)`,
-          transition: 'opacity 0.3s ease-in-out, transform 0.1s ease-out',
+          opacity: scrollY > 200 && scrollY < 600 ? 0.8 : 0,
+          transform: `translateX(${scrollY > 200 && scrollY < 600 ? Math.sin(scrollY * 0.01) * 20 : 0}px)`,
+          transition: 'right 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.1s ease-out',
         }}
       >
         <img 

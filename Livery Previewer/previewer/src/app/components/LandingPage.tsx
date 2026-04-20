@@ -644,52 +644,116 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Products ── */}
-      <section id="products" style={{ position:'relative', zIndex:10, padding:'120px 48px' }}>
-        <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:64 }}>
+      {/* ── Premium Products Grid ── */}
+      <section id="products" style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(8,8,8,0.8) 0%, rgba(216,255,99,0.02) 50%, rgba(8,8,8,0.8) 100%)' }}>
+        <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:80 }}>
           <div>
-            <p className="lp-section-label" style={{ marginBottom:12 }}>What we build</p>
-            <h2 style={{ fontSize:'clamp(28px,4vw,52px)', fontWeight:800, letterSpacing:'-0.025em', margin:0, lineHeight:1.1 }}>
-              Our products<br />&amp; community
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+              <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)', boxShadow:'0 0 20px rgba(216,255,99,0.6)' }} />
+              <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#D8FF63', margin:0 }}>What we build</p>
+            </div>
+            <h2 style={{ fontSize:'clamp(32px,4vw,56px)', fontWeight:900, letterSpacing:'-0.03em', margin:0, lineHeight:1.05, background:'linear-gradient(135deg, #FFFFFF 0%, #D8FF63 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+              Our Premium<br />Products
             </h2>
           </div>
-          <p style={{ fontSize:13, color:'var(--text-muted)', maxWidth:280, lineHeight:1.7, textAlign:'right', margin:0 }}>
-            Tools and spaces built for the itzz community — free, member-focused, always improving.
-          </p>
+          <div style={{ textAlign:'right', maxWidth:300 }}>
+            <p style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.8, margin:0, fontWeight:500 }}>
+              Cutting-edge tools and exclusive spaces built for the itzz community
+            </p>
+            <div style={{ marginTop:16, display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8 }}>
+              <div style={{ width:8, height:8, borderRadius:'50%', background:'#D8FF63', boxShadow:'0 0 10px rgba(216,255,99,0.8)' }} />
+              <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(255,255,255,0.5)' }}>Premium Quality</span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:2 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:4, position:'relative' }}>
           {PRODUCTS.map((p, i) => (
             <div key={p.id}
-              className="glass-card"
-              style={{ borderRadius: i===0?'16px 0 0 0':i===1?'0 16px 0 0':i===2?'0 0 0 16px':'0 0 16px 0', borderRight: i%2===0?'1px solid var(--border-subtle)':'none', borderBottom: i<2?'1px solid var(--border-subtle)':'none' }}
+              style={{ 
+                position:'relative',
+                borderRadius: i===0?'24px 0 0 0':i===1?'0 24px 0 0':i===2?'0 0 0 24px':'0 0 24px 0', 
+                border: '1px solid rgba(216,255,99,0.1)',
+                borderRight: i%2===0?'1px solid rgba(216,255,99,0.2)':'none', 
+                borderBottom: i<2?'1px solid rgba(216,255,99,0.2)':'none',
+                background:'linear-gradient(135deg, rgba(8,8,8,0.9) 0%, rgba(216,255,99,0.05) 100%)',
+                backdropFilter:'blur(20px)',
+                WebkitBackdropFilter:'blur(20px)',
+                overflow:'hidden',
+                transition:'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor:'pointer'
+              }}
               onClick={() => { if (p.isInternal && p.link) navigate(p.link); else if (p.link) window.open(p.link,'_blank'); }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-8px)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.4)';
+                e.currentTarget.style.boxShadow='0 20px 40px rgba(216,255,99,0.3)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.1)';
+                e.currentTarget.style.boxShadow='none';
+              }}
             >
-              <div style={{ padding:'48px 40px', height:'100%', minHeight:260, display:'flex', flexDirection:'column', justifyContent:'space-between', position:'relative', overflow:'hidden', transition:'background 0.2s ease' }}
-                onMouseEnter={e => (e.currentTarget.style.background='var(--bg-glass-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.background='var(--bg-glass)')}
-              >
-                {/* Number */}
-                <div style={{ position:'absolute', top:40, right:40, fontSize:64, fontWeight:900, color:'rgba(255,255,255,0.03)', lineHeight:1, letterSpacing:'-0.04em', userSelect:'none' }}>{p.num}</div>
+              {/* Premium Number */}
+              <div style={{ 
+                position:'absolute', 
+                top:32, 
+                right:32, 
+                fontSize:72, 
+                fontWeight:900, 
+                color:'rgba(216,255,99,0.08)', 
+                lineHeight:1, 
+                letterSpacing:'-0.05em', 
+                userSelect:'none',
+                textShadow:'0 0 30px rgba(216,255,99,0.4)'
+              }}>{p.num}</div>
 
-                <div>
-                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:20 }}>
-                    <span className="feature-badge">
-                      <div className="neon-dot" />
-                      <span>{p.tag}</span>
-                    </span>
-                  </div>
-                  <h3 style={{ fontSize:28, fontWeight:800, letterSpacing:'-0.02em', margin:'0 0 12px', color:'var(--text-primary)' }}>{p.name}</h3>
-                  <p style={{ fontSize:13, color:'var(--text-secondary)', lineHeight:1.7, margin:0, maxWidth:360 }}>{p.desc}</p>
+              {/* Content */}
+              <div style={{ padding:'56px 48px', height:'100%', minHeight:300, display:'flex', flexDirection:'column', justifyContent:'center', position:'relative', zIndex:2 }}>
+                {/* Premium Badge */}
+                <div style={{ 
+                  display:'inline-flex', 
+                  alignItems:'center', 
+                  gap:8, 
+                  marginBottom:24,
+                  padding:'8px 16px',
+                  borderRadius:20,
+                  background:'linear-gradient(45deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))',
+                  border:'1px solid rgba(216,255,99,0.3)'
+                }}>
+                  <div style={{ width:6, height:6, borderRadius:'50%', background:'#D8FF63', boxShadow:'0 0 15px rgba(216,255,99,0.8)' }} />
+                  <span style={{ fontSize:11, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color:'#D8FF63' }}>{p.tag}</span>
                 </div>
 
+                <h3 style={{ fontSize:32, fontWeight:900, letterSpacing:'-0.025em', margin:'0 0 16px', color:'#FFFFFF', lineHeight:1.2 }}>{p.name}</h3>
+                <p style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.8, margin:0, fontWeight:500 }}>{p.desc}</p>
+
+                {/* Premium CTA */}
                 {p.link && (
-                  <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:32 }}>
-                    <span className="feature-badge">
-                      <div className="neon-dot" />
-                      <span>{p.isInternal ? 'Open Tool' : p.tag==='Community' ? 'Join Now' : 'Learn More'}</span>
-                    </span>
-                    <span style={{ color:p.accent, fontSize:14 }}>→</span>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:32 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                      <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)' }} />
+                      <span style={{ fontSize:12, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(255,255,255,0.6)' }}>
+                        {p.isInternal ? 'Premium Tool' : p.tag==='Community' ? 'Join Community' : 'Explore More'}
+                      </span>
+                    </div>
+                    <div style={{ 
+                      width:40, 
+                      height:40, 
+                      borderRadius:'50%', 
+                      background:'linear-gradient(135deg, #D8FF63, #c0ff40)', 
+                      display:'flex', 
+                      alignItems:'center', 
+                      justifyContent:'center',
+                      fontSize:18,
+                      fontWeight:700,
+                      color:'#080808',
+                      boxShadow:'0 8px 24px rgba(216,255,99,0.4)',
+                      transition:'all 0.3s ease'
+                    }}>
+                      →
+                    </div>
                   </div>
                 )}
               </div>

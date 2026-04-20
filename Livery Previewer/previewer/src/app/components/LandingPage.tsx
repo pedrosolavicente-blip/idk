@@ -349,6 +349,7 @@ export default function LandingPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeNav, setActiveNav] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const { posts: showcasePosts, loading: showcaseLoading, refresh } = useShowcase();
 
   useEffect(() => {
@@ -359,9 +360,10 @@ export default function LandingPage() {
       document.head.appendChild(el);
     }
 
-    // Scroll animation for Audi render
+    // Scroll animation for Audi render + floating image
     const handleScroll = () => {
-      const scrollY = window.scrollY;
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const scrollProgress = Math.min(scrollY / maxScroll, 1);
       
@@ -380,7 +382,6 @@ export default function LandingPage() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-
 
     // Particle canvas
     const canvas = canvasRef.current;
@@ -430,6 +431,28 @@ export default function LandingPage() {
     <div className="lp" style={{ minHeight:'100vh', background:'#080808', color:'#fff', overflowX:'hidden' }}>
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
+
+      {/* Floating Car Image */}
+      <div 
+        style={{
+          position: 'fixed',
+          right: '-150px',
+          top: `${Math.random() * 60 + 20}%`,
+          zIndex: 1000,
+          opacity: scrollY > 100 ? 0 : 0.8,
+          transform: `translateX(${scrollY > 100 ? 0 : Math.sin(scrollY * 0.01) * 20}px)`,
+          transition: 'opacity 0.3s ease-in-out, transform 0.1s ease-out',
+        }}
+      >
+        <img 
+          src="/previewer/image 65.png"
+          alt="Floating Car"
+          style={{
+            width: '80px',
+            height: '80px',
+          }}
+        />
+      </div>
 
       {/* Ambient glows */}
       <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }}>

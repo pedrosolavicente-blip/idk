@@ -181,28 +181,84 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
         <div className="logo-3d-y-rotate" style={{ 
           position: 'relative',
           transformStyle: 'preserve-3d',
-          transform: 'perspective(1000px) translateZ(20px)',
+          transform: 'perspective(800px)',
         }}>
+          {/* Front face */}
           <img 
             src="/Vector (8).svg" 
-            alt="itzz" 
+            alt="itzz front" 
             style={{ 
+              position: 'absolute',
               width: '100%', 
               height: '100%', 
-              filter: 'brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(85deg) drop-shadow(0 10px 40px rgba(0,0,0,0.5))',
+              filter: 'brightness(0) invert(1) sepia(1) saturate(100) hue-rotate(70deg) brightness(1.1)',
+              transform: 'translateZ(30px)',
             }} 
           />
-          {/* Extrusion shadow layer */}
+          
+          {/* Back face */}
+          <img 
+            src="/Vector (8).svg" 
+            alt="itzz back" 
+            style={{ 
+              position: 'absolute',
+              width: '100%', 
+              height: '100%', 
+              filter: 'brightness(0) invert(1) sepia(1) saturate(100) hue-rotate(70deg) brightness(0.8)',
+              transform: 'translateZ(-30px) rotateY(180deg)',
+            }} 
+          />
+          
+          {/* Top edge */}
           <div style={{
             position: 'absolute',
-            top: '100%',
+            top: 0,
             left: 0,
             right: 0,
-            height: '100%',
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)',
-            transform: 'rotateX(-90deg) translateZ(-20px)',
+            height: '60px',
+            background: 'linear-gradient(to bottom, rgba(216,255,99,0.8), rgba(216,255,99,0.4))',
+            transform: 'rotateX(90deg) translateZ(30px)',
             transformOrigin: 'top',
-            filter: 'blur(2px)',
+            filter: 'drop-shadow(0 5px 15px rgba(0,0,0,0.3))',
+          }} />
+          
+          {/* Bottom edge */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '60px',
+            background: 'linear-gradient(to top, rgba(216,255,99,0.8), rgba(216,255,99,0.4))',
+            transform: 'rotateX(-90deg) translateZ(30px)',
+            transformOrigin: 'bottom',
+            filter: 'drop-shadow(0 5px 15px rgba(0,0,0,0.3))',
+          }} />
+          
+          {/* Left edge */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            bottom: 0,
+            width: '60px',
+            background: 'linear-gradient(to right, rgba(216,255,99,0.6), rgba(216,255,99,0.2))',
+            transform: 'rotateY(-90deg) translateZ(30px)',
+            transformOrigin: 'left',
+            filter: 'drop-shadow(5px 0 15px rgba(0,0,0,0.3))',
+          }} />
+          
+          {/* Right edge */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: '60px',
+            background: 'linear-gradient(to left, rgba(216,255,99,0.6), rgba(216,255,99,0.2))',
+            transform: 'rotateY(90deg) translateZ(30px)',
+            transformOrigin: 'right',
+            filter: 'drop-shadow(-5px 0 15px rgba(0,0,0,0.3))',
           }} />
         </div>
       </div>

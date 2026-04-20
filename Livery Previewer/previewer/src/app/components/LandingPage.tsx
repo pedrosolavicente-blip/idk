@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Logo3D from './Logo3D';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -14,6 +15,9 @@ const LANDING_STYLES = `
   @keyframes lp-shimmer  { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
   @keyframes lp-spin     { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
   @keyframes lp-marqee   { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+  @keyframes lp-float   { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+  @keyframes lp-pulse   { 0%,100% { transform:scale(1); opacity:0.8; } 50% { transform:scale(1.05); opacity:1; } }
+  @keyframes lp-slideIn { from { opacity:0; transform:translateX(-30px); } to { opacity:1; transform:translateX(0); } }
 
   .lp-nav-link {
     font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
@@ -48,7 +52,8 @@ const LANDING_STYLES = `
     transform: translateX(-120%); transition: transform 0.5s ease;
   }
   .lp-btn-primary:hover::before { transform: translateX(120%); }
-  .lp-btn-primary:hover { box-shadow: 0 6px 28px rgba(196,255,13,0.4); transform: translateY(-1px); }
+  .lp-btn-primary:hover { box-shadow: 0 8px 32px rgba(196,255,13,0.5); transform: translateY(-2px); }
+  .lp-btn-primary:active { transform: translateY(0); box-shadow: 0 4px 16px rgba(196,255,13,0.3); }
 
   .lp-btn-ghost {
     background: rgba(255,255,255,0.04);
@@ -59,7 +64,8 @@ const LANDING_STYLES = `
     cursor: pointer; transition: all 0.18s ease;
     display: inline-flex; align-items: center; gap: 8px;
   }
-  .lp-btn-ghost:hover { border-color: rgba(196,255,13,0.3); color: #fff; background: rgba(196,255,13,0.04); }
+  .lp-btn-ghost:hover { border-color: rgba(196,255,13,0.4); color: #fff; background: rgba(196,255,13,0.06); transform: translateY(-1px); }
+  .lp-btn-ghost:active { transform: translateY(0); }
 
   .lp-product-card {
     background: rgba(255,255,255,0.02);
@@ -96,6 +102,80 @@ const LANDING_STYLES = `
   .lp-counter {
     font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
     color: #3f3f46; font-variant-numeric: tabular-nums;
+  }
+
+  .lp-feature-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(196,255,13,0.1), rgba(196,255,13,0.05));
+    border: 1px solid rgba(196,255,13,0.2);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease; font-size: 20px;
+  }
+  .lp-feature-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+    background: linear-gradient(135deg, rgba(196,255,13,0.15), rgba(196,255,13,0.08));
+    box-shadow: 0 8px 24px rgba(196,255,13,0.2);
+  }
+
+  .lp-testimonial-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 24px;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .lp-testimonial-card::before {
+    content: '"'; position: absolute; top: 8px; right: 16px;
+    font-size: 48px; color: rgba(196,255,13,0.1);
+    font-weight: 900; line-height: 1;
+  }
+  .lp-testimonial-card:hover {
+    border-color: rgba(196,255,13,0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  .lp-showcase-item {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 12px; overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .lp-showcase-item:hover {
+    border-color: rgba(196,255,13,0.2);
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .lp-showcase-item img {
+    transition: transform 0.4s ease;
+  }
+  .lp-showcase-item:hover img {
+    transform: scale(1.1);
+  }
+
+  .lp-mobile-menu {
+    position: fixed; top: 56px; right: 0; bottom: 0; left: 0;
+    background: rgba(8,8,8,0.98); backdrop-filter: blur(24px);
+    z-index: 40; display: flex; flex-direction: column;
+    padding: 24px; transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .lp-mobile-menu.open { transform: translateX(0); }
+
+  @media (max-width: 768px) {
+    .lp-nav-desktop { display: none !important; }
+    .lp-nav-mobile { display: flex !important; }
+    .lp-hero-stats { display: none !important; }
+    .lp-products-grid { grid-template-columns: 1fr !important; }
+    .lp-about-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+    .lp-features-grid { grid-template-columns: 1fr !important; }
+    .lp-testimonials-grid { grid-template-columns: 1fr !important; }
+    .lp-showcase-grid { grid-template-columns: repeat(2,1fr) !important; }
+  }
+
+  @media (max-width: 480px) {
+    .lp-showcase-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
@@ -143,10 +223,73 @@ const PRODUCTS = [
 ];
 
 const STATS = [
-  { value: '20+',   label: 'Vehicle Models' },
+  { value: '25+',   label: 'Vehicle Models' },
   { value: '100%',  label: 'Free to Use'    },
   { value: 'ERLC',  label: 'Focused'        },
   { value: '24/7',  label: 'Available'      },
+];
+
+const FEATURES = [
+  {
+    icon: '??',
+    title: 'Real-time 3D Preview',
+    description: 'See your livery designs come to life with instant 3D rendering and accurate vehicle models.'
+  },
+  {
+    icon: '??',
+    title: '25+ Vehicle Models',
+    description: 'Extensive collection of ERLC vehicles with accurate details and proper scaling.'
+  },
+  {
+    icon: '??',
+    title: 'Community Driven',
+    description: 'Built by the community, for the community with regular updates based on feedback.'
+  },
+  {
+    icon: '??',
+    title: 'Cloud Storage',
+    description: 'Save your designs securely in the cloud and access them from anywhere.'
+  },
+  {
+    icon: '??',
+    title: 'Advanced Tools',
+    description: 'Professional-grade design tools with layers, textures, and precise controls.'
+  },
+  {
+    icon: '??',
+    title: 'Mobile Friendly',
+    description: 'Design on the go with full mobile support and responsive interface.'
+  }
+];
+
+const TESTIMONIALS = [
+  {
+    name: 'Alex Chen',
+    role: 'ERLC Designer',
+    content: 'The Livery Previewer has completely changed how I design. The real-time 3D preview is incredible.',
+    rating: 5
+  },
+  {
+    name: 'Sarah Martinez',
+    role: 'Community Member',
+    content: 'Finally a tool that actually understands what ERLC designers need. It\'s intuitive and powerful.',
+    rating: 5
+  },
+  {
+    name: 'Mike Johnson',
+    role: 'Fleet Manager',
+    content: 'Managing our department liveries has never been easier. The cloud storage is a game changer.',
+    rating: 5
+  }
+];
+
+const SHOWCASE_ITEMS = [
+  { id: 1, title: 'Police Cruiser', author: 'OfficerSmith', likes: 234 },
+  { id: 2, title: 'Fire Department', author: 'FireChief92', likes: 189 },
+  { id: 3, title: 'EMS Ambulance', author: 'MedicLife', likes: 156 },
+  { id: 4, title: 'SWAT Unit', author: 'TacticalTeam', likes: 298 },
+  { id: 5, title: 'Traffic Stop', author: 'HighwayPatrol', likes: 167 },
+  { id: 6, title: 'K-9 Unit', author: 'K9Handler', likes: 201 }
 ];
 
 export default function LandingPage() {
@@ -226,10 +369,10 @@ export default function LandingPage() {
 
       {/* ── Navbar ── */}
       <nav style={{ position:'fixed', top:0, left:0, right:0, zIndex:50, height:56, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 48px', background:'rgba(8,8,8,0.85)', backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)', borderBottom:'1px solid rgba(255,255,255,0.05)', boxShadow:'0 1px 0 rgba(196,255,13,0.06)' }}>
-        <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:26, width:'auto', cursor:'pointer' }} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })} />
+        <Logo3D size={60} style={{ cursor:'pointer' }} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })} />
 
         {/* Desktop nav */}
-        <div style={{ display:'flex', alignItems:'center', gap:36 }}>
+        <div className="lp-nav-desktop" style={{ display:'flex', alignItems:'center', gap:36 }}>
           {NAV_ITEMS.map(item => (
             <button key={item.id} className={`lp-nav-link ${activeNav===item.id?'active':''}`}
               onClick={() => { setActiveNav(item.id); item.action(); }}>
@@ -237,6 +380,17 @@ export default function LandingPage() {
             </button>
           ))}
         </div>
+
+        {/* Mobile menu button */}
+        <button 
+          className="lp-nav-mobile" 
+          style={{ display:'none', background:'none', border:'none', color:'#fff', cursor:'pointer', padding:'8px' }}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 12h18M3 6h18M3 18h18" />
+          </svg>
+        </button>
 
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
           <button className="lp-btn-ghost" style={{ padding:'8px 18px' }}
@@ -252,39 +406,78 @@ export default function LandingPage() {
         </div>
       </nav>
 
+      {/* Mobile Menu Overlay */}
+      <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`} style={{ display:'none' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
+          <Logo3D size={40} />
+          <button 
+            style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', padding:'8px' }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+          {NAV_ITEMS.map(item => (
+            <button key={item.id} className="lp-nav-link" style={{ fontSize:16, padding:'12px 0', textAlign:'left' }}
+              onClick={() => { setActiveNav(item.id); item.action(); setMenuOpen(false); }}>
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ marginTop:32, display:'flex', flexDirection:'column', gap:12 }}>
+          <button className="lp-btn-ghost" style={{ padding:'12px 24px', width:'100%' }}
+            onClick={() => { window.open('https://discord.gg/itzz','_blank'); setMenuOpen(false); }}>
+            Discord
+          </button>
+          <button className="lp-btn-primary" style={{ padding:'12px 24px', width:'100%' }} onClick={() => { navigate('/previewer'); setMenuOpen(false); }}>
+            Launch App
+          </button>
+        </div>
+      </div>
+
       {/* ── Hero ── */}
       <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'center', padding:'0 48px', paddingTop:56 }}>
-        <div style={{ maxWidth:680 }}>
-          {/* Counter */}
-          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:32, animation:'lp-fadeUp 0.5s ease both' }}>
-            <span className="lp-counter">/ 01</span>
-            <div style={{ height:1, width:40, background:'rgba(196,255,13,0.3)' }} />
-            <span style={{ fontSize:10, fontWeight:600, letterSpacing:'0.15em', color:'#3f3f46', textTransform:'uppercase' }}>itzz industries</span>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center', width:'100%' }}>
+          <div style={{ maxWidth:680 }}>
+            {/* Counter */}
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:32, animation:'lp-fadeUp 0.5s ease both' }}>
+              <span className="lp-counter">/ 01</span>
+              <div style={{ height:1, width:40, background:'rgba(196,255,13,0.3)' }} />
+              <span style={{ fontSize:10, fontWeight:600, letterSpacing:'0.15em', color:'#3f3f46', textTransform:'uppercase' }}>itzz industries</span>
+            </div>
+
+            {/* Heading */}
+            <h1 style={{ fontSize:'clamp(48px,6vw,92px)', fontWeight:900, lineHeight:1.0, letterSpacing:'-0.03em', margin:'0 0 28px', animation:'lp-fadeUp 0.5s ease 0.08s both', opacity:0 }}>
+              itzz all<br />
+              about <span style={{ background:'linear-gradient(135deg,#c4ff0d,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>quality.</span>
+            </h1>
+
+            <p style={{ fontSize:16, color:'#71717a', lineHeight:1.75, maxWidth:480, margin:'0 0 48px', fontWeight:400, animation:'lp-fadeUp 0.5s ease 0.16s both', opacity:0 }}>
+              A community built around ERLC — creating tools, designs, and experiences for players who care about the details.
+            </p>
+
+            <div style={{ display:'flex', gap:12, flexWrap:'wrap', animation:'lp-fadeUp 0.5s ease 0.24s both', opacity:0 }}>
+              <button className="lp-btn-primary" style={{ padding:'14px 28px', fontSize:13 }} onClick={() => navigate('/previewer')}>
+                Open Livery Previewer →
+              </button>
+              <button className="lp-btn-ghost" style={{ padding:'14px 24px', fontSize:13 }}
+                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior:'smooth' })}>
+                Explore
+              </button>
+            </div>
           </div>
 
-          {/* Heading */}
-          <h1 style={{ fontSize:'clamp(48px,6vw,92px)', fontWeight:900, lineHeight:1.0, letterSpacing:'-0.03em', margin:'0 0 28px', animation:'lp-fadeUp 0.5s ease 0.08s both', opacity:0 }}>
-            itzz all<br />
-            about <span style={{ background:'linear-gradient(135deg,#c4ff0d,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>quality.</span>
-          </h1>
-
-          <p style={{ fontSize:16, color:'#71717a', lineHeight:1.75, maxWidth:480, margin:'0 0 48px', fontWeight:400, animation:'lp-fadeUp 0.5s ease 0.16s both', opacity:0 }}>
-            A community built around ERLC — creating tools, designs, and experiences for players who care about the details.
-          </p>
-
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap', animation:'lp-fadeUp 0.5s ease 0.24s both', opacity:0 }}>
-            <button className="lp-btn-primary" style={{ padding:'14px 28px', fontSize:13 }} onClick={() => navigate('/previewer')}>
-              Open Livery Previewer →
-            </button>
-            <button className="lp-btn-ghost" style={{ padding:'14px 24px', fontSize:13 }}
-              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior:'smooth' })}>
-              Explore
-            </button>
+          {/* Large 3D Logo */}
+          <div style={{ display:'flex', justifyContent:'center', alignItems:'center', animation:'lp-fadeUp 0.6s ease 0.3s both', opacity:0 }}>
+            <Logo3D size={300} />
           </div>
         </div>
 
         {/* Right side — stats */}
-        <div style={{ position:'absolute', right:48, bottom:80, display:'flex', flexDirection:'column', gap:4, animation:'lp-fadeIn 0.8s ease 0.5s both', opacity:0 }}>
+        <div className="lp-hero-stats responsive" style={{ position:'absolute', right:48, bottom:80, display:'flex', flexDirection:'column', gap:4, animation:'lp-fadeIn 0.8s ease 0.5s both', opacity:0 }}>
           {STATS.map((s,i) => (
             <div key={i} style={{ display:'flex', alignItems:'center', gap:16, padding:'12px 0', borderBottom: i<STATS.length-1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
               <span style={{ fontSize:22, fontWeight:800, color:'#fff', minWidth:64, textAlign:'right' }}>{s.value}</span>
@@ -365,8 +558,113 @@ export default function LandingPage() {
 
       <div className="lp-divider" style={{ margin:'0 48px' }} />
 
-      {/* ── About ── */}
-      <section id="about" style={{ position:'relative', zIndex:10, padding:'120px 48px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center' }}>
+      {/* Features */}
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px' }}>
+        <div style={{ textAlign:'center', marginBottom:80 }}>
+          <p className="lp-section-label" style={{ marginBottom:16 }}>Features</p>
+          <h2 style={{ fontSize:'clamp(32px,4vw,56px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 24px', lineHeight:1.1 }}>
+            Everything you need to<br />create amazing liveries
+          </h2>
+          <p style={{ fontSize:16, color:'#71717a', maxWidth:600, margin:'0 auto', lineHeight:1.7 }}>
+            Professional tools designed specifically for ERLC livery creators. From concept to completion, we've got you covered.
+          </p>
+        </div>
+
+        <div className="lp-features-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:32 }}>
+          {FEATURES.map((feature, i) => (
+            <div key={i} style={{ textAlign:'center', animation:`lp-fadeUp 0.6s ease ${i*0.1}s both`, opacity:0 }}>
+              <div className="lp-feature-icon" style={{ margin:'0 auto 20px', fontSize:24 }}>
+                {feature.icon}
+              </div>
+              <h3 style={{ fontSize:18, fontWeight:700, color:'#f4f4f5', margin:'0 0 12px', letterSpacing:'-0.01em' }}>
+                {feature.title}
+              </h3>
+              <p style={{ fontSize:14, color:'#71717a', lineHeight:1.6, margin:0 }}>
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'rgba(255,255,255,0.01)' }}>
+        <div style={{ textAlign:'center', marginBottom:64 }}>
+          <p className="lp-section-label" style={{ marginBottom:16 }}>Testimonials</p>
+          <h2 style={{ fontSize:'clamp(28px,4vw,48px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 20px', lineHeight:1.1 }}>
+            Loved by the community
+          </h2>
+          <p style={{ fontSize:15, color:'#71717a', maxWidth:500, margin:'0 auto', lineHeight:1.7 }}>
+            See what ERLC players and designers are saying about our tools
+          </p>
+        </div>
+
+        <div className="lp-testimonials-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24 }}>
+          {TESTIMONIALS.map((testimonial, i) => (
+            <div key={i} className="lp-testimonial-card" style={{ animation:`lp-fadeUp 0.6s ease ${i*0.15}s both`, opacity:0 }}>
+              <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+                {[...Array(testimonial.rating)].map((_, j) => (
+                  <span key={j} style={{ color:'#c4ff0d', fontSize:16 }}>?</span>
+                ))}
+              </div>
+              <p style={{ fontSize:14, color:'#e4e4e7', lineHeight:1.6, margin:'0 0 20px', fontStyle:'italic' }}>
+                "{testimonial.content}"
+              </p>
+              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(135deg,#c4ff0d,#88ff00)', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, color:'#000' }}>
+                  {testimonial.name.charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontSize:13, fontWeight:600, color:'#f4f4f5', margin:0, lineHeight:1.2 }}>{testimonial.name}</p>
+                  <p style={{ fontSize:11, color:'#71717a', margin:0, lineHeight:1.2 }}>{testimonial.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Showcase */}
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px' }}>
+        <div style={{ textAlign:'center', marginBottom:64 }}>
+          <p className="lp-section-label" style={{ marginBottom:16 }}>Community Showcase</p>
+          <h2 style={{ fontSize:'clamp(28px,4vw,48px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 20px', lineHeight:1.1 }}>
+            Featured designs
+          </h2>
+          <p style={{ fontSize:15, color:'#71717a', maxWidth:500, margin:'0 auto', lineHeight:1.7 }}>
+            Amazing liveries created by our talented community members
+          </p>
+        </div>
+
+        <div className="lp-showcase-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
+          {SHOWCASE_ITEMS.map((item, i) => (
+            <div key={item.id} className="lp-showcase-item" style={{ animation:`lp-fadeUp 0.6s ease ${i*0.1}s both`, opacity:0 }}>
+              <div style={{ height:200, background:'linear-gradient(135deg,rgba(196,255,13,0.1),rgba(196,255,13,0.05))', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+                <div style={{ fontSize:48, opacity:0.3 }}>?</div>
+                <div style={{ position:'absolute', top:12, right:12, background:'rgba(8,8,8,0.8)', backdropFilter:'blur(8px)', padding:'4px 8px', borderRadius:6, display:'flex', alignItems:'center', gap:4 }}>
+                  <span style={{ fontSize:12, color:'#c4ff0d' }}>?</span>
+                  <span style={{ fontSize:11, color:'#e4e4e7' }}>{item.likes}</span>
+                </div>
+              </div>
+              <div style={{ padding:16 }}>
+                <h4 style={{ fontSize:14, fontWeight:600, color:'#f4f4f5', margin:'0 0 8px' }}>{item.title}</h4>
+                <p style={{ fontSize:12, color:'#71717a', margin:0 }}>by {item.author}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign:'center', marginTop:48 }}>
+          <button className="lp-btn-primary" style={{ padding:'14px 32px', fontSize:13 }} onClick={() => navigate('/previewer')}>
+            View All Designs ?
+          </button>
+        </div>
+      </section>
+
+      <div className="lp-divider" style={{ margin:'0 48px' }} />
+
+      {/* About */}
+      <section id="about" className="lp-about-grid responsive" style={{ position:'relative', zIndex:10, padding:'120px 48px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center' }}>
         <div>
           <p className="lp-section-label" style={{ marginBottom:16 }}>Who we are</p>
           <h2 style={{ fontSize:'clamp(28px,3.5vw,48px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 28px', lineHeight:1.15 }}>

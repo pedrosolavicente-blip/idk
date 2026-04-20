@@ -3,7 +3,6 @@ import path from 'path'
 import fs from 'fs'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-
 import { cloudflare } from "@cloudflare/vite-plugin";
 
 const serveGlbsPlugin = {
@@ -27,6 +26,7 @@ const serveGlbsPlugin = {
 
 export default defineConfig({
   base: '/previewer/',
+  publicDir: path.resolve(__dirname, 'public'),
   plugins: [react(), tailwindcss(), serveGlbsPlugin, cloudflare()],
   resolve: {
     alias: {
@@ -35,7 +35,6 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // Proxy R2 asset requests through localhost so CORS isn't an issue in dev
       '/r2-proxy': {
         target: 'https://pub-13c1fc73579544bdb2eb07e28434bd74.r2.dev',
         changeOrigin: true,

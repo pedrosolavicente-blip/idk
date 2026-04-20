@@ -347,6 +347,8 @@ export default function LandingPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeNav, setActiveNav] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showcasePosts, setShowcasePosts] = useState<any[]>([]);
+  const [showcaseLoading, setShowcaseLoading] = useState(true);
 
   useEffect(() => {
     if (!document.getElementById('lp-styles')) {
@@ -377,6 +379,25 @@ export default function LandingPage() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
+
+    // Fetch showcase posts
+    useEffect(() => {
+      const fetchShowcasePosts = async () => {
+        try {
+          const response = await fetch('/api/showcases');
+          if (response.ok) {
+            const posts = await response.json();
+            setShowcasePosts(posts.sort((a, b) => b.like_count - a.like_count).slice(0, 6));
+            setShowcaseLoading(false);
+          }
+        } catch (error) {
+          console.error('Failed to fetch showcase posts:', error);
+          setShowcaseLoading(false);
+        }
+      };
+
+      fetchShowcasePosts();
+    }, []);
 
     // Particle canvas
     const canvas = canvasRef.current;
@@ -920,10 +941,8 @@ export default function LandingPage() {
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:24, padding:'0 20px' }}>
-          {/* This will be replaced with actual showcases data from showcases.tsx */}
-          {/* For now, showing placeholder that will be populated with real showcase posts */}
-          {[1, 2, 3].map((item, i) => (
-            <div key={item}
+          {showcasePosts.map((post, i) => (
+            <div key={post.id}
               style={{ 
                 position:'relative',
                 borderRadius: '16px',
@@ -979,14 +998,14 @@ export default function LandingPage() {
                   border:'1px solid rgba(216,255,99,0.2)'
                 }}>
                   <span style={{ fontSize:14, color:'#D8FF63', filter:'drop-shadow(0 0 8px rgba(216,255,99,0.6)' }}>❤️</span>
-                  <span style={{ fontSize:12, color:'rgba(255,255,255,0.9)', fontWeight:600 }}>{item}</span>
+                  <span style={{ fontSize:12, color:'rgba(255,255,255,0.9)', fontWeight:600 }}>{post.like_count || 0}</span>
                 </div>
               </div>
               
               {/* Content */}
               <div style={{ padding:24 }}>
-                <h4 style={{ fontSize:16, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>Loading Showcase #{item}</h4>
-                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>From showcases.tsx</p>
+                <h4 style={{ fontSize:16, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>{post.title || 'Untitled Showcase'}</h4>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>{post.caption ? post.caption.replace(/#\w+/g, '').trim() : 'No description'}</p>
               </div>
             </div>
           ))}

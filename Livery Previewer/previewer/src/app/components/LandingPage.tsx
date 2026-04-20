@@ -558,13 +558,13 @@ export default function LandingPage() {
           </div>
 
           {/* Right Side - Audi Render */}
-          <div style={{ position:'relative', width:1000, height:1000, display:'flex', alignItems:'center', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, marginRight:'-400px', marginLeft:'200px' }}>
+          <div style={{ position:'relative', width:1200, height:1200, display:'flex', alignItems:'center', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, marginRight:'-600px', marginLeft:'400px', zIndex:5 }}>
             <img 
               src="/Audi_Render_2.png" 
               alt="Audi Render" 
               style={{ 
-                width:'150%', 
-                height:'150%', 
+                width:'200%', 
+                height:'200%', 
                 objectFit:'contain'
               }} 
             />

@@ -432,16 +432,16 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-      {/* Floating Car Image */}
+      {/* Floating Car Image - positioned near Core Features */}
       <div 
         style={{
-          position: 'fixed',
-          right: `${scrollY > 300 ? '-150px' : '20px'}`,
-          top: '50%',
+          position: 'absolute',
+          right: '20px',
+          top: '1400px', // Position near Core Features section
           zIndex: 1000,
-          opacity: scrollY > 300 && scrollY < 800 ? 0.8 : 0,
-          transform: `translateX(${scrollY > 300 && scrollY < 800 ? Math.sin(scrollY * 0.01) * 20 : 0}px) translateY(-50%)`,
-          transition: 'right 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.1s ease-out',
+          opacity: scrollY > 1300 && scrollY < 1600 ? 0.8 : 0,
+          transform: `translateX(${scrollY > 1300 && scrollY < 1600 ? Math.sin(scrollY * 0.01) * 20 : 0}px)`,
+          transition: 'opacity 0.3s ease-in-out, transform 0.1s ease-out',
         }}
       >
         <img 

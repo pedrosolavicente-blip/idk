@@ -170,16 +170,35 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
       
       {/* 3D Logo */}
       <div className="logo-3d">
-        <img 
-          src="/Vector (8).svg" 
-          alt="itzz" 
-          style={{ 
-            width: '100%', 
-            height: '100%', 
-            filter: 'brightness(0) invert(1)',
-            animation: 'lp-spin 8s linear infinite'
-          }} 
-        />
+        <div style={{ 
+          position: 'relative',
+          transformStyle: 'preserve-3d',
+          transform: 'perspective(1000px)',
+        }}>
+          <img 
+            src="/Vector (8).svg" 
+            alt="itzz" 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              filter: 'brightness(0) invert(1) drop-shadow(0 0 20px rgba(196,255,13,0.3)) drop-shadow(0 10px 40px rgba(0,0,0,0.5))',
+              animation: 'lp-spin 8s linear infinite',
+              transform: 'translateZ(20px)',
+            }} 
+          />
+          {/* Extrusion shadow layer */}
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            height: '100%',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)',
+            transform: 'rotateX(-90deg) translateZ(-20px)',
+            transformOrigin: 'top',
+            filter: 'blur(2px)',
+          }} />
+        </div>
       </div>
     </div>
   );

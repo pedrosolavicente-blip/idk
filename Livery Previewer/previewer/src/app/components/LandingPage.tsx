@@ -606,13 +606,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Moving Strip ── */}
-      <div style={{ position:'relative', zIndex:10, overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'12px 0', background:'rgba(255,255,255,0.01)' }}>
+      {/* ── Premium Moving Strip ── */}
+      <div style={{ 
+        position:'relative', 
+        zIndex:10, 
+        overflow:'hidden', 
+        borderTop:'2px solid rgba(216,255,99,0.2)', 
+        borderBottom:'2px solid rgba(216,255,99,0.2)', 
+        padding:'16px 0', 
+        background:'linear-gradient(90deg, rgba(8,8,8,0.95) 0%, rgba(216,255,99,0.05) 50%, rgba(8,8,8,0.95) 100%)',
+        backdropFilter:'blur(20px)',
+        WebkitBackdropFilter:'blur(20px)'
+      }}>
         <div style={{ display:'flex', overflow:'hidden' }}>
           <div className="lp-marquee-track">
-            {['Innovation','Efficiency','Quality','itzz','Advanced Tools','Professional Designs','Premium Quality','Seamless Integration'].map((t,i) => (
-              <span key={i} style={{ fontSize:10, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%4===0 ? '#D8FF63' : '#27272a', flexShrink:0 }}>
-                {t} <span style={{ color:'#1f1f23', marginLeft:48 }}>✦</span>
+            {['INNOVATION','EFFICIENCY','QUALITY','ITZZ INDUSTRIES','ADVANCED TOOLS','PROFESSIONAL DESIGNS','PREMIUM QUALITY','SEAMLESS INTEGRATION','MODERN INTERFACE','EXPERT SUPPORT','CONTINUOUS IMPROVEMENT','CUTTING EDGE','FUTURE READY','COMMUNITY DRIVEN','INDUSTRY LEADING'].map((t,i) => (
+              <span key={i} style={{ 
+                fontSize:12, 
+                fontWeight:800, 
+                letterSpacing:'0.2em', 
+                textTransform:'uppercase', 
+                color: i%3===0 ? '#D8FF63' : i%3===1 ? '#FFFFFF' : '#666666', 
+                flexShrink:0,
+                textShadow: i%3===0 ? '0 0 20px rgba(216,255,99,0.6)' : 'none',
+                padding:'0 24px'
+              }}>
+                {t}
+                <span style={{ 
+                  color:'rgba(216,255,99,0.4)', 
+                  marginLeft:32, 
+                  fontSize:14,
+                  fontWeight:900
+                }}>◆</span>
               </span>
             ))}
           </div>

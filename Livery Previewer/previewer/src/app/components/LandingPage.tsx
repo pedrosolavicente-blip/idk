@@ -356,6 +356,27 @@ export default function LandingPage() {
       document.head.appendChild(el);
     }
 
+    // Scroll animation for Audi render
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollProgress = Math.min(scrollY / maxScroll, 1);
+      
+      const audiElement = document.getElementById('audi-render');
+      if (audiElement) {
+        const baseOffset = 400;
+        const additionalOffset = scrollProgress * 300; // Move up to 300px more left as scroll progresses
+        audiElement.style.marginRight = `-${baseOffset + additionalOffset}px`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial call
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+
     // Particle canvas
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -554,7 +575,7 @@ export default function LandingPage() {
         </div>
 
         {/* Right Side - Audi Render (Positioned Absolutely) */}
-        <div style={{ position:'absolute', top:80, right:0, width:1000, height:1000, display:'flex', alignItems:'center', justifyContent:'flex-end', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, zIndex:5 }}>
+        <div id="audi-render" style={{ position:'absolute', top:80, right:0, width:1000, height:1000, display:'flex', alignItems:'center', justifyContent:'flex-end', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, zIndex:5, marginRight:'-400px', transition:'margin-right 0.3s ease-out' }}>
           <img 
             src="/Audi_Render_2.png" 
             alt="Audi Render" 

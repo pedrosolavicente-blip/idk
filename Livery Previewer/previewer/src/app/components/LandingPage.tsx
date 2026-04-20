@@ -432,15 +432,15 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-      {/* Floating Car Image - positioned near Core Features */}
+      {/* Floating Car Image - positioned next to Core Features */}
       <div 
         style={{
           position: 'absolute',
-          right: '20px',
-          top: '1400px', // Position near Core Features section
+          right: '30px',
+          top: '750px', // Position right next to Core Features section
           zIndex: 1000,
-          opacity: scrollY > 1300 && scrollY < 1600 ? 0.8 : 0,
-          transform: `translateX(${scrollY > 1300 && scrollY < 1600 ? Math.sin(scrollY * 0.01) * 20 : 0}px)`,
+          opacity: scrollY > 650 && scrollY < 950 ? 1 : 0,
+          transform: `translateX(${scrollY > 650 && scrollY < 950 ? Math.sin(scrollY * 0.01) * 30 : 0}px)`,
           transition: 'opacity 0.3s ease-in-out, transform 0.1s ease-out',
         }}
       >
@@ -448,8 +448,8 @@ export default function LandingPage() {
           src="/previewer/image 65.png"
           alt="Floating Car"
           style={{
-            width: '80px',
-            height: '80px',
+            width: '120px',
+            height: '120px',
           }}
         />
       </div>

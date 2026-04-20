@@ -9,6 +9,26 @@ const LANDING_STYLES = `
 
   .lp * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
 
+  @keyframes lp-fadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes premiumFadeUp {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes premiumSlideIn {
+    0% { opacity: 0; transform: translateX(100px) rotateY(10deg); }
+    100% { opacity: 1; transform: translateX(0) rotateY(0deg); }
+  }
+
+  @keyframes premiumGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
   @keyframes lp-fadeUp   { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
   @keyframes lp-fadeIn   { from { opacity:0; } to { opacity:1; } }
   @keyframes lp-glow     { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
@@ -68,15 +88,28 @@ const LANDING_STYLES = `
   .lp-btn-ghost:active { transform: translateY(0); }
 
   .lp-product-card {
-    background: rgba(255,255,255,0.02);
+    background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px; overflow: hidden;
-    transition: all 0.22s ease; cursor: pointer;
+    border-radius: 20px; overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2); cursor: pointer;
+    position: relative;
   }
   .lp-product-card:hover {
-    border-color: rgba(196,255,13,0.2);
-    transform: translateY(-3px);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    border-color: rgba(196,255,13,0.3);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 24px 64px rgba(196,255,13,0.15), 0 8px 32px rgba(0,0,0,0.1);
+  }
+  .lp-product-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(196,255,13,0.05), transparent);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .lp-product-card:hover::before {
+    opacity: 1;
   }
   .lp-product-card:hover .lp-card-img { transform: scale(1.04); }
 
@@ -231,32 +264,32 @@ const STATS = [
 
 const FEATURES = [
   {
-    icon: '??',
+    icon: '🎨',
     title: 'Real-time 3D Preview',
     description: 'See your livery designs come to life with instant 3D rendering and accurate vehicle models.'
   },
   {
-    icon: '??',
+    icon: '🚗',
     title: '25+ Vehicle Models',
     description: 'Extensive collection of ERLC vehicles with accurate details and proper scaling.'
   },
   {
-    icon: '??',
+    icon: '👥',
     title: 'Community Driven',
     description: 'Built by the community, for the community with regular updates based on feedback.'
   },
   {
-    icon: '??',
+    icon: '☁️',
     title: 'Cloud Storage',
     description: 'Save your designs securely in the cloud and access them from anywhere.'
   },
   {
-    icon: '??',
+    icon: '🛠️',
     title: 'Advanced Tools',
     description: 'Professional-grade design tools with layers, textures, and precise controls.'
   },
   {
-    icon: '??',
+    icon: '📱',
     title: 'Mobile Friendly',
     description: 'Design on the go with full mobile support and responsive interface.'
   }
@@ -376,25 +409,38 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* ── Navbar ── */}
-      <nav className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-6"
-          style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '0.5px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(216,255,99,0.06)' }}>
-        <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:28, width:'auto', cursor:'pointer' }} onClick={() => window.location.href = '/'} />
-
-        {/* Desktop nav */}
-        <div className="lp-nav-desktop" style={{ display:'flex', alignItems:'center', gap:36 }}>
-          {NAV_ITEMS.map(item => (
-            <button key={item.id} className={`lp-nav-link ${activeNav===item.id?'active':''}`}
-              onClick={() => { setActiveNav(item.id); item.action(); }}>
-              {item.label}
-            </button>
-          ))}
-        </div>
+      {/* ── Premium Navbar ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3"
+          style={{ 
+            height: 56, 
+            background: 'rgba(4,4,4,0.98)', 
+            backdropFilter: 'blur(32px)', 
+            WebkitBackdropFilter: 'blur(32px)', 
+            borderBottom: '1px solid rgba(255,255,255,0.08)', 
+            boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 1px 0 rgba(216,255,99,0.08), inset 0 0 0 4px rgba(216,255,99,0.03)'
+          }}>    
+        <div className="flex items-center gap-8">
+          <div className="relative group">
+            <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:32, width:'auto', cursor:'pointer', transition: 'transform 0.2s ease, filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} onClick={() => window.location.href = '/'} />
+            <div className="absolute -bottom-1 left-1/2 w-2 h-0.5 bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-600 rounded-full" />
+            </div>
+          </div>
+          
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center gap-8">
+            {NAV_ITEMS.map(item => (
+              <button key={item.id} className={`relative px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200 ${activeNav===item.id?'text-white bg-white/10':''}`}
+                onClick={() => { setActiveNav(item.id); item.action(); }}>
+                {item.label}
+                {activeNav===item.id && <div className="absolute -bottom-1 left-1/2 w-2 h-0.5 bg-green-500 rounded-full" />}
+              </button>
+            ))}
+          </div>
 
         {/* Mobile menu button */}
         <button 
-          className="lp-nav-mobile" 
-          style={{ display:'none', background:'none', border:'none', color:'#fff', cursor:'pointer', padding:'8px' }}
+          className="lg:hidden p-2 rounded-lg bg-white/10 backdrop-blur-md transition-all duration-300 hover:bg-white/20"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -402,15 +448,16 @@ export default function LandingPage() {
           </svg>
         </button>
 
-        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <button className="lp-btn-ghost" style={{ padding:'8px 18px' }}
+        <div className="hidden lg:flex items-center gap-3">
+          <button className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200 bg-white/10 backdrop-blur-md rounded-lg hover:bg-white/15"
             onClick={() => window.open('https://discord.gg/itzz','_blank')}>
-            <svg width="14" height="11" viewBox="0 0 71 55" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 71 55" fill="currentColor" className="mr-2">
               <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.401329 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978Z"/>
             </svg>
             Discord
           </button>
-          <button className="lp-btn-primary" style={{ padding:'8px 18px' }} onClick={() => navigate('/previewer')}>
+          <button className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all duration-200 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+            onClick={() => navigate('/previewer')}>
             Launch App →
           </button>
         </div>
@@ -448,41 +495,42 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Hero ── */}
-      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'center', padding:'0 48px', paddingTop:56 }}>
-        <div style={{ display:'flex', flexDirection:'column', gap:80, width:'100%' }}>
-          <div style={{ maxWidth:680 }}>
-            {/* Counter */}
-            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:32, animation:'lp-fadeUp 0.5s ease both' }}>
-              <span className="lp-counter">/ 01</span>
-              <div style={{ height:1, width:40, background:'rgba(196,255,13,0.3)' }} />
-              <span style={{ fontSize:10, fontWeight:600, letterSpacing:'0.15em', color:'#3f3f46', textTransform:'uppercase' }}>itzz industries</span>
+      {/* ── Premium Hero ── */}
+      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'center', padding:'0 48px', paddingTop:72 }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:120, width:'100%', maxWidth:1400 }}>
+          <div style={{ maxWidth:800 }}>
+            {/* Premium Counter */}
+            <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:48, animation:'premiumFadeUp 0.8s ease both' }}>
+              <span className="lp-counter" style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', color:'#c4ff0d' }}>/ 01</span>
+              <div style={{ height:1, width:60, background:'linear-gradient(to right, transparent, #c4ff0d, transparent)', animation:'premiumGlow 2s ease-in-out infinite' }} />
+              <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.18em', color:'#52525b', textTransform:'uppercase' }}>itzz industries</span>
             </div>
 
-            {/* Heading */}
-            <h1 style={{ fontSize:'clamp(48px,6vw,92px)', fontWeight:900, lineHeight:1.0, letterSpacing:'-0.03em', margin:'0 0 28px', animation:'lp-fadeUp 0.5s ease 0.08s both', opacity:0 }}>
-              itzz all<br />
-              about <span style={{ background:'linear-gradient(135deg,#c4ff0d,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>quality.</span>
+            {/* Premium Heading */}
+            <h1 style={{ fontSize:'clamp(56px,7vw,120px)', fontWeight:900, lineHeight:0.95, letterSpacing:'-0.04em', margin:'0 0 40px', animation:'premiumFadeUp 0.8s ease 0.15s both', opacity:0, textShadow:'0 8px 32px rgba(196,255,13,0.15)' }}>
+              <span style={{ display:'block', marginBottom:8 }}>itzz all</span>
+              <span style={{ display:'block', background:'linear-gradient(135deg,#c4ff0d,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', filter:'drop-shadow(0 4px 16px rgba(196,255,13,0.3))' }}>quality.</span>
             </h1>
 
-            <p style={{ fontSize:16, color:'#71717a', lineHeight:1.75, maxWidth:480, margin:'0 0 48px', fontWeight:400, animation:'lp-fadeUp 0.5s ease 0.16s both', opacity:0 }}>
+            <p style={{ fontSize:18, color:'#a1a1aa', lineHeight:1.8, maxWidth:520, margin:'0 0 64px', fontWeight:400, animation:'premiumFadeUp 0.8s ease 0.25s both', opacity:0 }}>
               A community built around ERLC — creating tools, designs, and experiences for players who care about the details.
             </p>
 
-            <div style={{ display:'flex', gap:12, flexWrap:'wrap', animation:'lp-fadeUp 0.5s ease 0.24s both', opacity:0 }}>
-              <button className="lp-btn-primary" style={{ padding:'14px 28px', fontSize:13 }} onClick={() => navigate('/previewer')}>
+            {/* Premium CTA Buttons */}
+            <div style={{ display:'flex', gap:16, flexWrap:'wrap', animation:'premiumFadeUp 0.8s ease 0.35s both', opacity:0 }}>
+              <button className="lp-btn-primary" style={{ padding:'18px 36px', fontSize:14, fontWeight:600, boxShadow:'0 8px 24px rgba(196,255,13,0.25)' }} onClick={() => navigate('/previewer')}>
                 Open Livery Previewer →
               </button>
-              <button className="lp-btn-ghost" style={{ padding:'14px 24px', fontSize:13 }}
+              <button className="lp-btn-ghost" style={{ padding:'18px 32px', fontSize:14, fontWeight:500 }}
                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior:'smooth' })}>
                 Explore
               </button>
             </div>
           </div>
 
-          {/* Large 3D Logo coming from side */}
-          <div style={{ display:'flex', justifyContent:'flex-start', alignItems:'center', animation:'slideInFromRight 1s ease 0.5s both', opacity:0 }}>
-            <Logo3D size={500} />
+          {/* Premium 3D Logo */}
+          <div style={{ display:'flex', justifyContent:'flex-start', alignItems:'center', animation:'premiumSlideIn 1.2s ease 0.6s both', opacity:0, filter:'drop-shadow(0 16px 48px rgba(196,255,13,0.2))' }}>
+            <Logo3D size={600} />
           </div>
         </div>
 

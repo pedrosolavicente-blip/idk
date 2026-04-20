@@ -64,7 +64,6 @@ export function avatarUrl(userId: string, avatarHash: string | null): string {
 }
 
 export function imageUrl(imageKey: string): string {
-  // Handle legacy full URLs stored before the Worker rewrite
   if (imageKey.startsWith('http://') || imageKey.startsWith('https://')) {
     const match = imageKey.match(/\/showcases\/(.+)$/);
     if (match) return `/previewer/api/showcases/images/${encodeURIComponent(match[1])}`;

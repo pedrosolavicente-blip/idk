@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useShowcase } from '../hooks/useShowcase';
 import { useNavigate } from 'react-router-dom';
 import Logo3D from './Logo3D';
+import { imageUrl } from '@/lib/showcaseApi';
 
 const BASE = import.meta.env?.BASE_URL || '';
 
@@ -962,7 +963,7 @@ export default function LandingPage() {
                 overflow:'hidden'
               }}>
                 <img 
-                  src={post.image_key ? `https://your-cloudflare-domain.com/showcases/${post.image_key}` : '/placeholder.jpg'}
+                  src={post.image_key ? imageUrl(post.image_key) : '/placeholder.jpg'}
                   alt={post.title || 'Showcase Image'}
                   style={{ 
                     width:'100%', 

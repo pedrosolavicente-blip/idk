@@ -895,7 +895,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         <nav className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-6"
           style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',          borderBottom: '0.5px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(216,255,99,0.06)' }}>
 
-          <img src="`${BASE}itzz.svg`" alt="itzz" style={{ height: 28, width: 'auto' }} />
+          <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height: 28, width: 'auto' }} />
 
           <div className="flex-1 flex items-center justify-center gap-2">
             {/* Settings */}
@@ -1255,7 +1255,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="pointer-events-none absolute inset-x-0 top-0 h-16"
             style={{ background:'radial-gradient(ellipse at top, rgba(0,255,136,0.08) 0%, transparent 70%)', animation:'fadeIn 0.8s ease 0.3s both', opacity:0 }} />
           <div style={{ animation:'slideDown 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both', opacity:0 }}>
-            <img src="`${BASE}Group_15.svg`" alt="Livery Previewer" style={{ height:50, width:'auto', mixBlendMode:'lighten', display:'block' }} />
+            <img src={`${BASE}Group_15.svg`} alt="Livery Previewer" style={{ height:50, width:'auto', mixBlendMode:'lighten', display:'block' }} />
           </div>
           <div style={{ marginTop:12, width:'80%', height:1, background:'linear-gradient(to right, transparent, rgba(0,255,136,0.4), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
         </div>

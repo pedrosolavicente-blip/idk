@@ -520,25 +520,9 @@ export default function LandingPage() {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, width:'100%', maxWidth:1400, alignItems:'center' }}>
           {/* Left Content */}
           <div style={{ maxWidth:800 }}>
-            {/* Feature Badges */}
-            <div style={{ display:'flex', gap:12, marginBottom:32, animation:'fadeInUp 0.8s ease both' }}>
-              <div className="feature-badge">
-                <div className="neon-dot" />
-                <span>25+ Assets</span>
-              </div>
-              <div className="feature-badge">
-                <div className="neon-dot" />
-                <span>Members Only</span>
-              </div>
-              <div className="feature-badge">
-                <div className="neon-dot" />
-                <span>100% Free</span>
-              </div>
-            </div>
-
             {/* Logo Heading */}
             <div style={{ animation:'fadeInUp 0.8s ease 0.15s both', opacity:0, marginBottom:40 }}>
-              <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:400, height:'auto' }} />
+              <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:600, height:'auto' }} />
             </div>
 
             <p style={{ fontSize:18, color:'var(--text-secondary)', lineHeight:1.8, maxWidth:520, margin:'0 0 64px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>

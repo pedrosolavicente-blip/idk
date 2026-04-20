@@ -920,8 +920,10 @@ export default function LandingPage() {
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:24, padding:'0 20px' }}>
-          {SHOWCASE_ITEMS.map((item, i) => (
-            <div key={item.id}
+          {/* This will be replaced with actual showcases data from showcases.tsx */}
+          {/* For now, showing placeholder that will be populated with real showcase posts */}
+          {[1, 2, 3].map((item, i) => (
+            <div key={item}
               style={{ 
                 position:'relative',
                 borderRadius: '16px',
@@ -934,6 +936,7 @@ export default function LandingPage() {
                 cursor:'pointer',
                 margin:'0'
               }}
+              onClick={() => navigate('/showcases')}
               onMouseEnter={e => {
                 e.currentTarget.style.transform='translateY(-8px) scale(1.02)';
                 e.currentTarget.style.borderColor='rgba(216,255,99,0.25)';
@@ -976,14 +979,14 @@ export default function LandingPage() {
                   border:'1px solid rgba(216,255,99,0.2)'
                 }}>
                   <span style={{ fontSize:14, color:'#D8FF63', filter:'drop-shadow(0 0 8px rgba(216,255,99,0.6)' }}>❤️</span>
-                  <span style={{ fontSize:12, color:'rgba(255,255,255,0.9)', fontWeight:600 }}>{item.likes}</span>
+                  <span style={{ fontSize:12, color:'rgba(255,255,255,0.9)', fontWeight:600 }}>{item}</span>
                 </div>
               </div>
               
               {/* Content */}
               <div style={{ padding:24 }}>
-                <h4 style={{ fontSize:16, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>{item.title}</h4>
-                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>by {item.author}</p>
+                <h4 style={{ fontSize:16, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>Loading Showcase #{item}</h4>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>From showcases.tsx</p>
               </div>
             </div>
           ))}

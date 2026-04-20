@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useShowcase } from '../../hooks/useShowcase';
+import { useShowcase } from '../hooks/useShowcase';
 import { useNavigate } from 'react-router-dom';
 import Logo3D from './Logo3D';
 

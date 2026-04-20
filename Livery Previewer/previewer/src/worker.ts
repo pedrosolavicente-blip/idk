@@ -70,13 +70,17 @@ export default {
     }
 
     // ── Serve static assets (SPA fallback) ────────────────────────────────────
-    if (!path.startsWith(API_PREFIX)) {
-      const assetResponse = await env.ASSETS.fetch(request);
-      if (assetResponse.status === 404) {
-        return env.ASSETS.fetch(new Request(new URL('/index.html', request.url)));
-      }
-      return assetResponse;
-    }
+ if (!path.startsWith(API_PREFIX)) {
+  // Strip /previewer prefix for asset lookup
+  const assetPath = path.startsWith('/previewer') ? path.slice('/previewer'.length) || '/' : path;
+  const assetUrl = new URL(assetPath, request.url);
+  const assetRequest = new Request(assetUrl, request);
+  const assetResponse = await env.ASSETS.fetch(assetRequest);
+  if (assetResponse.status === 404) {
+    return env.ASSETS.fetch(new Request(new URL('/index.html', request.url)));
+  }
+  return assetResponse;
+}
 
     // ── Serve R2 image ────────────────────────────────────────────────────────
     const assetMatch = path.match(/^\/previewer\/api\/showcases\/images\/(.+)$/);

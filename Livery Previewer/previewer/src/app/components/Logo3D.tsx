@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+const BASE = '/';
+
 const LOGO_3D_STYLES = `
   .logo-3d-container {
     perspective: 1000px;
@@ -185,7 +187,7 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
         }}>
           {/* Front face */}
           <img 
-            src="/Vector (8).svg" 
+            src={`${BASE}Vector (8).svg`} 
             alt="itzz front" 
             style={{ 
               position: 'absolute',
@@ -198,7 +200,7 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
           
           {/* Back face */}
           <img 
-            src="/Vector (8).svg" 
+            src={`${BASE}Vector (8).svg`} 
             alt="itzz back" 
             style={{ 
               position: 'absolute',

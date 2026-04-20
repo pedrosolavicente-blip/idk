@@ -68,7 +68,7 @@ export default {
       return new Response(upstream.body, { status: 200, headers: h });
     }
 
-    if (!path.startsWith('/api/showcases')) return env.ASSETS.fetch(request);
+    if (!path.startsWith('/previewer/api/showcases')) return env.ASSETS.fetch(request);
 
     // ── Serve R2 image ────────────────────────────────────────────────────────
     const assetMatch = path.match(/^\/api\/showcases\/images\/(.+)$/);
@@ -211,7 +211,7 @@ export default {
     }
 
     // ── List posts ────────────────────────────────────────────────────────────
-    if (path === '/api/showcases' && method === 'GET') {
+    if (path === '/previewer/api/showcases' && method === 'GET') {
       const viewer = request.headers.get('Authorization')?.startsWith('Bearer ')
         ? await getUser(request) : null;
       const viewerId = viewer?.id ?? null;
@@ -240,7 +240,7 @@ export default {
     }
 
     // ── Create post ───────────────────────────────────────────────────────────
-    if (path === '/api/showcases' && method === 'POST') {
+    if (path === '/previewer/api/showcases' && method === 'POST') {
       const user = await getUser(request);
       if (!user) return err('Unauthorized', 401);
 

@@ -64,11 +64,11 @@ export function avatarUrl(userId: string, avatarHash: string | null): string {
 }
 
 export function imageUrl(imageKey: string): string {
-  return `/api/showcases/images/${encodeURIComponent(imageKey)}`;
+  return `/previewer/api/showcases/images/${encodeURIComponent(imageKey)}`;
 }
 
 export function liveryConfigUrl(liveryKey: string): string {
-  return `/api/showcases/livery/${encodeURIComponent(liveryKey)}`;
+  return `/previewer/api/showcases/livery/${encodeURIComponent(liveryKey)}`;
 }
 
 export function relativeTime(ts: number): string {
@@ -97,15 +97,15 @@ async function handle<T>(res: Response): Promise<T> {
 export async function fetchPosts(sort = 'new', tag?: string): Promise<ShowcasePost[]> {
   const p = new URLSearchParams({ sort });
   if (tag) p.set('tag', tag);
-  return handle(await fetch(`/api/showcases?${p}`, { headers: authHeaders() }));
+  return handle(await fetch(`/previewer/api/showcases?${p}`, { headers: authHeaders() }));
 }
 
 export async function fetchPost(id: string): Promise<ShowcasePost> {
-  return handle(await fetch(`/api/showcases/${id}`, { headers: authHeaders() }));
+  return handle(await fetch(`/previewer/api/showcases/${id}`, { headers: authHeaders() }));
 }
 
 export async function editPost(id: string, caption: string): Promise<void> {
-  await handle(await fetch(`/api/showcases/${id}`, {
+  await handle(await fetch(`/previewer/api/showcases/${id}`, {
     method: 'PATCH',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ caption }),
@@ -113,7 +113,7 @@ export async function editPost(id: string, caption: string): Promise<void> {
 }
 
 export async function editComment(postId: string, commentId: string, body: string): Promise<void> {
-  await handle(await fetch(`/api/showcases/${postId}/comments/${commentId}`, {
+  await handle(await fetch(`/previewer/api/showcases/${postId}/comments/${commentId}`, {
     method: 'PATCH',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ body }),
@@ -131,11 +131,11 @@ export async function createPost(
   form.append('caption', caption);
   form.append('post_type', postType);
   if (livery) form.append('livery', JSON.stringify(livery));
-  return handle(await fetch('/api/showcases', { method: 'POST', headers: authHeaders(), body: form }));
+  return handle(await fetch('/previewer/api/showcases', { method: 'POST', headers: authHeaders(), body: form }));
 }
 
 export async function deletePost(id: string): Promise<void> {
-  await handle(await fetch(`/api/showcases/${id}`, { method: 'DELETE', headers: authHeaders() }));
+  await handle(await fetch(`/previewer/api/showcases/${id}`, { method: 'DELETE', headers: authHeaders() }));
 }
 
 export async function fetchLiveryConfig(liveryKey: string): Promise<LiveryConfig> {
@@ -145,7 +145,7 @@ export async function fetchLiveryConfig(liveryKey: string): Promise<LiveryConfig
 // ─── Reactions ────────────────────────────────────────────────────────────────
 
 export async function reactToPost(postId: string, value: 1 | -1): Promise<void> {
-  await handle(await fetch(`/api/showcases/${postId}/react`, {
+  await handle(await fetch(`/previewer/api/showcases/${postId}/react`, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ value }),
@@ -153,7 +153,7 @@ export async function reactToPost(postId: string, value: 1 | -1): Promise<void> 
 }
 
 export async function removeReaction(postId: string): Promise<void> {
-  await handle(await fetch(`/api/showcases/${postId}/react`, {
+  await handle(await fetch(`/previewer/api/showcases/${postId}/react`, {
     method: 'DELETE', headers: authHeaders(),
   }));
 }
@@ -161,7 +161,7 @@ export async function removeReaction(postId: string): Promise<void> {
 // ─── Views ────────────────────────────────────────────────────────────────────
 
 export async function recordView(postId: string): Promise<void> {
-  fetch(`/api/showcases/${postId}/view`, {
+  fetch(`/previewer/api/showcases/${postId}/view`, {
     method: 'POST', headers: authHeaders(),
   }).catch(() => {});
 }
@@ -169,17 +169,17 @@ export async function recordView(postId: string): Promise<void> {
 // ─── Analytics ────────────────────────────────────────────────────────────────
 
 export async function fetchAnalytics(postId: string): Promise<Analytics> {
-  return handle(await fetch(`/api/showcases/${postId}/analytics`, { headers: authHeaders() }));
+  return handle(await fetch(`/previewer/api/showcases/${postId}/analytics`, { headers: authHeaders() }));
 }
 
 // ─── Comments ────────────────────────────────────────────────────────────────
 
 export async function fetchComments(postId: string): Promise<ShowcaseComment[]> {
-  return handle(await fetch(`/api/showcases/${postId}/comments`));
+  return handle(await fetch(`/previewer/api/showcases/${postId}/comments`));
 }
 
 export async function addComment(postId: string, body: string): Promise<ShowcaseComment> {
-  return handle(await fetch(`/api/showcases/${postId}/comments`, {
+  return handle(await fetch(`/previewer/api/showcases/${postId}/comments`, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ body }),
@@ -187,7 +187,7 @@ export async function addComment(postId: string, body: string): Promise<Showcase
 }
 
 export async function deleteComment(postId: string, commentId: string): Promise<void> {
-  await handle(await fetch(`/api/showcases/${postId}/comments/${commentId}`, {
+  await handle(await fetch(`/previewer/api/showcases/${postId}/comments/${commentId}`, {
     method: 'DELETE', headers: authHeaders(),
   }));
 }

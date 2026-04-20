@@ -377,8 +377,9 @@ export default function LandingPage() {
       </div>
 
       {/* ── Navbar ── */}
-      <nav style={{ position:'fixed', top:0, left:0, right:0, zIndex:50, height:56, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 48px', background:'rgba(8,8,8,0.85)', backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)', borderBottom:'1px solid rgba(255,255,255,0.05)', boxShadow:'0 1px 0 rgba(196,255,13,0.06)' }}>
-        <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:26, width:'auto', cursor:'pointer' }} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })} />
+      <nav className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-6"
+          style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '0.5px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(216,255,99,0.06)' }}>
+        <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:28, width:'auto', cursor:'pointer' }} onClick={() => window.location.href = '/'} />
 
         {/* Desktop nav */}
         <div className="lp-nav-desktop" style={{ display:'flex', alignItems:'center', gap:36 }}>
@@ -449,7 +450,7 @@ export default function LandingPage() {
 
       {/* ── Hero ── */}
       <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'center', padding:'0 48px', paddingTop:56 }}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center', width:'100%' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:80, width:'100%' }}>
           <div style={{ maxWidth:680 }}>
             {/* Counter */}
             <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:32, animation:'lp-fadeUp 0.5s ease both' }}>
@@ -479,9 +480,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Large 3D Logo */}
-          <div style={{ display:'flex', justifyContent:'center', alignItems:'center', animation:'lp-fadeUp 0.6s ease 0.3s both', opacity:0 }}>
-            <Logo3D size={600} />
+          {/* Large 3D Logo coming from side */}
+          <div style={{ display:'flex', justifyContent:'flex-start', alignItems:'center', animation:'slideInFromRight 1s ease 0.5s both', opacity:0 }}>
+            <Logo3D size={500} />
           </div>
         </div>
 

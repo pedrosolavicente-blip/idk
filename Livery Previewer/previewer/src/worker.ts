@@ -32,7 +32,6 @@ async function getUser(req: Request): Promise<{
   return res.json() as Promise<{ id: string; username: string; global_name: string | null; avatar: string | null }>;
 }
 
-// Correlated-subquery post SELECT — avoids Cartesian product from multi-JOINs
 function postSelect(viewerId: string | null) {
   return `
     SELECT p.*,
@@ -44,6 +43,8 @@ function postSelect(viewerId: string | null) {
     FROM showcase_posts p
   `;
 }
+
+const API_PREFIX = '/previewer/api/showcases';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -57,8 +58,8 @@ export default {
     }
 
     // ── Vehicle model proxy ───────────────────────────────────────────────────
-    if (path.startsWith('/api/models/')) {
-      const key      = path.slice('/api/models/'.length);
+    if (path.startsWith('/previewer/api/models/')) {
+      const key      = path.slice('/previewer/api/models/'.length);
       const upstream = await fetch(`https://pub-13c1fc73579544bdb2eb07e28434bd74.r2.dev/${key}`);
       if (!upstream.ok) return err('Model not found', 404);
       const h = new Headers();
@@ -68,10 +69,17 @@ export default {
       return new Response(upstream.body, { status: 200, headers: h });
     }
 
-    if (!path.startsWith('/previewer/api/showcases')) return env.ASSETS.fetch(request);
+    // ── Serve static assets (SPA fallback) ────────────────────────────────────
+    if (!path.startsWith(API_PREFIX)) {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (assetResponse.status === 404) {
+        return env.ASSETS.fetch(new Request(new URL('/index.html', request.url)));
+      }
+      return assetResponse;
+    }
 
     // ── Serve R2 image ────────────────────────────────────────────────────────
-    const assetMatch = path.match(/^\/api\/showcases\/images\/(.+)$/);
+    const assetMatch = path.match(/^\/previewer\/api\/showcases\/images\/(.+)$/);
     if (assetMatch && method === 'GET') {
       const obj = await env.SHOWCASE_IMAGES.get(decodeURIComponent(assetMatch[1]));
       if (!obj) return err('Not found', 404);
@@ -82,7 +90,7 @@ export default {
     }
 
     // ── Livery config ─────────────────────────────────────────────────────────
-    const liveryMatch = path.match(/^\/api\/showcases\/livery\/(.+)$/);
+    const liveryMatch = path.match(/^\/previewer\/api\/showcases\/livery\/(.+)$/);
     if (liveryMatch && method === 'GET') {
       const obj = await env.SHOWCASE_IMAGES.get(decodeURIComponent(liveryMatch[1]));
       if (!obj) return err('Not found', 404);
@@ -92,7 +100,7 @@ export default {
     }
 
     // ── Reactions ─────────────────────────────────────────────────────────────
-    const reactMatch = path.match(/^\/api\/showcases\/([^/]+)\/react$/);
+    const reactMatch = path.match(/^\/previewer\/api\/showcases\/([^/]+)\/react$/);
     if (reactMatch) {
       const [, postId] = reactMatch;
       const user = await getUser(request);
@@ -114,7 +122,7 @@ export default {
     }
 
     // ── View tracking ─────────────────────────────────────────────────────────
-    const viewMatch = path.match(/^\/api\/showcases\/([^/]+)\/view$/);
+    const viewMatch = path.match(/^\/previewer\/api\/showcases\/([^/]+)\/view$/);
     if (viewMatch && method === 'POST') {
       const [, postId] = viewMatch;
       const user = await getUser(request);
@@ -137,7 +145,7 @@ export default {
     }
 
     // ── Analytics (owner only) ────────────────────────────────────────────────
-    const analyticsMatch = path.match(/^\/api\/showcases\/([^/]+)\/analytics$/);
+    const analyticsMatch = path.match(/^\/previewer\/api\/showcases\/([^/]+)\/analytics$/);
     if (analyticsMatch && method === 'GET') {
       const [, postId] = analyticsMatch;
       const user = await getUser(request);
@@ -164,7 +172,7 @@ export default {
     }
 
     // ── Comments ──────────────────────────────────────────────────────────────
-    const commentsBase = path.match(/^\/api\/showcases\/([^/]+)\/comments$/);
+    const commentsBase = path.match(/^\/previewer\/api\/showcases\/([^/]+)\/comments$/);
     if (commentsBase) {
       const [, postId] = commentsBase;
       if (method === 'GET') {
@@ -188,7 +196,7 @@ export default {
     }
 
     // ── Edit / Delete comment ─────────────────────────────────────────────────
-    const commentSingle = path.match(/^\/api\/showcases\/([^/]+)\/comments\/([^/]+)$/);
+    const commentSingle = path.match(/^\/previewer\/api\/showcases\/([^/]+)\/comments\/([^/]+)$/);
     if (commentSingle) {
       const [, postId, commentId] = commentSingle;
       const user = await getUser(request);
@@ -279,7 +287,7 @@ export default {
     }
 
     // ── Single post: GET / PATCH / DELETE ─────────────────────────────────────
-    const postMatch = path.match(/^\/api\/showcases\/([^/]+)$/);
+    const postMatch = path.match(/^\/previewer\/api\/showcases\/([^/]+)$/);
     if (postMatch) {
       const postId = postMatch[1];
 

@@ -364,8 +364,9 @@ export default function LandingPage() {
       
       const audiElement = document.getElementById('audi-render');
       if (audiElement) {
-        const baseOffset = 400;
-        const additionalOffset = scrollProgress * 300; // Move up to 300px more left as scroll progresses
+        // Start showing more of the car (3/5 visible)
+        const baseOffset = 200; // Reduced from 400 to show more initially
+        const additionalOffset = scrollProgress * 400; // Move up to 400px more left as scroll progresses
         audiElement.style.marginRight = `-${baseOffset + additionalOffset}px`;
       }
     };

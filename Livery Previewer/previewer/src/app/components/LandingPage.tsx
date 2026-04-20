@@ -571,11 +571,11 @@ export default function LandingPage() {
       {/* Features */}
       <section style={{ position:'relative', zIndex:10, padding:'120px 48px' }}>
         <div style={{ textAlign:'center', marginBottom:80 }}>
-          <p className="lp-section-label" style={{ marginBottom:16 }}>Features</p>
-          <h2 style={{ fontSize:'clamp(32px,4vw,56px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 24px', lineHeight:1.1 }}>
+          <p className="lp-section-label" style={{ marginBottom:16, fontSize: 18, fontWeight: 600, color: '#f4f4f5', letterSpacing: '-0.01em' }}>Features</p>
+          <h2 style={{ fontSize:'clamp(32px,4vw,56px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 24px', lineHeight:1.1, color: '#f4f4f5' }}>
             Everything you need to<br />create amazing liveries
           </h2>
-          <p style={{ fontSize:16, color:'#71717a', maxWidth:600, margin:'0 auto', lineHeight:1.7 }}>
+          <p style={{ fontSize:16, color:'#71717a', maxWidth:600, margin:'0 auto', lineHeight:1.7, fontWeight: 400 }}>
             Professional tools designed specifically for ERLC livery creators. From concept to completion, we've got you covered.
           </p>
         </div>

@@ -639,7 +639,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Premium Products Grid ── */}
-      <section id="products" style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(8,8,8,0.8) 0%, rgba(216,255,99,0.02) 50%, rgba(8,8,8,0.8) 100%)' }}>
+      <section id="products" style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(4,4,4,0.9) 0%, rgba(216,255,99,0.01) 50%, rgba(4,4,4,0.9) 100%)' }}>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:80 }}>
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
@@ -666,42 +666,27 @@ export default function LandingPage() {
             <div key={p.id}
               style={{ 
                 position:'relative',
-                borderRadius: i===0?'24px 0 0 0':i===1?'0 24px 0 0':i===2?'0 0 0 24px':'0 0 24px 0', 
-                border: '1px solid rgba(216,255,99,0.1)',
-                borderRight: i%2===0?'1px solid rgba(216,255,99,0.2)':'none', 
-                borderBottom: i<2?'1px solid rgba(216,255,99,0.2)':'none',
-                background:'linear-gradient(135deg, rgba(8,8,8,0.9) 0%, rgba(216,255,99,0.05) 100%)',
-                backdropFilter:'blur(20px)',
-                WebkitBackdropFilter:'blur(20px)',
+                borderRadius: '16px', 
+                border: '1px solid rgba(216,255,99,0.08)',
+                background:'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.02) 100%)',
+                backdropFilter:'blur(10px)',
+                WebkitBackdropFilter:'blur(10px)',
                 overflow:'hidden',
-                transition:'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition:'all 0.3s ease',
                 cursor:'pointer'
               }}
               onClick={() => { if (p.isInternal && p.link) navigate(p.link); else if (p.link) window.open(p.link,'_blank'); }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform='translateY(-8px)';
-                e.currentTarget.style.borderColor='rgba(216,255,99,0.4)';
-                e.currentTarget.style.boxShadow='0 20px 40px rgba(216,255,99,0.3)';
+                e.currentTarget.style.transform='translateY(-4px)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.2)';
+                e.currentTarget.style.boxShadow='0 8px 20px rgba(216,255,99,0.15)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform='translateY(0)';
-                e.currentTarget.style.borderColor='rgba(216,255,99,0.1)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.08)';
                 e.currentTarget.style.boxShadow='none';
               }}
             >
-              {/* Premium Number */}
-              <div style={{ 
-                position:'absolute', 
-                top:32, 
-                right:32, 
-                fontSize:72, 
-                fontWeight:900, 
-                color:'rgba(216,255,99,0.08)', 
-                lineHeight:1, 
-                letterSpacing:'-0.05em', 
-                userSelect:'none',
-                textShadow:'0 0 30px rgba(216,255,99,0.4)'
-              }}>{p.num}</div>
 
               {/* Content */}
               <div style={{ padding:'56px 48px', height:'100%', minHeight:300, display:'flex', flexDirection:'column', justifyContent:'center', position:'relative', zIndex:2 }}>

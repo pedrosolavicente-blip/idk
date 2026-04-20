@@ -532,43 +532,39 @@ export default function LandingPage() {
       </div>
 
       {/* ── Premium Hero ── */}
-      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'flex-start', padding:'0 48px', paddingTop:120 }}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, width:'100%', maxWidth:1400, alignItems:'center' }}>
-          {/* Left Content */}
-          <div style={{ maxWidth:800 }}>
-            {/* Logo Heading */}
-            <div style={{ animation:'fadeInUp 0.8s ease 0.15s both', opacity:0, marginBottom:40 }}>
-              <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:800, height:'auto' }} />
-            </div>
+      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', padding:'0 48px', paddingTop:100 }}>
+        {/* Left Content - Dashboard and Text */}
+        <div style={{ position:'relative', zIndex:10, maxWidth:600, animation:'fadeInUp 0.8s ease 0.15s both', opacity:0 }}>
+          <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:700, height:'auto', marginBottom:40 }} />
+          
+          <p style={{ fontSize:28, color:'var(--text-secondary)', lineHeight:1.6, maxWidth:550, margin:'0 0 40px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>
+            itzz all about quality — creating tools, designs, and experiences for players who care about the details.
+          </p>
 
-            <p style={{ fontSize:24, color:'var(--text-secondary)', lineHeight:1.8, maxWidth:620, margin:'0 0 64px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>
-              itzz all about quality — creating tools, designs, and experiences for players who care about the details.
-            </p>
-
-            {/* Premium CTA Buttons */}
-            <div style={{ display:'flex', gap:16, flexWrap:'wrap', animation:'fadeInUp 0.8s ease 0.35s both', opacity:0 }}>
-              <button className="neon-button" onClick={() => navigate('/previewer')}>
-                Launch App →
-              </button>
-              <button className="glass-card" style={{ padding:'18px 32px', fontSize:14, fontWeight:500, color:'var(--text-primary)' }}
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior:'smooth' })}>
-                Explore
-              </button>
-            </div>
+          {/* CTA Buttons */}
+          <div style={{ display:'flex', gap:16, flexWrap:'wrap', animation:'fadeInUp 0.8s ease 0.35s both', opacity:0 }}>
+            <button className="neon-button" onClick={() => navigate('/previewer')}>
+              Launch App →
+            </button>
+            <button className="glass-card" style={{ padding:'18px 32px', fontSize:14, fontWeight:500, color:'var(--text-primary)' }}
+              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior:'smooth' })}>
+              Explore
+            </button>
           </div>
+        </div>
 
-          {/* Right Side - Audi Render */}
-          <div style={{ position:'relative', width:1200, height:1200, display:'flex', alignItems:'flex-start', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, marginRight:'-600px', marginLeft:'400px', zIndex:5, marginTop:'-100px' }}>
-            <img 
-              src="/Audi_Render_2.png" 
-              alt="Audi Render" 
-              style={{ 
-                width:'200%', 
-                height:'200%', 
-                objectFit:'contain'
-              }} 
-            />
-          </div>
+        {/* Right Side - Audi Render (Positioned Absolutely) */}
+        <div style={{ position:'absolute', top:80, right:0, width:1000, height:1000, display:'flex', alignItems:'center', justifyContent:'flex-end', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, zIndex:5 }}>
+          <img 
+            src="/Audi_Render_2.png" 
+            alt="Audi Render" 
+            style={{ 
+              width:'180%', 
+              height:'180%', 
+              objectFit:'contain',
+              marginRight:'-400px'
+            }} 
+          />
         </div>
 
         {/* Bottom Stats */}

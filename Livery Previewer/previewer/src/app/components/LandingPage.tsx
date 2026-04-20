@@ -578,7 +578,7 @@ export default function LandingPage() {
         {/* Right Side - Audi Render (Positioned Absolutely) */}
         <div id="audi-render" style={{ position:'absolute', top:80, right:0, width:1000, height:1000, display:'flex', alignItems:'center', justifyContent:'flex-end', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, zIndex:5, marginRight:'-400px', transition:'margin-right 0.3s ease-out' }}>
           <img 
-            src="/Audi_Render_2.png" 
+            src="/Audi_Render_2 (1).png" 
             alt="Audi Render" 
             style={{ 
               width:'180%', 

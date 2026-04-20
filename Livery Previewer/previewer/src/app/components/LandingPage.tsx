@@ -48,17 +48,17 @@ const LANDING_STYLES = `
   }
   .lp-nav-link::after {
     content: ''; position: absolute; bottom: -2px; left: 0;
-    width: 0; height: 1px; background: #c4ff0d;
+    width: 0; height: 1px; background: #D8FF63;
     transition: width 0.2s ease;
   }
-  .lp-nav-link:hover { color: #c4ff0d; }
+  .lp-nav-link:hover { color: #D8FF63; }
   .lp-nav-link:hover::after { width: 100%; }
-  .lp-nav-link.active { color: #c4ff0d; }
+  .lp-nav-link.active { color: #D8FF63; }
   .lp-nav-link.active::after { width: 100%; }
 
   .lp-btn-primary {
     position: relative; overflow: hidden;
-    background: #c4ff0d; color: #000;
+    background: #D8FF63; color: #000;
     border: none; border-radius: 10px;
     font-size: 12px; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase;
@@ -118,7 +118,7 @@ const LANDING_STYLES = `
   .lp-section-label {
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.22em; text-transform: uppercase;
-    color: #c4ff0d;
+    color: #D8FF63;
   }
 
   .lp-marquee-track {
@@ -218,7 +218,7 @@ const PRODUCTS = [
     tag: 'Tool',
     name: 'Livery Previewer',
     desc: 'Design and preview ERLC vehicle liveries in real-time 3D.',
-    accent: '#c4ff0d',
+    accent: '#D8FF63',
     link: '/previewer',
     isInternal: true,
     num: '01',
@@ -228,7 +228,7 @@ const PRODUCTS = [
     tag: 'Coming Soon',
     name: 'itzz Portfolio',
     desc: 'A showcase of the best livery designs from the itzz community.',
-    accent: '#c4ff0d',
+    accent: '#D8FF63',
     link: null,
     isInternal: false,
     num: '02',
@@ -238,7 +238,7 @@ const PRODUCTS = [
     tag: 'Coming Soon',
     name: 'itzz Shop',
     desc: 'Official itzz merchandise and digital goods for the community.',
-    accent: '#c4ff0d',
+    accent: '#D8FF63',
     link: null,
     isInternal: false,
     num: '03',
@@ -501,15 +501,15 @@ export default function LandingPage() {
           <div style={{ maxWidth:800 }}>
             {/* Premium Counter */}
             <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:48, animation:'premiumFadeUp 0.8s ease both' }}>
-              <span className="lp-counter" style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', color:'#c4ff0d' }}>/ 01</span>
-              <div style={{ height:1, width:60, background:'linear-gradient(to right, transparent, #c4ff0d, transparent)', animation:'premiumGlow 2s ease-in-out infinite' }} />
+              <span className="lp-counter" style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', color:'#D8FF63' }}>/ 01</span>
+              <div style={{ height:1, width:60, background:'linear-gradient(to right, transparent, #D8FF63, transparent)', animation:'premiumGlow 2s ease-in-out infinite' }} />
               <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.18em', color:'#52525b', textTransform:'uppercase' }}>itzz industries</span>
             </div>
 
             {/* Premium Heading */}
             <h1 style={{ fontSize:'clamp(56px,7vw,120px)', fontWeight:900, lineHeight:0.95, letterSpacing:'-0.04em', margin:'0 0 40px', animation:'premiumFadeUp 0.8s ease 0.15s both', opacity:0, textShadow:'0 8px 32px rgba(196,255,13,0.15)' }}>
               <span style={{ display:'block', marginBottom:8 }}>itzz all</span>
-              <span style={{ display:'block', background:'linear-gradient(135deg,#c4ff0d,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', filter:'drop-shadow(0 4px 16px rgba(196,255,13,0.3))' }}>quality.</span>
+              <span style={{ display:'block', background:'linear-gradient(135deg,#D8FF63,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', filter:'drop-shadow(0 4px 16px rgba(216,255,99,0.3))' }}>quality.</span>
             </h1>
 
             <p style={{ fontSize:18, color:'#a1a1aa', lineHeight:1.8, maxWidth:520, margin:'0 0 64px', fontWeight:400, animation:'premiumFadeUp 0.8s ease 0.25s both', opacity:0 }}>
@@ -556,7 +556,7 @@ export default function LandingPage() {
         <div style={{ display:'flex', overflow:'hidden' }}>
           <div className="lp-marquee-track">
             {['Livery Previewer','ERLC Community','itzz Industries','Quality First','Discord Community','Vehicle Design','Real-time 3D','Livery Previewer','ERLC Community','itzz Industries','Quality First','Discord Community','Vehicle Design','Real-time 3D'].map((t,i) => (
-              <span key={i} style={{ fontSize:11, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%3===0 ? '#c4ff0d' : '#27272a', flexShrink:0 }}>
+              <span key={i} style={{ fontSize:11, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%3===0 ? '#D8FF63' : '#27272a', flexShrink:0 }}>
                 {t} <span style={{ color:'#1f1f23', marginLeft:48 }}>✦</span>
               </span>
             ))}
@@ -594,7 +594,7 @@ export default function LandingPage() {
 
                 <div>
                   <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:20 }}>
-                    <span style={{ fontSize:9, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', padding:'4px 10px', borderRadius:99, background: p.tag==='Coming Soon' ? 'rgba(255,255,255,0.04)' : `rgba(${p.accent==='#c4ff0d'?'196,255,13':'88,101,242'},0.1)`, border: `1px solid ${p.tag==='Coming Soon'?'rgba(255,255,255,0.07)':`${p.accent}30`}`, color: p.tag==='Coming Soon'?'#52525b':p.accent }}>
+                    <span style={{ fontSize:9, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', padding:'4px 10px', borderRadius:99, background: p.tag==='Coming Soon' ? 'rgba(255,255,255,0.04)' : `rgba(${p.accent==='#D8FF63'?'216,255,99':'88,101,242'},0.1)`, border: `1px solid ${p.tag==='Coming Soon'?'rgba(255,255,255,0.07)':`${p.accent}30`}`, color: p.tag==='Coming Soon'?'#52525b':p.accent }}>
                       {p.tag}
                     </span>
                   </div>
@@ -662,14 +662,14 @@ export default function LandingPage() {
             <div key={i} className="lp-testimonial-card" style={{ animation:`lp-fadeUp 0.6s ease ${i*0.15}s both`, opacity:0 }}>
               <div style={{ display:'flex', gap:8, marginBottom:16 }}>
                 {[...Array(testimonial.rating)].map((_, j) => (
-                  <span key={j} style={{ color:'#c4ff0d', fontSize:16 }}>?</span>
+                  <span key={j} style={{ color:'#D8FF63', fontSize:16 }}>?</span>
                 ))}
               </div>
               <p style={{ fontSize:14, color:'#e4e4e7', lineHeight:1.6, margin:'0 0 20px', fontStyle:'italic' }}>
                 "{testimonial.content}"
               </p>
               <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(135deg,#c4ff0d,#88ff00)', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, color:'#000' }}>
+                <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(135deg,#D8FF63,#88ff00)', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, color:'#000' }}>
                   {testimonial.name.charAt(0)}
                 </div>
                 <div>
@@ -697,10 +697,10 @@ export default function LandingPage() {
         <div className="lp-showcase-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
           {SHOWCASE_ITEMS.map((item, i) => (
             <div key={item.id} className="lp-showcase-item" style={{ animation:`lp-fadeUp 0.6s ease ${i*0.1}s both`, opacity:0 }}>
-              <div style={{ height:200, background:'linear-gradient(135deg,rgba(196,255,13,0.1),rgba(196,255,13,0.05))', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+              <div style={{ height:200, background:'linear-gradient(135deg,rgba(216,255,99,0.1),rgba(216,255,99,0.05))', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
                 <div style={{ fontSize:48, opacity:0.3 }}>?</div>
                 <div style={{ position:'absolute', top:12, right:12, background:'rgba(8,8,8,0.8)', backdropFilter:'blur(8px)', padding:'4px 8px', borderRadius:6, display:'flex', alignItems:'center', gap:4 }}>
-                  <span style={{ fontSize:12, color:'#c4ff0d' }}>?</span>
+                  <span style={{ fontSize:12, color:'#D8FF63' }}>?</span>
                   <span style={{ fontSize:11, color:'#e4e4e7' }}>{item.likes}</span>
                 </div>
               </div>
@@ -748,8 +748,8 @@ export default function LandingPage() {
             { label:'Open to Feedback', desc:'We build what the community actually needs.' },
           ].map((v,i) => (
             <div key={i} style={{ padding:'24px', borderRadius:14, background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ width:28, height:28, borderRadius:8, background:'rgba(196,255,13,0.1)', border:'1px solid rgba(196,255,13,0.2)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
-                <div style={{ width:8, height:8, borderRadius:'50%', background:'#c4ff0d' }} />
+              <div style={{ width:28, height:28, borderRadius:8, background:'rgba(216,255,99,0.1)', border:'1px solid rgba(216,255,99,0.2)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
+                <div style={{ width:8, height:8, borderRadius:'50%', background:'#D8FF63' }} />
               </div>
               <p style={{ fontSize:13, fontWeight:700, color:'#e4e4e7', margin:'0 0 8px' }}>{v.label}</p>
               <p style={{ fontSize:12, color:'#52525b', lineHeight:1.6, margin:0 }}>{v.desc}</p>

@@ -992,8 +992,7 @@ export default function LandingPage() {
               
               {/* Content */}
               <div style={{ padding:24 }}>
-                <h4 style={{ fontSize:16, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>{post.title || 'Untitled Showcase'}</h4>
-                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>{post.caption ? post.caption.replace(/#\w+/g, '').trim() : 'No description'}</p>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>{post.caption ? post.caption.replace(/#\w+/g, '').trim() : ''}</p>
               </div>
             </div>
           ))}

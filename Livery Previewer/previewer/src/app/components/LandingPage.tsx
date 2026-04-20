@@ -481,7 +481,7 @@ export default function LandingPage() {
 
           {/* Large 3D Logo */}
           <div style={{ display:'flex', justifyContent:'center', alignItems:'center', animation:'lp-fadeUp 0.6s ease 0.3s both', opacity:0 }}>
-            <Logo3D size={300} />
+            <Logo3D size={600} />
           </div>
         </div>
 

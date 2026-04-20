@@ -364,7 +364,17 @@ export default function LandingPage() {
 
       {/* Background vector */}
       <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <img src={`${BASE}Vector_(7).svg`} alt="" aria-hidden style={{ width:'90%', opacity:0.025, filter:'brightness(0) invert(1)' }} />
+        <img 
+          src={`${BASE}Vector_(7).svg`} 
+          alt="" 
+          aria-hidden 
+          style={{ 
+            width:'90%', 
+            opacity:0.025, 
+            filter:'brightness(0) invert(1)',
+            animation: 'lp-spin 60s linear infinite'
+          }} 
+        />
       </div>
 
       {/* ── Navbar ── */}

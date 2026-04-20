@@ -365,7 +365,7 @@ export default function LandingPage() {
       {/* Background vector */}
       <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', display:'flex', alignItems:'center', justifyContent:'center' }}>
         <img 
-          src={`${BASE}Vector_(7).svg`} 
+          src={`${BASE}Vector (8).svg`} 
           alt="" 
           aria-hidden 
           style={{ 
@@ -379,7 +379,7 @@ export default function LandingPage() {
 
       {/* ── Navbar ── */}
       <nav style={{ position:'fixed', top:0, left:0, right:0, zIndex:50, height:56, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 48px', background:'rgba(8,8,8,0.85)', backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)', borderBottom:'1px solid rgba(255,255,255,0.05)', boxShadow:'0 1px 0 rgba(196,255,13,0.06)' }}>
-        <Logo3D size={60} style={{ cursor:'pointer' }} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })} />
+        <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:26, width:'auto', cursor:'pointer' }} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })} />
 
         {/* Desktop nav */}
         <div className="lp-nav-desktop" style={{ display:'flex', alignItems:'center', gap:36 }}>
@@ -419,7 +419,7 @@ export default function LandingPage() {
       {/* Mobile Menu Overlay */}
       <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`} style={{ display:'none' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
-          <Logo3D size={40} />
+          <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:24, width:'auto' }} />
           <button 
             style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', padding:'8px' }}
             onClick={() => setMenuOpen(false)}

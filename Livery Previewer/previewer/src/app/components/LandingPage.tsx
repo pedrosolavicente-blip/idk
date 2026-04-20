@@ -643,11 +643,11 @@ export default function LandingPage() {
       </section>
 
       {/* ── Moving Strip ── */}
-      <div style={{ position:'relative', zIndex:10, overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'16px 0', background:'rgba(255,255,255,0.01)' }}>
+      <div style={{ position:'relative', zIndex:10, overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'12px 0', background:'rgba(255,255,255,0.01)' }}>
         <div style={{ display:'flex', overflow:'hidden' }}>
           <div className="lp-marquee-track">
-            {['itzz industries','Livery Previewer','ERLC Community','Quality First','Discord Community','Vehicle Design','Real-time 3D','itzz industries','Livery Previewer','ERLC Community','Quality First','Discord Community','Vehicle Design','Real-time 3D'].map((t,i) => (
-              <span key={i} style={{ fontSize:11, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%3===0 ? '#D8FF63' : '#27272a', flexShrink:0 }}>
+            {['innovation','efficiency','quality','itzz industries','Livery Previewer','ERLC Community','Discord Community','Vehicle Design','Real-time 3D','innovation','efficiency','quality','itzz industries','Livery Previewer','ERLC Community','Discord Community','Vehicle Design','Real-time 3D'].map((t,i) => (
+              <span key={i} style={{ fontSize:10, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%3===0 ? '#D8FF63' : '#27272a', flexShrink:0 }}>
                 {t} <span style={{ color:'#1f1f23', marginLeft:48 }}>✦</span>
               </span>
             ))}

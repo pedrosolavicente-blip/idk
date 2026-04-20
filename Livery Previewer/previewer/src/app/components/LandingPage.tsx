@@ -72,8 +72,8 @@ const LANDING_STYLES = `
     transform: translateX(-120%); transition: transform 0.5s ease;
   }
   .lp-btn-primary:hover::before { transform: translateX(120%); }
-  .lp-btn-primary:hover { box-shadow: 0 8px 32px rgba(196,255,13,0.5); transform: translateY(-2px); }
-  .lp-btn-primary:active { transform: translateY(0); box-shadow: 0 4px 16px rgba(196,255,13,0.3); }
+  .lp-btn-primary:hover { box-shadow: 0 8px 32px rgba(216,255,99,0.5); transform: translateY(-2px); }
+  .lp-btn-primary:active { transform: translateY(0); box-shadow: 0 4px 16px rgba(216,255,99,0.3); }
 
   .lp-btn-ghost {
     background: rgba(255,255,255,0.04);
@@ -84,7 +84,7 @@ const LANDING_STYLES = `
     cursor: pointer; transition: all 0.18s ease;
     display: inline-flex; align-items: center; gap: 8px;
   }
-  .lp-btn-ghost:hover { border-color: rgba(196,255,13,0.4); color: #fff; background: rgba(196,255,13,0.06); transform: translateY(-1px); }
+  .lp-btn-ghost:hover { border-color: rgba(216,255,99,0.4); color: #fff; background: rgba(216,255,99,0.06); transform: translateY(-1px); }
   .lp-btn-ghost:active { transform: translateY(0); }
 
   .lp-product-card {
@@ -95,15 +95,15 @@ const LANDING_STYLES = `
     position: relative;
   }
   .lp-product-card:hover {
-    border-color: rgba(196,255,13,0.3);
+    border-color: rgba(216,255,99,0.3);
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 24px 64px rgba(196,255,13,0.15), 0 8px 32px rgba(0,0,0,0.1);
+    box-shadow: 0 24px 64px rgba(216,255,99,0.15), 0 8px 32px rgba(0,0,0,0.1);
   }
   .lp-product-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, transparent, rgba(196,255,13,0.05), transparent);
+    background: linear-gradient(135deg, transparent, rgba(216,255,99,0.05), transparent);
     z-index: 1;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -139,15 +139,15 @@ const LANDING_STYLES = `
 
   .lp-feature-icon {
     width: 48px; height: 48px; border-radius: 12px;
-    background: linear-gradient(135deg, rgba(196,255,13,0.1), rgba(196,255,13,0.05));
-    border: 1px solid rgba(196,255,13,0.2);
+    background: linear-gradient(135deg, rgba(216,255,99,0.1), rgba(216,255,99,0.05));
+    border: 1px solid rgba(216,255,99,0.2);
     display: flex; align-items: center; justify-content: center;
     transition: all 0.3s ease; font-size: 20px;
   }
   .lp-feature-icon:hover {
     transform: scale(1.1) rotate(5deg);
-    background: linear-gradient(135deg, rgba(196,255,13,0.15), rgba(196,255,13,0.08));
-    box-shadow: 0 8px 24px rgba(196,255,13,0.2);
+    background: linear-gradient(135deg, rgba(216,255,99,0.15), rgba(216,255,99,0.08));
+    box-shadow: 0 8px 24px rgba(216,255,99,0.2);
   }
 
   .lp-testimonial-card {
@@ -159,11 +159,11 @@ const LANDING_STYLES = `
   }
   .lp-testimonial-card::before {
     content: '"'; position: absolute; top: 8px; right: 16px;
-    font-size: 48px; color: rgba(196,255,13,0.1);
+    font-size: 48px; color: rgba(216,255,99,0.1);
     font-weight: 900; line-height: 1;
   }
   .lp-testimonial-card:hover {
-    border-color: rgba(196,255,13,0.2);
+    border-color: rgba(216,255,99,0.2);
     transform: translateY(-2px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.4);
   }
@@ -176,9 +176,9 @@ const LANDING_STYLES = `
     cursor: pointer;
   }
   .lp-showcase-item:hover {
-    border-color: rgba(196,255,13,0.2);
+    border-color: rgba(216,255,99,0.2);
     transform: scale(1.02);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 24px rgba(216,255,99,0.2);
   }
   .lp-showcase-item img {
     transition: transform 0.4s ease;
@@ -363,12 +363,12 @@ export default function LandingPage() {
         if(p.x<0) p.x=W; if(p.x>W) p.x=0;
         if(p.y<0) p.y=H; if(p.y>H) p.y=0;
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fillStyle=`rgba(196,255,13,${p.o})`; ctx.fill();
+        ctx.fillStyle=`rgba(216,255,99,${p.o})`; ctx.fill();
       });
       for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++) {
         const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
         const d=Math.sqrt(dx*dx+dy*dy);
-        if(d<90) { ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(196,255,13,${.05*(1-d/90)})`; ctx.lineWidth=.4; ctx.stroke(); }
+        if(d<90) { ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(216,255,99,${.05*(1-d/90)})`; ctx.lineWidth=.4; ctx.stroke(); }
       }
       raf=requestAnimationFrame(draw);
     };
@@ -390,9 +390,9 @@ export default function LandingPage() {
 
       {/* Ambient glows */}
       <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'-15%', right:'-8%', width:700, height:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(196,255,13,0.1) 0%,transparent 60%)', animation:'lp-glow 5s ease-in-out infinite' }} />
-        <div style={{ position:'absolute', bottom:'-20%', left:'-10%', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(196,255,13,0.05) 0%,transparent 65%)' }} />
-        <div style={{ position:'absolute', top:'40%', left:'40%', width:400, height:400, borderRadius:'50%', transform:'translate(-50%,-50%)', background:'radial-gradient(circle,rgba(196,255,13,0.04) 0%,transparent 60%)' }} />
+        <div style={{ position:'absolute', top:'-15%', right:'-8%', width:700, height:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(216,255,99,0.1) 0%,transparent 60%)', animation:'lp-glow 5s ease-in-out infinite' }} />
+        <div style={{ position:'absolute', bottom:'-20%', left:'-10%', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(216,255,99,0.05) 0%,transparent 65%)' }} />
+        <div style={{ position:'absolute', top:'40%', left:'40%', width:400, height:400, borderRadius:'50%', transform:'translate(-50%,-50%)', background:'radial-gradient(circle,rgba(216,255,99,0.04) 0%,transparent 60%)' }} />
       </div>
 
       {/* Background vector */}
@@ -507,7 +507,7 @@ export default function LandingPage() {
             </div>
 
             {/* Premium Heading */}
-            <h1 style={{ fontSize:'clamp(56px,7vw,120px)', fontWeight:900, lineHeight:0.95, letterSpacing:'-0.04em', margin:'0 0 40px', animation:'premiumFadeUp 0.8s ease 0.15s both', opacity:0, textShadow:'0 8px 32px rgba(196,255,13,0.15)' }}>
+            <h1 style={{ fontSize:'clamp(56px,7vw,120px)', fontWeight:900, lineHeight:0.95, letterSpacing:'-0.04em', margin:'0 0 40px', animation:'premiumFadeUp 0.8s ease 0.15s both', opacity:0, textShadow:'0 8px 32px rgba(216,255,99,0.15)' }}>
               <span style={{ display:'block', marginBottom:8 }}>itzz all</span>
               <span style={{ display:'block', background:'linear-gradient(135deg,#D8FF63,#88ff00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', filter:'drop-shadow(0 4px 16px rgba(216,255,99,0.3))' }}>quality.</span>
             </h1>
@@ -518,7 +518,7 @@ export default function LandingPage() {
 
             {/* Premium CTA Buttons */}
             <div style={{ display:'flex', gap:16, flexWrap:'wrap', animation:'premiumFadeUp 0.8s ease 0.35s both', opacity:0 }}>
-              <button className="lp-btn-primary" style={{ padding:'18px 36px', fontSize:14, fontWeight:600, boxShadow:'0 8px 24px rgba(196,255,13,0.25)' }} onClick={() => navigate('/previewer')}>
+              <button className="lp-btn-primary" style={{ padding:'18px 36px', fontSize:14, fontWeight:600, boxShadow:'0 8px 24px rgba(216,255,99,0.25)' }} onClick={() => navigate('/previewer')}>
                 Open Livery Previewer →
               </button>
               <button className="lp-btn-ghost" style={{ padding:'18px 32px', fontSize:14, fontWeight:500 }}
@@ -529,7 +529,7 @@ export default function LandingPage() {
           </div>
 
           {/* Premium 3D Logo */}
-          <div style={{ display:'flex', justifyContent:'flex-start', alignItems:'center', animation:'premiumSlideIn 1.2s ease 0.6s both', opacity:0, filter:'drop-shadow(0 16px 48px rgba(196,255,13,0.2))' }}>
+          <div style={{ display:'flex', justifyContent:'flex-start', alignItems:'center', animation:'premiumSlideIn 1.2s ease 0.6s both', opacity:0, filter:'drop-shadow(0 16px 48px rgba(216,255,99,0.2))' }}>
             <Logo3D size={600} />
           </div>
         </div>
@@ -546,7 +546,7 @@ export default function LandingPage() {
 
         {/* Scroll indicator */}
         <div style={{ position:'absolute', bottom:40, left:48, display:'flex', alignItems:'center', gap:10, animation:'lp-fadeIn 1s ease 0.8s both', opacity:0 }}>
-          <div style={{ width:1, height:36, background:'linear-gradient(to bottom, rgba(196,255,13,0.5), transparent)' }} />
+          <div style={{ width:1, height:36, background:'linear-gradient(to bottom, rgba(216,255,99,0.5), transparent)' }} />
           <span style={{ fontSize:9, fontWeight:600, letterSpacing:'0.2em', color:'#3f3f46', textTransform:'uppercase', writingMode:'vertical-rl' }}>Scroll</span>
         </div>
       </section>
@@ -586,7 +586,7 @@ export default function LandingPage() {
               onClick={() => { if (p.isInternal && p.link) navigate(p.link); else if (p.link) window.open(p.link,'_blank'); }}
             >
               <div style={{ padding:'48px 40px', height:'100%', minHeight:260, display:'flex', flexDirection:'column', justifyContent:'space-between', position:'relative', overflow:'hidden', transition:'background 0.2s ease' }}
-                onMouseEnter={e => (e.currentTarget.style.background='rgba(196,255,13,0.02)')}
+                onMouseEnter={e => (e.currentTarget.style.background='rgba(216,255,99,0.02)')}
                 onMouseLeave={e => (e.currentTarget.style.background='transparent')}
               >
                 {/* Number */}

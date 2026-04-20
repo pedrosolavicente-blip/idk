@@ -1,52 +1,49 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, createContext, useContext, type ReactNode, type Dispatch, type SetStateAction } from 'react';
+import { fetchPosts } from '../lib/showcaseApi';
 import type { ShowcasePost } from '../lib/showcaseApi';
 
+export type SortMode = 'new' | 'liked' | 'viewed' | 'comments';
+
 interface ShowcaseContextType {
-  posts: ShowcasePost[];
-  loading: boolean;
-  refresh: () => void;
+  posts:        ShowcasePost[];
+  loading:      boolean;
+  error:        string | null;
+  sort:         SortMode;
+  setSort:      Dispatch<SetStateAction<SortMode>>;
+  activeTag:    string | null;
+  setActiveTag: Dispatch<SetStateAction<string | null>>;
+  setPosts:     Dispatch<SetStateAction<ShowcasePost[]>>;
+  refresh:      () => void;
 }
 
 const ShowcaseContext = createContext<ShowcaseContextType | undefined>(undefined);
 
-export function useShowcase() {
-  const context = useContext(ShowcaseContext);
-  if (!context) {
-    throw new Error('useShowcase must be used within a ShowcaseProvider');
-  }
-  return context;
+export function useShowcase(): ShowcaseContextType {
+  const ctx = useContext(ShowcaseContext);
+  if (!ctx) throw new Error('useShowcase must be used within ShowcaseProvider');
+  return ctx;
 }
 
 export function ShowcaseProvider({ children }: { children: ReactNode }) {
-  const [posts, setPosts] = useState<ShowcasePost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [posts,     setPosts]     = useState<ShowcasePost[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [error,     setError]     = useState<string | null>(null);
+  const [sort,      setSort]      = useState<SortMode>('new');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  const refresh = async () => {
-    try {
-      const response = await fetch('/api/showcases');
-      if (response.ok) {
-        const fetchedPosts = await response.json();
-        setPosts(fetchedPosts.sort((a: ShowcasePost, b: ShowcasePost) => b.like_count - a.like_count));
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error('Failed to fetch showcase posts:', error);
-      setLoading(false);
-    }
+  const refresh = () => {
+    setLoading(true);
+    setError(null);
+    fetchPosts(sort, activeTag ?? undefined)
+      .then(setPosts)
+      .catch(e => setError(e instanceof Error ? e.message : 'Failed to load'))
+      .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    refresh();
-  }, []);
-
-  const value: ShowcaseContextType = {
-    posts,
-    loading,
-    refresh
-  };
+  useEffect(() => { refresh(); }, [sort, activeTag]);
 
   return (
-    <ShowcaseContext.Provider value={value}>
+    <ShowcaseContext.Provider value={{ posts, loading, error, sort, setSort, activeTag, setActiveTag, setPosts, refresh }}>
       {children}
     </ShowcaseContext.Provider>
   );

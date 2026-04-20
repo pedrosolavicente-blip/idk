@@ -1,14 +1,16 @@
-import { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { DiscordUser } from '../../lib/discordAuth';
 import {
   type ShowcasePost, type ShowcaseComment, type LiveryConfig, type Analytics, type PostType,
-  fetchPosts, fetchPost, createPost, deletePost, fetchLiveryConfig,
+  type RuleId, RELEASE_RULES,
+  fetchPost, createPost, deletePost, fetchLiveryConfig,
   fetchComments, addComment, deleteComment,
   reactToPost, removeReaction, recordView, fetchAnalytics,
   avatarUrl, imageUrl, relativeTime,
 } from '../../lib/showcaseApi';
 import { initLiveryViewer, type LiveryViewer as Viewer, type SceneSettings } from '../../lib/liveryEngine';
-import { useShowcase, ShowcaseProvider } from '../hooks/useShowcase';
+import { useShowcase } from '../hooks/useShowcase';
+import type { SortMode } from '../hooks/useShowcase';
 import {
   X, Upload, Send, Trash2, MessageSquare, Image, ArrowLeft,
   ThumbsUp, ThumbsDown, Eye, Settings2, BarChart2, Box,
@@ -21,7 +23,7 @@ const ACCENT = '#c4ff0d';
 
 const BADGES: Record<string, { label: string; shortLabel: string; color: string }> = {
   '1256593664856162384': { label: 'Developer & Creator', shortLabel: 'CREATOR', color: '#f59e0b' },
-  '1195666796099948597': { label: 'Developer', shortLabel: 'DEV', color: '#3b82f6' },
+  '1195666796099948597': { label: 'Developer',           shortLabel: 'DEV',     color: '#3b82f6' },
 };
 
 function UserBadge({ userId }: { userId: string }) {
@@ -79,7 +81,7 @@ async function getWordFilter(): Promise<string[]> {
   return _wordCache;
 }
 
-function normaliseText(raw: string): string[] {
+function normaliseText(raw: string): [string, string, string] {
   const s = raw.toLowerCase()
     .replace(/[\u200b-\u200f\u202a-\u202e\u00ad\ufeff]/g, '')
     .replace(/[4@]/g, 'a').replace(/3/g, 'e').replace(/[1!|]/g, 'i')
@@ -137,8 +139,12 @@ function Avatar({ userId, hash, size = 8 }: { userId: string; hash: string | nul
 }
 
 function TypeBadge({ type }: { type: PostType }) {
-  const map = { image: ['Image', 'text-zinc-500 border-zinc-700'], showcase: ['3D Showcase', 'text-[#c4ff0d] border-[#c4ff0d]/40'], release: ['Free Release', 'text-green-400 border-green-500/40'] };
-  const [label, cls] = map[type] ?? map.image;
+  const map: Record<PostType, [string, string]> = {
+    image:    ['Image',        'text-zinc-500 border-zinc-700'],
+    showcase: ['3D Showcase',  'text-[#c4ff0d] border-[#c4ff0d]/40'],
+    release:  ['Free Release', 'text-green-400 border-green-500/40'],
+  };
+  const [label, cls] = map[type];
   return <span className={`text-[9px] font-bold uppercase tracking-widest border rounded px-1.5 py-0.5 ${cls}`}>{label}</span>;
 }
 
@@ -171,7 +177,6 @@ function PostCard({ post, currentUserId, onClick, onDeleted, onTagClick }: {
             </div>
             <TypeBadge type={post.post_type} />
           </div>
-          {post.title && <p className="text-sm font-bold text-white truncate">{post.title}</p>}
           {post.caption && <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{post.caption.replace(/#\w+/g, '').trim()}</p>}
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1" onClick={e => e.stopPropagation()}>
@@ -199,16 +204,22 @@ function PostCard({ post, currentUserId, onClick, onDeleted, onTagClick }: {
 
 // ─── Post settings / analytics ────────────────────────────────────────────────
 
-function PostSettings({ post: initialPost, onClose, onDeleted }: {
+function PostSettings({ post, onClose, onDeleted }: {
   post: ShowcasePost; onClose: () => void; onDeleted: () => void;
 }) {
-  const [post, setPost]            = useState(initialPost);
-  const [tab, setTab]              = useState<'info' | 'analytics'>('info');
-  const [analytics, setAnalytics]  = useState<Analytics | null>(null);
-  const [loading, setLoading]      = useState(false);
-  const [deleting, setDeleting]    = useState(false);
+  const [tab,       setTab]       = useState<'info' | 'analytics'>('info');
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [loading,   setLoading]   = useState(false);
+  const [deleting,  setDeleting]  = useState(false);
 
-  useEffect(() => { if (tab === 'analytics') { setLoading(true); fetchAnalytics(post.id).then(setAnalytics).catch(() => {}).finally(() => setLoading(false)); } }, [tab]);
+  useEffect(() => {
+    if (tab !== 'analytics') return;
+    setLoading(true);
+    fetchAnalytics(post.id)
+      .then(setAnalytics)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [tab, post.id]);
 
   const handleDelete = async () => {
     if (!confirm('Delete this post permanently?')) return;
@@ -244,7 +255,9 @@ function PostSettings({ post: initialPost, onClose, onDeleted }: {
                 <TypeBadge type={post.post_type} />
                 <p className="text-xs text-zinc-400">{new Date(post.created_at).toLocaleDateString()}</p>
               </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">{post.caption || <span className="text-zinc-600 italic">No description</span>}</p>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {post.caption || <span className="text-zinc-600 italic">No description</span>}
+              </p>
               <div className="flex gap-4 text-xs text-zinc-500 pt-1">
                 <span className="flex items-center gap-1"><Eye size={11} /> {post.view_count}</span>
                 <span className="flex items-center gap-1"><ThumbsUp size={11} /> {post.like_count}</span>
@@ -265,7 +278,11 @@ function PostSettings({ post: initialPost, onClose, onDeleted }: {
             ) : analytics ? (
               <>
                 <div className="grid grid-cols-3 gap-2">
-                  {[{ icon: Eye, label: 'Views', value: analytics.views }, { icon: ThumbsUp, label: 'Likes', value: analytics.likes }, { icon: ThumbsDown, label: 'Dislikes', value: analytics.dislikes }].map(({ icon: Icon, label, value }) => (
+                  {([
+                    { icon: Eye,       label: 'Views',    value: analytics.views    },
+                    { icon: ThumbsUp,  label: 'Likes',    value: analytics.likes    },
+                    { icon: ThumbsDown,label: 'Dislikes', value: analytics.dislikes },
+                  ] as const).map(({ icon: Icon, label, value }) => (
                     <div key={label} className="rounded-xl border border-white/8 bg-white/3 p-3 text-center">
                       <Icon size={14} className="mx-auto mb-1 text-zinc-500" />
                       <p className="text-lg font-black text-white">{value}</p>
@@ -328,13 +345,20 @@ function LiveryView3D({ config }: { config: LiveryConfig }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    const viewer = initLiveryViewer(containerRef.current, { zoomFactor: 1.3 });
-    viewerRef.current = viewer;
-    viewer.updateScene(DEFAULT_SCENE);
-    viewer.loadLivery(config.modelPath, config.vehicleColor, config.textures, (_msg, pct) => { if (pct >= 100) setReady(true); }).catch(() => {});
-    return () => viewer.dispose();
-  }, [config]);
+    const container = containerRef.current;
+    if (!container) return;
+    let destroyed = false;
+    initLiveryViewer(container, config, DEFAULT_SCENE).then(v => {
+      if (destroyed) { v.destroy(); return; }
+      viewerRef.current = v;
+      setReady(true);
+    });
+    return () => {
+      destroyed = true;
+      viewerRef.current?.destroy();
+      viewerRef.current = null;
+    };
+  }, []);
 
   return (
     <div className="relative w-full h-full">
@@ -363,23 +387,23 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
   onDeleted: () => void; onApplyLivery?: (c: LiveryConfig) => void;
   onTagClick: (tag: string) => void;
 }) {
-  const [post, setPost]                 = useState(initialPost);
-  const [comments, setComments]         = useState<ShowcaseComment[]>([]);
+  const [post, setPost]                       = useState(initialPost);
+  const [comments, setComments]               = useState<ShowcaseComment[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
-  const [commentText, setCommentText]   = useState('');
-  const [sending, setSending]           = useState(false);
-  const [liveryConfig, setLiveryConfig] = useState<LiveryConfig | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [replyingToId, setReplyingToId] = useState<string | null>(null);
-  const [replyText, setReplyText]       = useState('');
-  const [sendingReply, setSendingReply] = useState(false);
-  const [wordList, setWordList]         = useState<string[]>([]);
-  const [copied, setCopied]             = useState(false);
+  const [commentText, setCommentText]         = useState('');
+  const [sending, setSending]                 = useState(false);
+  const [liveryConfig, setLiveryConfig]       = useState<LiveryConfig | null>(null);
+  const [showSettings, setShowSettings]       = useState(false);
+  const [replyingToId, setReplyingToId]       = useState<string | null>(null);
+  const [replyText, setReplyText]             = useState('');
+  const [sendingReply, setSendingReply]       = useState(false);
+  const [wordList, setWordList]               = useState<string[]>([]);
+  const [copied, setCopied]                   = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { getWordFilter().then(setWordList); }, []);
 
-  // View — once per session
+  // Record view once per session
   useEffect(() => {
     const key = `viewed_${post.id}`;
     if (!sessionStorage.getItem(key)) { sessionStorage.setItem(key, '1'); recordView(post.id); }
@@ -387,21 +411,22 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 
   // Load comments
   useEffect(() => {
-    const refresh = useContext(ShowcaseProvider);
-    refresh(post.id).then(setComments).finally(() => setLoadingComments(false));
+    setLoadingComments(true);
+    fetchComments(post.id)
+      .then(setComments)
+      .finally(() => setLoadingComments(false));
   }, [post.id]);
 
-  // Auto-update comments every 30s
+  // Auto-refresh comments every 30s
   useEffect(() => {
-    const timer = setInterval(async () => {
-      try {
-        const fresh = await useContext(ShowcaseProvider).refresh(post.id);
+    const timer = setInterval(() => {
+      fetchComments(post.id).then(fresh => {
         setComments(prev => {
           const ids = new Set(prev.map(c => c.id));
           const newOnes = fresh.filter(c => !ids.has(c.id));
           return newOnes.length ? [...prev, ...newOnes] : prev;
         });
-      } catch { /* ignore */ }
+      }).catch(() => {});
     }, 30_000);
     return () => clearInterval(timer);
   }, [post.id]);
@@ -420,17 +445,24 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
     const prev = post.user_reaction;
     if (prev === value) {
       await removeReaction(post.id).catch(() => {});
-      setPost(p => ({ ...p, user_reaction: null, like_count: p.like_count - (value === 1 ? 1 : 0), dislike_count: p.dislike_count - (value === -1 ? 1 : 0) }));
+      setPost(p => ({
+        ...p,
+        user_reaction: null,
+        like_count:    p.like_count    - (value === 1  ? 1 : 0),
+        dislike_count: p.dislike_count - (value === -1 ? 1 : 0),
+      }));
     } else {
       await reactToPost(post.id, value).catch(() => {});
-      setPost(p => ({ ...p, user_reaction: value, like_count: p.like_count + (value === 1 ? 1 : 0) - (prev === 1 ? 1 : 0), dislike_count: p.dislike_count + (value === -1 ? 1 : 0) - (prev === -1 ? 1 : 0) }));
+      setPost(p => ({
+        ...p,
+        user_reaction: value,
+        like_count:    p.like_count    + (value === 1  ? 1 : 0) - (prev === 1  ? 1 : 0),
+        dislike_count: p.dislike_count + (value === -1 ? 1 : 0) - (prev === -1 ? 1 : 0),
+      }));
     }
   };
 
-  const filter = (text: string) => {
-    const wl = wordList.length ? wordList : BUILTIN_WORDS;
-    return hasBannedWord(text, wl);
-  };
+  const filter = (text: string) => hasBannedWord(text, wordList.length ? wordList : BUILTIN_WORDS);
 
   const handleSend = async () => {
     if (!commentText.trim() || sending) return;
@@ -466,10 +498,12 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 
   const handleShare = () => {
     const url = `${window.location.origin}${window.location.pathname}?showcase=${post.id}`;
-    navigator.clipboard.writeText(url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }).catch(() => {});
+    navigator.clipboard.writeText(url)
+      .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })
+      .catch(() => {});
   };
 
-  const tags = extractTags(post.caption);
+  const tags        = extractTags(post.caption);
   const captionText = post.caption.replace(/#\w+/g, '').trim();
 
   return (
@@ -497,7 +531,9 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
             <Share2 size={11} />{copied ? 'Copied!' : 'Share'}
           </button>
           {currentUserId === post.user_id && (
-            <button onClick={() => setShowSettings(true)} className="text-zinc-500 hover:text-[#c4ff0d] transition-colors"><Settings2 size={14} /></button>
+            <button onClick={() => setShowSettings(true)} className="text-zinc-500 hover:text-[#c4ff0d] transition-colors">
+              <Settings2 size={14} />
+            </button>
           )}
         </div>
 
@@ -506,7 +542,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 
           {/* Left: media + info */}
           <div className="flex-1 min-w-0 overflow-y-auto border-r border-white/8">
-            {/* Media */}
             <div className="w-full bg-black shrink-0">
               {post.post_type === 'showcase' && liveryConfig ? (
                 <div className="w-full h-[700px]">
@@ -514,7 +549,8 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                 </div>
               ) : (
                 <div className="flex items-center justify-center p-4">
-                  <img src={imageUrl(post.image_key)} alt={post.caption} className="max-w-full max-h-[60vh] object-contain rounded-xl" />
+                  <img src={imageUrl(post.image_key)} alt={post.caption}
+                    className="max-w-full max-h-[60vh] object-contain rounded-xl" />
                 </div>
               )}
             </div>
@@ -542,7 +578,8 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                         <div key={panel} className="flex items-center gap-2">
                           <span className="text-xs text-zinc-500 w-14 shrink-0">{panel}</span>
                           <button onClick={() => navigator.clipboard.writeText(id)}
-                            className="flex-1 text-left font-mono text-xs text-[#c4ff0d] bg-black/40 border border-white/10 hover:border-[#c4ff0d]/40 rounded px-2 py-1 transition-all truncate" title="Click to copy">
+                            className="flex-1 text-left font-mono text-xs text-[#c4ff0d] bg-black/40 border border-white/10 hover:border-[#c4ff0d]/40 rounded px-2 py-1 transition-all truncate"
+                            title="Click to copy">
                             {id}
                           </button>
                         </div>
@@ -556,7 +593,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 
             {/* Description + tags + reactions */}
             <div className="px-5 py-4 border-t border-white/8 space-y-3">
-              {post.title && <p className="text-lg font-black text-white leading-tight">{post.title}</p>}
               {liveryConfig?.modelName && (
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{liveryConfig.modelName}</p>
               )}
@@ -594,18 +630,22 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
               </p>
             </div>
 
-            {/* Scrollable comments list */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
               {loadingComments ? (
-                <div className="flex justify-center py-8"><div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" /></div>
+                <div className="flex justify-center py-8">
+                  <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
+                </div>
               ) : comments.length === 0 ? (
-                <div className="text-center py-8"><MessageSquare size={20} className="mx-auto text-zinc-800 mb-2" /><p className="text-xs text-zinc-600">No comments yet</p></div>
+                <div className="text-center py-8">
+                  <MessageSquare size={20} className="mx-auto text-zinc-800 mb-2" />
+                  <p className="text-xs text-zinc-600">No comments yet</p>
+                </div>
               ) : (
                 <>
                   {comments.map(c => {
-                    const isCreator = c.user_id === post.user_id;
+                    const isCreator  = c.user_id === post.user_id;
                     const isReplying = replyingToId === c.id;
-                    const parsed = parseReply(c.body);
+                    const parsed     = parseReply(c.body);
                     return (
                       <div key={c.id} className="space-y-2">
                         <div className="flex gap-2.5">
@@ -625,23 +665,25 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
                               </div>
                             )}
                             <p className="text-xs text-zinc-300 leading-relaxed break-words">
-                                {parsed ? parsed.text : c.body}
+                              {parsed ? parsed.text : c.body}
                             </p>
                             <div className="flex items-center gap-3 mt-1">
-                                {currentUserId && (
-                                  <button onClick={() => { setReplyingToId(isReplying ? null : c.id); setReplyText(''); }}
-                                    className="text-[10px] font-bold text-zinc-500 hover:text-[#c4ff0d] transition-colors">
-                                    {isReplying ? 'Cancel' : 'Reply'}
-                                  </button>
-                                )}
-                                {currentUserId === c.user_id && (
-                                  <button onClick={() => handleDeleteComment(c)}
-                                    className="text-[10px] font-bold text-zinc-500 hover:text-red-400 transition-colors">Delete</button>
-                                )}
-                              </div>
+                              {currentUserId && (
+                                <button
+                                  onClick={() => { setReplyingToId(isReplying ? null : c.id); setReplyText(''); }}
+                                  className="text-[10px] font-bold text-zinc-500 hover:text-[#c4ff0d] transition-colors">
+                                  {isReplying ? 'Cancel' : 'Reply'}
+                                </button>
+                              )}
+                              {currentUserId === c.user_id && (
+                                <button onClick={() => handleDeleteComment(c)}
+                                  className="text-[10px] font-bold text-zinc-500 hover:text-red-400 transition-colors">
+                                  Delete
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        {/* Inline reply input */}
                         {isReplying && (
                           <div className="ml-9 flex gap-2">
                             <input autoFocus value={replyText} onChange={e => setReplyText(e.target.value)}
@@ -662,7 +704,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
               )}
             </div>
 
-            {/* New comment input — pinned to bottom */}
             <div className="shrink-0 px-4 py-3 border-t border-white/8">
               {currentUserId ? (
                 <div className="flex gap-2">
@@ -680,7 +721,6 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
               )}
             </div>
           </div>
-
         </div>
       </div>
     </>
@@ -690,32 +730,35 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 // ─── Upload modal ─────────────────────────────────────────────────────────────
 
 interface CurrentLivery {
-  modelId: string | null; modelPath: string | null;
-  modelName: string | null;
+  modelId:      string | null;
+  modelPath:    string | null;
+  modelName:    string | null;
   vehicleColor: string;
-  panelNums: Record<string, number>; textures: Record<string, string>;
+  panelNums:    Record<string, number>;
+  textures:     Record<string, string>;
   captureThumb: () => string;
 }
 
 function UploadModal({ onClose, onUploaded, currentLivery }: {
   onClose: () => void; onUploaded: (p: ShowcasePost) => void; currentLivery?: CurrentLivery;
 }) {
-  const [postType, setPostType]   = useState<PostType>('image');
-  const [file, setFile]           = useState<File | null>(null);
-  const [preview, setPreview]     = useState<string | null>(null);
-  const [title, setTitle]         = useState('');
-  const [caption, setCaption]     = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [uploadErr, setUploadErr] = useState<string | null>(null);
-  const [assetMode, setAssetMode] = useState<'textures' | 'roblox_ids'>('textures');
-  const [robloxIds, setRobloxIds] = useState<Record<string, string>>({});
-  const [rules, setRules]         = useState<RuleId[]>([]);
+  const [postType,   setPostType]   = useState<PostType>('image');
+  const [file,       setFile]       = useState<File | null>(null);
+  const [preview,    setPreview]    = useState<string | null>(null);
+  const [caption,    setCaption]    = useState('');
+  const [uploading,  setUploading]  = useState(false);
+  const [uploadErr,  setUploadErr]  = useState<string | null>(null);
+  const [assetMode,  setAssetMode]  = useState<'textures' | 'roblox_ids'>('textures');
+  const [robloxIds,  setRobloxIds]  = useState<Record<string, string>>({});
+  const [rules,      setRules]      = useState<RuleId[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const has3D = !!currentLivery?.modelId;
-  const panelKeys = currentLivery ? Object.keys(currentLivery.panelNums).flatMap(face =>
-    Array.from({ length: currentLivery.panelNums[face] }, (_, i) => `${face}${i + 1}`)
-  ) : [];
+  const panelKeys = currentLivery
+    ? Object.keys(currentLivery.panelNums).flatMap(face =>
+        Array.from({ length: currentLivery.panelNums[face] }, (_, i) => `${face}${i + 1}`)
+      )
+    : [];
 
   useEffect(() => {
     if ((postType === 'showcase' || postType === 'release') && currentLivery?.modelId && !file) {
@@ -747,15 +790,17 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
           }));
         }
         livery = {
-          modelId: currentLivery.modelId!, modelName: currentLivery.modelName ?? undefined,
-          modelPath: currentLivery.modelPath!,
-          vehicleColor: currentLivery.vehicleColor, panelNums: currentLivery.panelNums,
+          modelId:      currentLivery.modelId!,
+          modelName:    currentLivery.modelName ?? undefined,
+          modelPath:    currentLivery.modelPath!,
+          vehicleColor: currentLivery.vehicleColor,
+          panelNums:    currentLivery.panelNums,
           textures,
-          robloxIds: assetMode === 'roblox_ids' ? robloxIds : undefined,
-          rules: postType === 'release' ? rules : undefined,
+          robloxIds:    assetMode === 'roblox_ids' ? robloxIds : undefined,
+          rules:        postType === 'release' ? rules : undefined,
         };
       }
-      onUploaded(await createPost(file, caption, postType, livery, title.trim() || undefined));
+      onUploaded(await createPost(file, caption, postType, livery));
     } catch (e) { setUploadErr(e instanceof Error ? e.message : 'Upload failed'); }
     finally { setUploading(false); }
   };
@@ -771,10 +816,10 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
 
         <div className="flex gap-1.5 p-4 pb-0">
           {([
-            { type: 'image', label: 'Image Post' },
-            { type: 'showcase', label: '3D Showcase' },
-            { type: 'release', label: 'Free Release' },
-          ] as { type: PostType }[]).map(({ type, label }: any) => (
+            { type: 'image'    as PostType, label: 'Image Post'   },
+            { type: 'showcase' as PostType, label: '3D Showcase'  },
+            { type: 'release'  as PostType, label: 'Free Release' },
+          ]).map(({ type, label }) => (
             <button key={type} onClick={() => setPostType(type)}
               className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${postType === type ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]' : 'border-white/10 bg-white/3 text-zinc-400 hover:text-white'}`}>
               {label}
@@ -784,7 +829,9 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
 
         <div className="p-4 space-y-3">
           {postType === 'image' ? (
-            <div onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith('image/')) handleFile(f); }}
+            <div
+              onDragOver={e => e.preventDefault()}
+              onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith('image/')) handleFile(f); }}
               onClick={() => inputRef.current?.click()}
               className={`relative rounded-xl border-2 border-dashed cursor-pointer transition-all overflow-hidden ${preview ? 'border-[#c4ff0d]/50' : 'border-white/10 hover:border-white/30'}`}>
               {preview
@@ -817,14 +864,11 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
           )}
 
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1.5">Post Name</p>
-            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. LSPD Bullhorn Prancer"
-              className="w-full bg-black/40 border border-white/10 rounded-lg text-xs px-3 py-2 text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 transition-all" />
-          </div>
-          <div>
             <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1.5">Description (optional) — use #tags</p>
-            <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="Describe your livery… #sports #clean #roblox"
-              rows={2} className="w-full bg-black/40 border border-white/10 rounded-lg text-xs px-3 py-2 text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 transition-all resize-none" />
+            <textarea value={caption} onChange={e => setCaption(e.target.value)}
+              placeholder="Describe your livery… #sports #clean #roblox"
+              rows={2}
+              className="w-full bg-black/40 border border-white/10 rounded-lg text-xs px-3 py-2 text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-[#c4ff0d]/50 transition-all resize-none" />
           </div>
 
           {postType === 'release' && (
@@ -858,7 +902,8 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
                   {RELEASE_RULES.map(r => {
                     const active = rules.includes(r.id);
                     return (
-                      <button key={r.id} onClick={() => setRules(p => active ? p.filter(x => x !== r.id) : [...p, r.id])}
+                      <button key={r.id}
+                        onClick={() => setRules(p => active ? p.filter(x => x !== r.id) : [...p, r.id])}
                         className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition-all ${active ? 'border-[#c4ff0d]/50 bg-[#c4ff0d]/10 text-[#c4ff0d]' : 'border-white/10 bg-white/3 text-zinc-400 hover:text-white'}`}>
                         {r.label}
                       </button>
@@ -869,14 +914,22 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
             </>
           )}
 
-          {uploadErr && <p className="text-xs text-red-400 bg-red-900/20 border border-red-500/20 rounded-lg px-3 py-2">{uploadErr}</p>}
+          {uploadErr && (
+            <p className="text-xs text-red-400 bg-red-900/20 border border-red-500/20 rounded-lg px-3 py-2">{uploadErr}</p>
+          )}
         </div>
 
         <div className="px-4 pb-4 flex gap-2">
-          <button onClick={onClose} className="flex-1 text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 py-2.5 rounded-xl transition-all">Cancel</button>
-          <button onClick={handleSubmit} disabled={!file || uploading || ((postType === 'showcase' || postType === 'release') && !has3D)}
+          <button onClick={onClose}
+            className="flex-1 text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 py-2.5 rounded-xl transition-all">
+            Cancel
+          </button>
+          <button onClick={handleSubmit}
+            disabled={!file || uploading || ((postType === 'showcase' || postType === 'release') && !has3D)}
             className="flex-1 flex items-center justify-center gap-2 text-xs font-bold bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black py-2.5 rounded-xl transition-all disabled:opacity-40 shadow-lg shadow-[#c4ff0d]/20">
-            {uploading ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : <><Upload size={13} />Post</>}
+            {uploading
+              ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              : <><Upload size={13} />Post</>}
           </button>
         </div>
       </div>
@@ -888,7 +941,7 @@ function UploadModal({ onClose, onUploaded, currentLivery }: {
 
 function dataURLtoBlob(dataUrl: string): Blob {
   const [header, data] = dataUrl.split(',');
-  const mime = header.match(/:(.*?);/)?.[1] ?? 'image/png';
+  const mime  = header.match(/:(.*?);/)?.[1] ?? 'image/png';
   const bytes = atob(data);
   const arr   = new Uint8Array(bytes.length);
   for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
@@ -898,34 +951,36 @@ function dataURLtoBlob(dataUrl: string): Blob {
 async function blobToBase64(url: string): Promise<string> {
   const res  = await fetch(url);
   const blob = await res.blob();
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload  = () => res(r.result as string);
-    r.onerror = rej;
+  return new Promise((resolve, reject) => {
+    const r   = new FileReader();
+    r.onload  = () => resolve(r.result as string);
+    r.onerror = reject;
     r.readAsDataURL(blob);
   });
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function Showcases() {
-  const { posts, loading, refresh } = useContext(ShowcaseProvider);
-  const [search, setSearch] = useState('');
-  const [activeTag, setActiveTag] = useState<PostType>('all');
-  const [selectedPost, setSelectedPost] = useState<ShowcasePost | null>(null);
-  const [showUpload, setShowUpload] = useState(false);
-  const [sort, setSort] = useState<'new' | 'liked' | 'viewed' | 'comments'>('new');
-  const [fetchErr, setFetchErr] = useState<string | null>(null);
-  const [user, setUser] = useState<DiscordUser | null>(null);
+interface ShowcasesProps {
+  onClose:        () => void;
+  onApplyLivery?: (c: LiveryConfig) => void;
+  currentLivery?: CurrentLivery;
+  user?:          DiscordUser | null;
+}
 
-  useEffect(() => {
-    setLoading(true); setFetchErr(null);
-    try { setPosts(await fetchPosts(s, tag ?? undefined)); }
-    catch (e) { setFetchErr(e instanceof Error ? e.message : 'Failed to load'); }
-    finally { setLoading(false); }
-  }, [sort]);
+export default function Showcases({ onClose, onApplyLivery, currentLivery, user }: ShowcasesProps) {
+  const { posts, loading, error, sort, setSort, activeTag, setActiveTag, setPosts, refresh } = useShowcase();
 
-  useEffect(() => { load(sort, activeTag); }, [sort, activeTag]);
+  const [activePost,  setActivePost]  = useState<ShowcasePost | null>(null);
+  const [showUpload,  setShowUpload]  = useState(false);
+  const [search,      setSearch]      = useState('');
+
+  const SORT_LABELS: { key: SortMode; label: string }[] = [
+    { key: 'new',      label: 'New'           },
+    { key: 'liked',    label: 'Most Liked'    },
+    { key: 'viewed',   label: 'Most Viewed'   },
+    { key: 'comments', label: 'Most Comments' },
+  ];
 
   // Check URL for shared post on mount
   useEffect(() => {
@@ -956,22 +1011,23 @@ export default function Showcases() {
     return p.username.toLowerCase().includes(q) || p.caption.toLowerCase().includes(q);
   });
 
-  const SORT_LABELS: { key: SortMode; label: string }[] = [
-    { key: 'new', label: 'New' },
-    { key: 'liked', label: 'Most Liked' },
-    { key: 'viewed', label: 'Most Viewed' },
-    { key: 'comments', label: 'Most Comments' },
-  ];
-
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#0a0a0a]">
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onUploaded={handleUploaded} currentLivery={currentLivery} />}
+      {showUpload && (
+        <UploadModal
+          onClose={() => setShowUpload(false)}
+          onUploaded={handleUploaded}
+          currentLivery={currentLivery}
+        />
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-white/8 shrink-0">
         <div>
           <p className="text-sm font-black uppercase tracking-widest text-white">Showcases</p>
-          <p className="text-xs text-zinc-400 mt-0.5">{loading ? 'Loading…' : `${posts.length} post${posts.length === 1 ? '' : 's'}`}</p>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            {loading ? 'Loading…' : `${posts.length} post${posts.length === 1 ? '' : 's'}`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {user && !activePost && (
@@ -1032,17 +1088,24 @@ export default function Showcases() {
                 <div className="w-6 h-6 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
                 <p className="text-xs text-zinc-500 uppercase tracking-widest">Loading…</p>
               </div>
-            ) : fetchErr ? (
+            ) : error ? (
               <div className="flex items-center justify-center h-64 flex-col gap-3 text-center">
-                <p className="text-sm text-red-400">{fetchErr}</p>
-                <button onClick={() => load(sort, activeTag)} className="text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 px-4 py-2 rounded-lg">Retry</button>
+                <p className="text-sm text-red-400">{error}</p>
+                <button onClick={refresh}
+                  className="text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 px-4 py-2 rounded-lg">
+                  Retry
+                </button>
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex items-center justify-center h-64 flex-col gap-4 text-center">
                 <Image size={48} className="text-zinc-800" strokeWidth={1.5} />
                 <div>
-                  <p className="text-sm font-bold uppercase tracking-wider text-zinc-600 mb-1">{search || activeTag ? 'No results' : 'No posts yet'}</p>
-                  <p className="text-xs text-zinc-700">{search || activeTag ? 'Try a different search or tag' : 'Be the first to showcase your livery work'}</p>
+                  <p className="text-sm font-bold uppercase tracking-wider text-zinc-600 mb-1">
+                    {search || activeTag ? 'No results' : 'No posts yet'}
+                  </p>
+                  <p className="text-xs text-zinc-700">
+                    {search || activeTag ? 'Try a different search or tag' : 'Be the first to showcase your livery work'}
+                  </p>
                 </div>
                 {user && !search && !activeTag && (
                   <button onClick={() => setShowUpload(true)}
@@ -1055,10 +1118,14 @@ export default function Showcases() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filtered.map(post => (
-                  <PostCard key={post.id} post={post} currentUserId={user?.id}
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    currentUserId={user?.id}
                     onClick={() => setActivePost(post)}
                     onDeleted={() => handlePostDeleted(post.id)}
-                    onTagClick={handleTagClick} />
+                    onTagClick={handleTagClick}
+                  />
                 ))}
               </div>
             )}

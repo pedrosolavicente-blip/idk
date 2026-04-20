@@ -1,8 +1,9 @@
-import { useShowcase, ShowcaseProvider } from '../../hooks/useShowcase';
+import { useState, useEffect, useRef } from 'react';
+import { useShowcase } from '../../hooks/useShowcase';
 import { useNavigate } from 'react-router-dom';
 import Logo3D from './Logo3D';
 
-const BASE = import.meta.env.BASE_URL;
+const BASE = import.meta.env?.BASE_URL || '';
 
 const LANDING_STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');

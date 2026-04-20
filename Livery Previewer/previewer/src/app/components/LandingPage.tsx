@@ -526,7 +526,7 @@ export default function LandingPage() {
             </div>
 
             <p style={{ fontSize:18, color:'var(--text-secondary)', lineHeight:1.8, maxWidth:520, margin:'0 0 64px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>
-              A community built around ERLC — creating tools, designs, and experiences for players who care about the details.
+              itzz all about quality — creating tools, designs, and experiences for players who care about the details.
             </p>
 
             {/* Premium CTA Buttons */}
@@ -642,11 +642,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Marquee ── */}
+      {/* ── Moving Strip ── */}
       <div style={{ position:'relative', zIndex:10, overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'16px 0', background:'rgba(255,255,255,0.01)' }}>
         <div style={{ display:'flex', overflow:'hidden' }}>
           <div className="lp-marquee-track">
-            {['Livery Previewer','ERLC Community','itzz Industries','Quality First','Discord Community','Vehicle Design','Real-time 3D','Livery Previewer','ERLC Community','itzz Industries','Quality First','Discord Community','Vehicle Design','Real-time 3D'].map((t,i) => (
+            {['itzz industries','Livery Previewer','ERLC Community','Quality First','Discord Community','Vehicle Design','Real-time 3D','itzz industries','Livery Previewer','ERLC Community','Quality First','Discord Community','Vehicle Design','Real-time 3D'].map((t,i) => (
               <span key={i} style={{ fontSize:11, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%3===0 ? '#D8FF63' : '#27272a', flexShrink:0 }}>
                 {t} <span style={{ color:'#1f1f23', marginLeft:48 }}>✦</span>
               </span>

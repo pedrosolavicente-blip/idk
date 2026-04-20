@@ -532,16 +532,16 @@ export default function LandingPage() {
       </div>
 
       {/* ── Premium Hero ── */}
-      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'center', padding:'0 48px', paddingTop:72 }}>
+      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', display:'flex', alignItems:'flex-start', padding:'0 48px', paddingTop:120 }}>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, width:'100%', maxWidth:1400, alignItems:'center' }}>
           {/* Left Content */}
           <div style={{ maxWidth:800 }}>
             {/* Logo Heading */}
             <div style={{ animation:'fadeInUp 0.8s ease 0.15s both', opacity:0, marginBottom:40 }}>
-              <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:600, height:'auto' }} />
+              <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:800, height:'auto' }} />
             </div>
 
-            <p style={{ fontSize:18, color:'var(--text-secondary)', lineHeight:1.8, maxWidth:520, margin:'0 0 64px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>
+            <p style={{ fontSize:24, color:'var(--text-secondary)', lineHeight:1.8, maxWidth:620, margin:'0 0 64px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>
               itzz all about quality — creating tools, designs, and experiences for players who care about the details.
             </p>
 
@@ -558,7 +558,7 @@ export default function LandingPage() {
           </div>
 
           {/* Right Side - Audi Render */}
-          <div style={{ position:'relative', width:1200, height:1200, display:'flex', alignItems:'center', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, marginRight:'-600px', marginLeft:'400px', zIndex:5 }}>
+          <div style={{ position:'relative', width:1200, height:1200, display:'flex', alignItems:'flex-start', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0, marginRight:'-600px', marginLeft:'400px', zIndex:5, marginTop:'-100px' }}>
             <img 
               src="/Audi_Render_2.png" 
               alt="Audi Render" 

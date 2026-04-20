@@ -461,7 +461,10 @@ export default function LandingPage() {
             Launch App →
           </button>
         </div>
-      </nav>
+      </div> {/* closes "flex items-center gap-8" */}
+    </nav>
+
+      {/* Mobile Menu Overlay */}
 
       {/* Mobile Menu Overlay */}
       <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`} style={{ display:'none' }}>

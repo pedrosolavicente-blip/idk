@@ -26,6 +26,7 @@ const serveGlbsPlugin = {
 };
 
 export default defineConfig({
+  base: '/previewer/',
   plugins: [react(), tailwindcss(), serveGlbsPlugin, cloudflare()],
   resolve: {
     alias: {

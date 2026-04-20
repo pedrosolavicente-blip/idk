@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import type { DiscordUser } from '../../lib/discordAuth';
 import {
   type ShowcasePost, type ShowcaseComment, type LiveryConfig, type Analytics, type PostType,
-  type RuleId, RELEASE_RULES,
   fetchPosts, fetchPost, createPost, deletePost, fetchLiveryConfig,
   fetchComments, addComment, deleteComment,
   reactToPost, removeReaction, recordView, fetchAnalytics,
   avatarUrl, imageUrl, relativeTime,
 } from '../../lib/showcaseApi';
 import { initLiveryViewer, type LiveryViewer as Viewer, type SceneSettings } from '../../lib/liveryEngine';
+import { useShowcase, ShowcaseProvider } from '../hooks/useShowcase';
 import {
   X, Upload, Send, Trash2, MessageSquare, Image, ArrowLeft,
   ThumbsUp, ThumbsDown, Eye, Settings2, BarChart2, Box,
@@ -387,14 +387,15 @@ function PostDetail({ post: initialPost, currentUserId, onBack, onDeleted, onApp
 
   // Load comments
   useEffect(() => {
-    fetchComments(post.id).then(setComments).finally(() => setLoadingComments(false));
+    const refresh = useContext(ShowcaseProvider);
+    refresh(post.id).then(setComments).finally(() => setLoadingComments(false));
   }, [post.id]);
 
   // Auto-update comments every 30s
   useEffect(() => {
     const timer = setInterval(async () => {
       try {
-        const fresh = await fetchComments(post.id);
+        const fresh = await useContext(ShowcaseProvider).refresh(post.id);
         setComments(prev => {
           const ids = new Set(prev.map(c => c.id));
           const newOnes = fresh.filter(c => !ids.has(c.id));
@@ -907,28 +908,12 @@ async function blobToBase64(url: string): Promise<string> {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-interface Props {
-  user: DiscordUser | null;
-  onClose: () => void;
-  currentLivery?: CurrentLivery;
-  onApplyLivery?: (config: LiveryConfig) => void;
-}
-
-export type { CurrentLivery };
-
-type SortMode = 'new' | 'liked' | 'viewed' | 'comments';
-
-export default function Showcases({ user, onClose, currentLivery, onApplyLivery }: Props) {
-  const [posts, setPosts]           = useState<ShowcasePost[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [fetchErr, setFetchErr]     = useState<string | null>(null);
-  const [activePost, setActivePost] = useState<ShowcasePost | null>(null);
+export default function Showcases() {
+  const { posts, loading, refresh } = useContext(ShowcaseProvider);
+  const [search, setSearch] = useState('');
+  const [activeTag, setActiveTag] = useState<PostType>('all');
+  const [selectedPost, setSelectedPost] = useState<ShowcasePost | null>(null);
   const [showUpload, setShowUpload] = useState(false);
-  const [search, setSearch]         = useState('');
-  const [sort, setSort]             = useState<SortMode>('new');
-  const [activeTag, setActiveTag]   = useState<string | null>(null);
-
-  const load = useCallback(async (s: SortMode = sort, tag?: string | null) => {
     setLoading(true); setFetchErr(null);
     try { setPosts(await fetchPosts(s, tag ?? undefined)); }
     catch (e) { setFetchErr(e instanceof Error ? e.message : 'Failed to load'); }

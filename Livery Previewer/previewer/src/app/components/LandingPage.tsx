@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useShowcase, ShowcaseProvider } from '../../hooks/useShowcase';
 import { useNavigate } from 'react-router-dom';
 import Logo3D from './Logo3D';
 
@@ -347,8 +347,7 @@ export default function LandingPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeNav, setActiveNav] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showcasePosts, setShowcasePosts] = useState<any[]>([]);
-  const [showcaseLoading, setShowcaseLoading] = useState(true);
+  const { posts: showcasePosts, loading: showcaseLoading, refresh } = useShowcase();
 
   useEffect(() => {
     if (!document.getElementById('lp-styles')) {
@@ -380,24 +379,6 @@ export default function LandingPage() {
       window.removeEventListener('scroll', handleScroll);
     };
 
-    // Fetch showcase posts
-    useEffect(() => {
-      const fetchShowcasePosts = async () => {
-        try {
-          const response = await fetch('/api/showcases');
-          if (response.ok) {
-            const posts = await response.json();
-            setShowcasePosts(posts.sort((a, b) => b.like_count - a.like_count).slice(0, 6));
-            setShowcaseLoading(false);
-          }
-        } catch (error) {
-          console.error('Failed to fetch showcase posts:', error);
-          setShowcaseLoading(false);
-        }
-      };
-
-      fetchShowcasePosts();
-    }, []);
 
     // Particle canvas
     const canvas = canvasRef.current;
@@ -941,7 +922,7 @@ export default function LandingPage() {
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:24, padding:'0 20px' }}>
-          {showcasePosts.map((post, i) => (
+          {showcasePosts.map((post: any, i: number) => (
             <div key={post.id}
               style={{ 
                 position:'relative',
@@ -979,11 +960,16 @@ export default function LandingPage() {
                 position:'relative', 
                 overflow:'hidden'
               }}>
-                <div style={{ 
-                  fontSize:48, 
-                  opacity:0.4,
-                  filter:'drop-shadow(0 0 20px rgba(216,255,99,0.3))'
-                }}>🚗</div>
+                <img 
+                  src={post.image_key ? `https://your-cloudflare-domain.com/showcases/${post.image_key}` : '/placeholder.jpg'}
+                  alt={post.title || 'Showcase Image'}
+                  style={{ 
+                    width:'100%', 
+                    height:'100%', 
+                    objectFit:'cover',
+                    filter:'drop-shadow(0 0 20px rgba(216,255,99,0.3))'
+                  }}
+                />
                 <div style={{ 
                   position:'absolute', 
                   top:12, 

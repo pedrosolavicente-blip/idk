@@ -56,7 +56,13 @@ export default {
       const h = new Headers(); addCors(h);
       return new Response(null, { status: 204, headers: h });
     }
+    
+const MAINTENANCE = true;
 
+if (MAINTENANCE && (path === '/' || path === '/index.html')) {
+  return new Response(`...`, { status: 503, headers: { 'Content-Type': 'text/html' } });
+}
+    
     // ── Vehicle model proxy ───────────────────────────────────────────────────
     if (path.startsWith('/previewer/api/models/')) {
       const key      = path.slice('/previewer/api/models/'.length);

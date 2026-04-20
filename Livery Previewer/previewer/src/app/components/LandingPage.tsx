@@ -610,7 +610,7 @@ export default function LandingPage() {
       <div style={{ position:'relative', zIndex:10, overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'12px 0', background:'rgba(255,255,255,0.01)' }}>
         <div style={{ display:'flex', overflow:'hidden' }}>
           <div className="lp-marquee-track">
-            {['innovation','efficiency','quality','itzz industries','Livery Previewer','ERLC Community','Discord Community','Vehicle Design','Real-time 3D','Advanced Tools','Professional Design','Community Driven','Premium Quality','Modern Interface','Seamless Integration','Expert Support','Continuous Innovation'].map((t,i) => (
+            {['Innovation','Efficiency','Quality','itzz','Advanced Tools','Professional Designs','Premium Quality','Seamless Integration'].map((t,i) => (
               <span key={i} style={{ fontSize:10, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color: i%4===0 ? '#D8FF63' : '#27272a', flexShrink:0 }}>
                 {t} <span style={{ color:'#1f1f23', marginLeft:48 }}>✦</span>
               </span>

@@ -560,7 +560,7 @@ export default function LandingPage() {
           {/* Right Side - Audi Render */}
           <div style={{ position:'relative', width:600, height:600, display:'flex', alignItems:'center', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0 }}>
             <img 
-              src={`${BASE}Audi_Render_2.png`} 
+              src="/Audi_Render_2.png" 
               alt="Audi Render" 
               style={{ 
                 width:'100%', 

@@ -36,6 +36,11 @@ const LANDING_STYLES = `
     100% { opacity: 1; transform: translateX(0); }
   }
 
+  @keyframes slideInRight {
+    0% { opacity: 0; transform: translateX(50px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
   @keyframes neonPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
@@ -552,87 +557,18 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Right Side - Abstract Geometric Visual */}
-          <div style={{ position:'relative', width:600, height:600, display:'flex', alignItems:'center', justifyContent:'center', animation:'slideInLeft 1.2s ease 0.6s both', opacity:0 }}>
-            {/* Tech Grid Background */}
-            <div className="tech-grid" />
-            
-            {/* Floating Geometric Elements */}
-            <div style={{ position:'absolute', width:'100%', height:'100%', pointerEvents:'none' }}>
-              {/* Central Hexagon */}
-              <div style={{ 
-                position:'absolute', 
-                top:'50%', 
-                left:'50%', 
-                transform:'translate(-50%, -50%)', 
-                width:200, 
-                height:200, 
-                border:'2px solid var(--neon-primary)', 
-                borderRadius:20, 
-                animation:'float 6s ease-in-out infinite'
-              }}>
-                <div style={{ 
-                  position:'absolute', 
-                  top:10, 
-                  left:10, 
-                  right:10, 
-                  bottom:10, 
-                  border:'1px solid var(--neon-primary)', 
-                  borderRadius:16, 
-                  opacity:0.5
-                }} />
-                <div style={{ 
-                  position:'absolute', 
-                  top:20, 
-                  left:20, 
-                  right:20, 
-                  bottom:20, 
-                  border:'1px solid rgba(216,255,99,0.3)', 
-                  borderRadius:12, 
-                  opacity:0.3
-                }} />
-              </div>
-              
-              {/* Orbiting Elements */}
-              <div style={{ 
-                position:'absolute', 
-                top:'50%', 
-                left:'50%', 
-                transform:'translate(-50%, -50%)', 
-                animation:'gridRotate 20s linear infinite'
-              }}>
-                {[0, 60, 120, 180, 240, 300].map((rotation, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      position:'absolute',
-                      width:8,
-                      height:8,
-                      background:'var(--neon-primary)',
-                      borderRadius:'50%',
-                      transform: `rotate(${rotation}deg) translateX(100px)`,
-                      boxShadow: '0 0 20px var(--neon-glow)'
-                    }}
-                  />
-                ))}
-              </div>
-              
-              {/* Particle Lines */}
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    position:'absolute',
-                    width:1,
-                    height:60,
-                    background:`linear-gradient(to bottom, transparent, var(--neon-primary), transparent)`,
-                    transform:`rotate(${i * 45}deg) translateY(-30px)`,
-                    opacity:0.6,
-                    animation:`float ${3 + i * 0.5}s ease-in-out infinite`
-                  }}
-                />
-              ))}
-            </div>
+          {/* Right Side - Audi Render */}
+          <div style={{ position:'relative', width:600, height:600, display:'flex', alignItems:'center', justifyContent:'center', animation:'slideInRight 1.2s ease 0.6s both', opacity:0 }}>
+            <img 
+              src={`${BASE}Audi_Render_2.png`} 
+              alt="Audi Render" 
+              style={{ 
+                width:'100%', 
+                height:'100%', 
+                objectFit:'contain',
+                filter:'drop-shadow(0 0 30px rgba(216,255,99,0.3))'
+              }} 
+            />
           </div>
         </div>
 

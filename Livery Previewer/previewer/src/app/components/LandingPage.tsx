@@ -581,10 +581,10 @@ export default function LandingPage() {
             src="/Audi_Render_2 (1).png" 
             alt="Audi Render" 
             style={{ 
-              width:'180%', 
-              height:'180%', 
+              width:'200%', 
+              height:'200%', 
               objectFit:'contain',
-              marginRight:'-400px'
+              marginRight:'-200px'
             }} 
           />
         </div>

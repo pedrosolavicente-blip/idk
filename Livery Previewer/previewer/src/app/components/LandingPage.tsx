@@ -436,11 +436,11 @@ export default function LandingPage() {
       <div 
         style={{
           position: 'fixed',
-          right: `${scrollY > 200 ? '-150px' : '20px'}`,
-          top: `${Math.random() * 60 + 20}%`,
+          right: `${scrollY > 300 ? '-150px' : '20px'}`,
+          top: '50%',
           zIndex: 1000,
-          opacity: scrollY > 200 && scrollY < 600 ? 0.8 : 0,
-          transform: `translateX(${scrollY > 200 && scrollY < 600 ? Math.sin(scrollY * 0.01) * 20 : 0}px)`,
+          opacity: scrollY > 300 && scrollY < 800 ? 0.8 : 0,
+          transform: `translateX(${scrollY > 300 && scrollY < 800 ? Math.sin(scrollY * 0.01) * 20 : 0}px) translateY(-50%)`,
           transition: 'right 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.1s ease-out',
         }}
       >

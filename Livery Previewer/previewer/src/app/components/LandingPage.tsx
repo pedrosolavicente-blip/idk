@@ -614,7 +614,7 @@ export default function LandingPage() {
         borderTop:'2px solid rgba(216,255,99,0.2)', 
         borderBottom:'2px solid rgba(216,255,99,0.2)', 
         padding:'16px 0', 
-        background:'linear-gradient(90deg, rgba(8,8,8,0.95) 0%, rgba(216,255,99,0.05) 50%, rgba(8,8,8,0.95) 100%)',
+        background:'linear-gradient(90deg, rgba(8,8,8,0.85) 0%, rgba(216,255,99,0.03) 50%, rgba(8,8,8,0.85) 100%)',
         backdropFilter:'blur(20px)',
         WebkitBackdropFilter:'blur(20px)'
       }}>
@@ -632,12 +632,6 @@ export default function LandingPage() {
                 padding:'0 24px'
               }}>
                 {t}
-                <span style={{ 
-                  color:'rgba(216,255,99,0.4)', 
-                  marginLeft:32, 
-                  fontSize:14,
-                  fontWeight:900
-                }}>◆</span>
               </span>
             ))}
           </div>

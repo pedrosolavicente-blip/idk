@@ -9,7 +9,10 @@ const LOGO_3D_STYLES = `
   .logo-3d {
     position: relative;
     transform-style: preserve-3d;
-    animation: logo3dRotate 8s linear infinite;
+  }
+
+  .logo-3d-y-rotate {
+    animation: logo3dYRotate 8s linear infinite;
   }
 
   .logo-3d-text {
@@ -77,6 +80,11 @@ const LOGO_3D_STYLES = `
     50% { transform: rotateY(180deg) rotateX(0deg); }
     75% { transform: rotateY(270deg) rotateX(-5deg); }
     100% { transform: rotateY(360deg) rotateX(0deg); }
+  }
+
+  @keyframes logo3dYRotate {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
   }
 
   @keyframes logo3dFloat {
@@ -170,10 +178,10 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
       
       {/* 3D Logo */}
       <div className="logo-3d">
-        <div style={{ 
+        <div className="logo-3d-y-rotate" style={{ 
           position: 'relative',
           transformStyle: 'preserve-3d',
-          transform: 'perspective(1000px)',
+          transform: 'perspective(1000px) translateZ(20px)',
         }}>
           <img 
             src="/Vector (8).svg" 
@@ -181,9 +189,7 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
             style={{ 
               width: '100%', 
               height: '100%', 
-              filter: 'brightness(0) invert(1) drop-shadow(0 0 20px rgba(196,255,13,0.3)) drop-shadow(0 10px 40px rgba(0,0,0,0.5))',
-              animation: 'lp-spin 8s linear infinite',
-              transform: 'translateZ(20px)',
+              filter: 'brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(85deg) drop-shadow(0 10px 40px rgba(0,0,0,0.5))',
             }} 
           />
           {/* Extrusion shadow layer */}

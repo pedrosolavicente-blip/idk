@@ -731,88 +731,87 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div style={{ display:'flex', gap:20, position:'relative', overflowX:'auto', padding:'0 20px', scrollBehavior:'smooth' }}>
+        {/* Feature Cards Container */}
+        <div style={{ 
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fit, minmax(300px, 1fr))',
+          gap:24,
+          padding:'0 20px',
+          position:'relative'
+        }}>
           {[
             {
               title: 'Academy Integration',
               description: 'Helping students improve by joining our comprehensive academy with expert guidance and structured learning paths',
-              icon: '🎓',
               accent: '#D8FF63'
             },
             {
               title: 'Premium Asset Library',
               description: 'Access to top-tier assets with exclusive designs, professional templates, and industry-standard quality',
-              icon: '💎',
               accent: '#D8FF63'
             },
             {
               title: 'Efficiency Tools',
               description: 'Providing intelligent tools to improve workflow efficiency and reduce design time significantly',
-              icon: '⚡',
               accent: '#D8FF63'
             },
             {
               title: 'Cloud Storage',
               description: 'Secure cloud-based storage with automatic backups, version control, and seamless collaboration features',
-              icon: '☁️',
               accent: '#D8FF63'
             },
             {
               title: 'Real-Time 3D Preview',
               description: 'Instant 3D visualization with real-time rendering, accurate lighting, and material preview',
-              icon: '🎯',
               accent: '#D8FF63'
             },
             {
               title: 'Protection & Safety',
               description: 'Advanced safety policies with data protection, secure authentication, and community guidelines enforcement',
-              icon: '🛡️',
               accent: '#D8FF63'
             }
           ].map((feature, i) => (
             <div key={i}
               style={{ 
                 position:'relative',
-                borderRadius: '20px',
-                border: '1px solid rgba(216,255,99,0.15)',
+                borderRadius: '16px',
+                border: '1px solid rgba(216,255,99,0.12)',
                 background:'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)',
-                backdropFilter:'blur(15px)',
-                WebkitBackdropFilter:'blur(15px)',
+                backdropFilter:'blur(12px)',
+                WebkitBackdropFilter:'blur(12px)',
                 overflow:'hidden',
                 transition:'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor:'pointer',
-                minWidth:'320px',
-                maxWidth:'400px',
-                height:'280px',
-                flexShrink:0,
-                margin:'0 10px'
+                height:'200px',
+                width:'100%',
+                margin:'0'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform='translateY(-12px) scale(1.05)';
-                e.currentTarget.style.borderColor='rgba(216,255,99,0.4)';
-                e.currentTarget.style.boxShadow='0 25px 50px rgba(216,255,99,0.3)';
-                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.95) 0%, rgba(216,255,99,0.1) 100%)';
+                e.currentTarget.style.transform='translateY(-8px) scale(1.02)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.25)';
+                e.currentTarget.style.boxShadow='0 15px 30px rgba(216,255,99,0.2)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.92) 0%, rgba(216,255,99,0.08) 100%)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform='translateY(0) scale(1)';
-                e.currentTarget.style.borderColor='rgba(216,255,99,0.15)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.12)';
                 e.currentTarget.style.boxShadow='none';
                 e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)';
               }}
             >
-              <div style={{ padding:'24px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center', textAlign:'center' }}>
+              <div style={{ padding:'20px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center', textAlign:'center' }}>
                 <h3 style={{ 
-                  fontSize:18, 
+                  fontSize:16, 
                   fontWeight:700, 
                   letterSpacing:'-0.02em', 
-                  margin:'0 0 16px', 
+                  margin:'0 0 12px', 
                   color:'#FFFFFF', 
                   lineHeight:1.3 
                 }}>
                   {feature.title}
                 </h3>
                 <p style={{ 
-                  fontSize:12, 
+                  fontSize:11, 
                   color:'rgba(255,255,255,0.8)', 
                   lineHeight:1.6, 
                   margin:0, 

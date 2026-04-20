@@ -779,44 +779,44 @@ export default function LandingPage() {
                 backdropFilter:'blur(15px)',
                 WebkitBackdropFilter:'blur(15px)',
                 overflow:'hidden',
-                transition:'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition:'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor:'pointer',
-                padding:'40px 32px',
-                height:'100%',
-                display:'flex',
-                flexDirection:'column',
-                justifyContent:'center',
-                textAlign:'center'
+                minWidth:'320px',
+                maxWidth:'400px',
+                height:'280px',
+                flexShrink:0,
+                margin:'0 10px'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform='translateY(-8px) scale(1.02)';
-                e.currentTarget.style.borderColor='rgba(216,255,99,0.3)';
-                e.currentTarget.style.boxShadow='0 20px 40px rgba(216,255,99,0.2)';
+                e.currentTarget.style.transform='translateY(-12px) scale(1.05)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.4)';
+                e.currentTarget.style.boxShadow='0 25px 50px rgba(216,255,99,0.3)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.95) 0%, rgba(216,255,99,0.1) 100%)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform='translateY(0) scale(1)';
                 e.currentTarget.style.borderColor='rgba(216,255,99,0.15)';
                 e.currentTarget.style.boxShadow='none';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)';
               }}
             >
-
-              <div style={{ padding:'32px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+              <div style={{ padding:'24px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center', textAlign:'center' }}>
                 <h3 style={{ 
-                  fontSize:22, 
-                  fontWeight:800, 
+                  fontSize:18, 
+                  fontWeight:700, 
                   letterSpacing:'-0.02em', 
-                  margin:'0 0 20px', 
+                  margin:'0 0 16px', 
                   color:'#FFFFFF', 
-                  lineHeight:1.2 
+                  lineHeight:1.3 
                 }}>
                   {feature.title}
                 </h3>
                 <p style={{ 
-                  fontSize:14, 
+                  fontSize:12, 
                   color:'rgba(255,255,255,0.8)', 
-                  lineHeight:1.7, 
+                  lineHeight:1.6, 
                   margin:0, 
-                  fontWeight:500 
+                  fontWeight:400 
                 }}>
                   {feature.description}
                 </p>

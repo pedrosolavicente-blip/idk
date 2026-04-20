@@ -731,7 +731,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24, position:'relative' }}>
+        <div style={{ display:'flex', gap:20, position:'relative', overflowX:'auto', padding:'0 20px', scrollBehavior:'smooth' }}>
           {[
             {
               title: 'Academy Integration',
@@ -799,56 +799,28 @@ export default function LandingPage() {
                 e.currentTarget.style.boxShadow='none';
               }}
             >
-              {/* Feature Icon */}
-              <div style={{ 
-                marginBottom:24,
-                width:64,
-                height:64,
-                borderRadius:'16px',
-                background:'linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))',
-                border:'2px solid rgba(216,255,99,0.3)',
-                display:'flex',
-                alignItems:'center',
-                justifyContent:'center',
-                fontSize:28,
-                filter:'drop-shadow(0 0 20px rgba(216,255,99,0.4))'
-              }}>
-                {feature.icon}
+
+              <div style={{ padding:'32px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                <h3 style={{ 
+                  fontSize:22, 
+                  fontWeight:800, 
+                  letterSpacing:'-0.02em', 
+                  margin:'0 0 20px', 
+                  color:'#FFFFFF', 
+                  lineHeight:1.2 
+                }}>
+                  {feature.title}
+                </h3>
+                <p style={{ 
+                  fontSize:14, 
+                  color:'rgba(255,255,255,0.8)', 
+                  lineHeight:1.7, 
+                  margin:0, 
+                  fontWeight:500 
+                }}>
+                  {feature.description}
+                </p>
               </div>
-
-              {/* Feature Content */}
-              <h3 style={{ 
-                fontSize:20, 
-                fontWeight:800, 
-                letterSpacing:'-0.02em', 
-                margin:'0 0 16px', 
-                color:'#FFFFFF', 
-                lineHeight:1.2 
-              }}>
-                {feature.title}
-              </h3>
-              <p style={{ 
-                fontSize:14, 
-                color:'rgba(255,255,255,0.8)', 
-                lineHeight:1.7, 
-                margin:0, 
-                fontWeight:500 
-              }}>
-                {feature.description}
-              </p>
-
-              {/* Subtle Glow Effect */}
-              <div style={{ 
-                position:'absolute',
-                top:0,
-                left:0,
-                right:0,
-                bottom:0,
-                borderRadius:'20px',
-                background:'linear-gradient(45deg, transparent, rgba(216,255,99,0.05), transparent)',
-                pointerEvents:'none',
-                zIndex:1
-              }} />
             </div>
           ))}
         </div>

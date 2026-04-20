@@ -821,35 +821,82 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'var(--bg-secondary)' }}>
-        <div style={{ textAlign:'center', marginBottom:64 }}>
-          <p className="lp-section-label" style={{ marginBottom:16 }}>Testimonials</p>
-          <h2 style={{ fontSize:'clamp(28px,4vw,48px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 20px', lineHeight:1.1 }}>
-            Loved by the community
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(4,4,4,0.8) 0%, rgba(216,255,99,0.02) 50%, rgba(4,4,4,0.8) 100%)' }}>
+        <div style={{ textAlign:'center', marginBottom:80 }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:12, marginBottom:20 }}>
+            <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)', boxShadow:'0 0 20px rgba(216,255,99,0.6)' }} />
+            <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#D8FF63', margin:0 }}>Community Voice</p>
+          </div>
+          <h2 style={{ fontSize:'clamp(36px,4vw,64px)', fontWeight:900, letterSpacing:'-0.03em', margin:'0 0 32px', lineHeight:1.05, background:'linear-gradient(135deg, #FFFFFF 0%, #D8FF63 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+            Trusted By<br />Professional Creators
           </h2>
-          <p style={{ fontSize:15, color:'var(--text-secondary)', maxWidth:500, margin:'0 auto', lineHeight:1.7 }}>
-            See what ERLC players and designers are saying about our tools
+          <p style={{ fontSize:16, color:'rgba(255,255,255,0.8)', lineHeight:1.8, margin:'0 auto', fontWeight:500, maxWidth:600 }}>
+            Hear from the ERLC community members who rely on our tools every day
           </p>
         </div>
 
-        <div className="feature-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:24, padding:'0 20px' }}>
           {TESTIMONIALS.map((testimonial, i) => (
-            <div key={i} className="glass-card" style={{ padding:32, animation:`fadeInUp 0.6s ease ${i*0.15}s both`, opacity:0 }}>
-              <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+            <div key={i}
+              style={{ 
+                position:'relative',
+                borderRadius: '16px',
+                border: '1px solid rgba(216,255,99,0.12)',
+                background:'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)',
+                backdropFilter:'blur(12px)',
+                WebkitBackdropFilter:'blur(12px)',
+                overflow:'hidden',
+                transition:'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor:'pointer',
+                padding:'32px',
+                height:'100%',
+                margin:'0'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-8px) scale(1.02)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.25)';
+                e.currentTarget.style.boxShadow='0 15px 30px rgba(216,255,99,0.2)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.92) 0%, rgba(216,255,99,0.08) 100%)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0) scale(1)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.12)';
+                e.currentTarget.style.boxShadow='none';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)';
+              }}
+            >
+              {/* Rating */}
+              <div style={{ display:'flex', gap:4, marginBottom:20 }}>
                 {[...Array(testimonial.rating)].map((_, j) => (
-                  <span key={j} style={{ color:'var(--neon-primary)', fontSize:16 }}>★</span>
+                  <span key={j} style={{ color:'#D8FF63', fontSize:16, filter:'drop-shadow(0 0 8px rgba(216,255,99,0.6)' }}>★</span>
                 ))}
               </div>
-              <p style={{ fontSize:14, color:'var(--text-primary)', lineHeight:1.6, margin:'0 0 20px', fontStyle:'italic' }}>
+              
+              {/* Quote */}
+              <p style={{ fontSize:14, color:'rgba(255,255,255,0.9)', lineHeight:1.7, margin:'0 0 24px', fontStyle:'italic', fontWeight:500 }}>
                 "{testimonial.content}"
               </p>
-              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(135deg,var(--neon-primary),#88ff00)', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, color:'var(--bg-primary)' }}>
+              
+              {/* Author */}
+              <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+                <div style={{ 
+                  width:48, 
+                  height:48, 
+                  borderRadius:'12px', 
+                  background:'linear-gradient(135deg, #D8FF63, #c0ff40)', 
+                  display:'flex', 
+                  alignItems:'center', 
+                  justifyContent:'center', 
+                  fontWeight:800, 
+                  color:'#080808',
+                  fontSize:20,
+                  boxShadow:'0 8px 24px rgba(216,255,99,0.3)'
+                }}>
                   {testimonial.name.charAt(0)}
                 </div>
                 <div>
-                  <p style={{ fontSize:13, fontWeight:600, color:'var(--text-primary)', margin:0, lineHeight:1.2 }}>{testimonial.name}</p>
-                  <p style={{ fontSize:11, color:'var(--text-secondary)', margin:0, lineHeight:1.2 }}>{testimonial.role}</p>
+                  <p style={{ fontSize:14, fontWeight:700, color:'#FFFFFF', margin:0, lineHeight:1.2 }}>{testimonial.name}</p>
+                  <p style={{ fontSize:12, color:'rgba(255,255,255,0.6)', margin:0, lineHeight:1.3, fontWeight:500 }}>{testimonial.role}</p>
                 </div>
               </div>
             </div>
@@ -858,38 +905,117 @@ export default function LandingPage() {
       </section>
 
       {/* Showcase */}
-      <section style={{ position:'relative', zIndex:10, padding:'120px 48px' }}>
-        <div style={{ textAlign:'center', marginBottom:64 }}>
-          <p className="lp-section-label" style={{ marginBottom:16 }}>Community Showcase</p>
-          <h2 style={{ fontSize:'clamp(28px,4vw,48px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 20px', lineHeight:1.1 }}>
-            Featured designs
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(4,4,4,0.7) 0%, rgba(216,255,99,0.02) 50%, rgba(4,4,4,0.7) 100%)' }}>
+        <div style={{ textAlign:'center', marginBottom:80 }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:12, marginBottom:20 }}>
+            <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)', boxShadow:'0 0 20px rgba(216,255,99,0.6)' }} />
+            <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#D8FF63', margin:0 }}>Community Creations</p>
+          </div>
+          <h2 style={{ fontSize:'clamp(36px,4vw,64px)', fontWeight:900, letterSpacing:'-0.03em', margin:'0 0 32px', lineHeight:1.05, background:'linear-gradient(135deg, #FFFFFF 0%, #D8FF63 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+            Featured<br />Masterpieces
           </h2>
-          <p style={{ fontSize:15, color:'var(--text-secondary)', maxWidth:500, margin:'0 auto', lineHeight:1.7 }}>
-            Amazing liveries created by our talented community members
+          <p style={{ fontSize:16, color:'rgba(255,255,255,0.8)', lineHeight:1.8, margin:'0 auto', fontWeight:500, maxWidth:600 }}>
+            Exceptional liveries designed by our community's most talented creators
           </p>
         </div>
 
-        <div className="feature-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:24, padding:'0 20px' }}>
           {SHOWCASE_ITEMS.map((item, i) => (
-            <div key={item.id} className="glass-card" style={{ animation:`fadeInUp 0.6s ease ${i*0.1}s both`, opacity:0, cursor:'pointer' }}>
-              <div style={{ height:200, background:'linear-gradient(135deg,var(--neon-glow),var(--neon-glow))', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
-                <div style={{ fontSize:48, opacity:0.3 }}>🚗</div>
-                <div style={{ position:'absolute', top:12, right:12, background:'var(--bg-secondary)', backdropFilter:'blur(8px)', padding:'4px 8px', borderRadius:6, display:'flex', alignItems:'center', gap:4 }}>
-                  <span style={{ fontSize:12, color:'var(--neon-primary)' }}>❤️</span>
-                  <span style={{ fontSize:11, color:'var(--text-primary)' }}>{item.likes}</span>
+            <div key={item.id}
+              style={{ 
+                position:'relative',
+                borderRadius: '16px',
+                border: '1px solid rgba(216,255,99,0.12)',
+                background:'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)',
+                backdropFilter:'blur(12px)',
+                WebkitBackdropFilter:'blur(12px)',
+                overflow:'hidden',
+                transition:'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor:'pointer',
+                margin:'0'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-8px) scale(1.02)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.25)';
+                e.currentTarget.style.boxShadow='0 15px 30px rgba(216,255,99,0.2)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.92) 0%, rgba(216,255,99,0.08) 100%)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0) scale(1)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.12)';
+                e.currentTarget.style.boxShadow='none';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)';
+              }}
+            >
+              {/* Image Preview */}
+              <div style={{ 
+                height:200, 
+                background:'linear-gradient(135deg, rgba(216,255,99,0.1), rgba(216,255,99,0.05))', 
+                display:'flex', 
+                alignItems:'center', 
+                justifyContent:'center', 
+                position:'relative', 
+                overflow:'hidden'
+              }}>
+                <div style={{ 
+                  fontSize:48, 
+                  opacity:0.4,
+                  filter:'drop-shadow(0 0 20px rgba(216,255,99,0.3))'
+                }}>🚗</div>
+                <div style={{ 
+                  position:'absolute', 
+                  top:12, 
+                  right:12, 
+                  background:'linear-gradient(135deg, rgba(4,4,4,0.8), rgba(4,4,4,0.6))', 
+                  backdropFilter:'blur(8px)', 
+                  padding:'8px 12px', 
+                  borderRadius:20, 
+                  display:'flex', 
+                  alignItems:'center', 
+                  gap:8,
+                  border:'1px solid rgba(216,255,99,0.2)'
+                }}>
+                  <span style={{ fontSize:14, color:'#D8FF63', filter:'drop-shadow(0 0 8px rgba(216,255,99,0.6)' }}>❤️</span>
+                  <span style={{ fontSize:12, color:'rgba(255,255,255,0.9)', fontWeight:600 }}>{item.likes}</span>
                 </div>
               </div>
-              <div style={{ padding:16 }}>
-                <h4 style={{ fontSize:14, fontWeight:600, color:'var(--text-primary)', margin:'0 0 8px' }}>{item.title}</h4>
-                <p style={{ fontSize:12, color:'var(--text-secondary)', margin:0 }}>by {item.author}</p>
+              
+              {/* Content */}
+              <div style={{ padding:24 }}>
+                <h4 style={{ fontSize:16, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>{item.title}</h4>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', margin:0, fontWeight:500 }}>by {item.author}</p>
               </div>
             </div>
           ))}
         </div>
 
         <div style={{ textAlign:'center', marginTop:48 }}>
-          <button className="neon-button" style={{ padding:'14px 32px', fontSize:13 }} onClick={() => navigate('/previewer')}>
-            View All Designs →
+          <button 
+            style={{ 
+              padding:'16px 36px', 
+              fontSize:14, 
+              fontWeight:700,
+              letterSpacing:'0.05em',
+              textTransform:'uppercase',
+              borderRadius:'12px',
+              background:'linear-gradient(135deg, #D8FF63, #c0ff40)',
+              color:'#080808',
+              border:'none',
+              cursor:'pointer',
+              transition:'all 0.3s ease',
+              boxShadow:'0 8px 24px rgba(216,255,99,0.3)'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform='translateY(-2px) scale(1.05)';
+              e.currentTarget.style.boxShadow='0 12px 32px rgba(216,255,99,0.4)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform='translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow='0 8px 24px rgba(216,255,99,0.3)';
+            }}
+            onClick={() => navigate('/previewer')}
+          >
+            Explore Gallery →
           </button>
         </div>
       </section>
@@ -897,60 +1023,176 @@ export default function LandingPage() {
       <div className="lp-divider" style={{ margin:'0 48px' }} />
 
       {/* About */}
-      <section id="about" className="lp-about-grid responsive" style={{ position:'relative', zIndex:10, padding:'120px 48px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center' }}>
-        <div>
-          <p className="lp-section-label" style={{ marginBottom:16 }}>Who we are</p>
-          <h2 style={{ fontSize:'clamp(28px,3.5vw,48px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 28px', lineHeight:1.15 }}>
-            Built by the community,<br />for the community.
-          </h2>
-          <p style={{ fontSize:14, color:'var(--text-secondary)', lineHeight:1.8, margin:'0 0 20px' }}>
-            itzz industries is a fan-made collective focused on building tools and experiences for the ERLC community. Everything we make is free, member-focused, and built with care.
-          </p>
-          <p style={{ fontSize:14, color:'var(--text-secondary)', lineHeight:1.8, margin:'0 0 40px' }}>
-            We believe in quality over quantity — every tool we ship is designed to be genuinely useful, well-crafted, and always improving based on community feedback.
-          </p>
-          <button className="glass-card" style={{ padding:'12px 24px', fontSize:12, fontWeight:500 }}
-            onClick={() => window.open('https://discord.gg/itzz','_blank')}>
-            Join our Discord →
-          </button>
-        </div>
-
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          {[
-            { label:'Community First',  desc:'Every decision is made with the community in mind.' },
-            { label:'Always Free',      desc:'All tools are and will remain completely free.' },
-            { label:'Quality Focused',  desc:'We ship things when they\'re ready, not before.' },
-            { label:'Open to Feedback', desc:'We build what the community actually needs.' },
-          ].map((v,i) => (
-            <div key={i} className="glass-card" style={{ padding:'24px' }}>
-              <div style={{ width:28, height:28, borderRadius:8, background:'var(--bg-glass)', border:'1px solid var(--border-glass)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
-                <div style={{ width:8, height:8, borderRadius:'50%', background:'var(--neon-primary)' }} />
-              </div>
-              <p style={{ fontSize:13, fontWeight:700, color:'var(--text-primary)', margin:'0 0 8px' }}>{v.label}</p>
-              <p style={{ fontSize:12, color:'var(--text-secondary)', lineHeight:1.6, margin:0 }}>{v.desc}</p>
+      <section id="about" style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(4,4,4,0.8) 0%, rgba(216,255,99,0.02) 50%, rgba(4,4,4,0.8) 100%)' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center', maxWidth:1200, margin:'0 auto' }}>
+          <div>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:12, marginBottom:20 }}>
+              <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)', boxShadow:'0 0 20px rgba(216,255,99,0.6)' }} />
+              <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#D8FF63', margin:0 }}>About Us</p>
             </div>
-          ))}
+            <h2 style={{ fontSize:'clamp(36px,4vw,64px)', fontWeight:900, letterSpacing:'-0.03em', margin:'0 0 32px', lineHeight:1.05, background:'linear-gradient(135deg, #FFFFFF 0%, #D8FF63 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+              Built By The<br />Community
+            </h2>
+            <p style={{ fontSize:16, color:'rgba(255,255,255,0.8)', lineHeight:1.8, margin:'0 0 24px', fontWeight:500 }}>
+              itzz industries is a fan-made collective focused on building tools and experiences for the ERLC community. Everything we make is free, member-focused, and built with care.
+            </p>
+            <p style={{ fontSize:16, color:'rgba(255,255,255,0.8)', lineHeight:1.8, margin:'0 0 40px', fontWeight:500 }}>
+              We believe in quality over quantity — every tool we ship is designed to be genuinely useful, well-crafted, and always improving based on community feedback.
+            </p>
+            <button 
+              style={{ 
+                padding:'16px 36px', 
+                fontSize:14, 
+                fontWeight:700,
+                letterSpacing:'0.05em',
+                textTransform:'uppercase',
+                borderRadius:'12px',
+                background:'linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))',
+                color:'#D8FF63',
+                border:'1px solid rgba(216,255,99,0.3)',
+                cursor:'pointer',
+                transition:'all 0.3s ease'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-2px) scale(1.05)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(216,255,99,0.3), rgba(216,255,99,0.1))';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.5)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0) scale(1)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.3)';
+              }}
+              onClick={() => window.open('https://discord.gg/itzz','_blank')}
+            >
+              Join Community →
+            </button>
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            {[
+              { label:'Community First',  desc:'Every decision is made with the community in mind.' },
+              { label:'Always Free',      desc:'All tools are and will remain completely free.' },
+              { label:'Quality Focused',  desc:'We ship things when they\'re ready, not before.' },
+              { label:'Open to Feedback', desc:'We build what the community actually needs.' },
+            ].map((v,i) => (
+              <div key={i}
+                style={{ 
+                  position:'relative',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(216,255,99,0.12)',
+                  background:'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)',
+                  backdropFilter:'blur(12px)',
+                  WebkitBackdropFilter:'blur(12px)',
+                  overflow:'hidden',
+                  transition:'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  cursor:'pointer',
+                  padding:'24px',
+                  margin:'0'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform='translateY(-4px) scale(1.02)';
+                  e.currentTarget.style.borderColor='rgba(216,255,99,0.25)';
+                  e.currentTarget.style.boxShadow='0 8px 20px rgba(216,255,99,0.15)';
+                  e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.92) 0%, rgba(216,255,99,0.08) 100%)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform='translateY(0) scale(1)';
+                  e.currentTarget.style.borderColor='rgba(216,255,99,0.12)';
+                  e.currentTarget.style.boxShadow='none';
+                  e.currentTarget.style.background='linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)';
+                }}
+              >
+                <div style={{ 
+                  width:32, 
+                  height:32, 
+                  borderRadius:'8px', 
+                  background:'linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))', 
+                  border:'1px solid rgba(216,255,99,0.3)',
+                  display:'flex', 
+                  alignItems:'center', 
+                  justifyContent:'center', 
+                  marginBottom:16 
+                }}>
+                  <div style={{ width:8, height:8, borderRadius:'50%', background:'#D8FF63', boxShadow:'0 0 15px rgba(216,255,99,0.8)' }} />
+                </div>
+                <p style={{ fontSize:14, fontWeight:700, color:'#FFFFFF', margin:'0 0 8px', letterSpacing:'-0.01em' }}>{v.label}</p>
+                <p style={{ fontSize:12, color:'rgba(255,255,255,0.7)', lineHeight:1.6, margin:0, fontWeight:500 }}>{v.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       <div className="lp-divider" style={{ margin:'0 48px' }} />
 
       {/* ── CTA ── */}
-      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', textAlign:'center' }}>
-        <div style={{ maxWidth:560, margin:'0 auto' }}>
-          <p className="lp-section-label" style={{ marginBottom:20 }}>Get started</p>
-          <h2 style={{ fontSize:'clamp(28px,4vw,52px)', fontWeight:900, letterSpacing:'-0.03em', margin:'0 0 20px', lineHeight:1.1 }}>
-            Ready to design?
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', textAlign:'center', background:'linear-gradient(180deg, rgba(4,4,4,0.7) 0%, rgba(216,255,99,0.02) 50%, rgba(4,4,4,0.7) 100%)' }}>
+        <div style={{ maxWidth:600, margin:'0 auto' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:12, marginBottom:24 }}>
+            <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)', boxShadow:'0 0 20px rgba(216,255,99,0.6)' }} />
+            <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#D8FF63', margin:0 }}>Get Started</p>
+          </div>
+          <h2 style={{ fontSize:'clamp(36px,4vw,64px)', fontWeight:900, letterSpacing:'-0.03em', margin:'0 0 32px', lineHeight:1.05, background:'linear-gradient(135deg, #FFFFFF 0%, #D8FF63 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+            Ready To Create<br />Your Masterpiece?
           </h2>
-          <p style={{ fontSize:15, color:'var(--text-secondary)', margin:'0 0 40px', lineHeight:1.7 }}>
+          <p style={{ fontSize:16, color:'rgba(255,255,255,0.8)', margin:'0 0 48px', lineHeight:1.8, fontWeight:500 }}>
             Log in with Discord and start building your perfect livery in seconds. Free for all verified itzz members.
           </p>
-          <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-            <button className="neon-button" style={{ padding:'16px 36px', fontSize:14 }} onClick={() => navigate('/previewer')}>
-              Open Livery Previewer →
+          <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+            <button 
+              style={{ 
+                padding:'18px 40px', 
+                fontSize:14, 
+                fontWeight:700,
+                letterSpacing:'0.05em',
+                textTransform:'uppercase',
+                borderRadius:'12px',
+                background:'linear-gradient(135deg, #D8FF63, #c0ff40)',
+                color:'#080808',
+                border:'none',
+                cursor:'pointer',
+                transition:'all 0.3s ease',
+                boxShadow:'0 8px 24px rgba(216,255,99,0.3)'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-2px) scale(1.05)';
+                e.currentTarget.style.boxShadow='0 12px 32px rgba(216,255,99,0.4)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow='0 8px 24px rgba(216,255,99,0.3)';
+              }}
+              onClick={() => navigate('/previewer')}
+            >
+              Launch Previewer →
             </button>
-            <button className="glass-card" style={{ padding:'16px 28px', fontSize:14, fontWeight:500, color:'var(--text-primary)' }}
-              onClick={() => window.open('https://discord.gg/itzz','_blank')}>
+            <button 
+              style={{ 
+                padding:'18px 36px', 
+                fontSize:14, 
+                fontWeight:700,
+                letterSpacing:'0.05em',
+                textTransform:'uppercase',
+                borderRadius:'12px',
+                background:'linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))',
+                color:'#D8FF63',
+                border:'1px solid rgba(216,255,99,0.3)',
+                cursor:'pointer',
+                transition:'all 0.3s ease'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-2px) scale(1.05)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(216,255,99,0.3), rgba(216,255,99,0.1))';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.5)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0) scale(1)';
+                e.currentTarget.style.background='linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.3)';
+              }}
+              onClick={() => window.open('https://discord.gg/itzz','_blank')}
+            >
               Join Discord
             </button>
           </div>

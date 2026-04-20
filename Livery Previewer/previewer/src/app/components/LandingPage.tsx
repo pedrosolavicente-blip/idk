@@ -717,29 +717,138 @@ export default function LandingPage() {
       <div className="lp-divider" style={{ margin:'0 48px' }} />
 
       {/* Features */}
-      <section style={{ position:'relative', zIndex:10, padding:'120px 48px' }}>
+      <section style={{ position:'relative', zIndex:10, padding:'120px 48px', background:'linear-gradient(180deg, rgba(4,4,4,0.7) 0%, rgba(216,255,99,0.02) 50%, rgba(4,4,4,0.7) 100%)' }}>
         <div style={{ textAlign:'center', marginBottom:80 }}>
-          <p className="lp-section-label" style={{ marginBottom:16, fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>Features</p>
-          <h2 style={{ fontSize:'clamp(32px,4vw,56px)', fontWeight:800, letterSpacing:'-0.025em', margin:'0 0 24px', lineHeight:1.1, color: 'var(--text-primary)' }}>
-            Everything you need to<br />create amazing liveries
+          <div style={{ display:'inline-flex', alignItems:'center', gap:12, marginBottom:20 }}>
+            <div style={{ width:6, height:6, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)', boxShadow:'0 0 20px rgba(216,255,99,0.6)' }} />
+            <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#D8FF63', margin:0 }}>Core Features</p>
+          </div>
+          <h2 style={{ fontSize:'clamp(36px,4vw,64px)', fontWeight:900, letterSpacing:'-0.03em', margin:'0 0 32px', lineHeight:1.05, background:'linear-gradient(135deg, #FFFFFF 0%, #D8FF63 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+            Advanced Tools For<br />Professional Creators
           </h2>
-          <p style={{ fontSize:16, color:'var(--text-secondary)', maxWidth:600, margin:'0 auto', lineHeight:1.7, fontWeight: 400 }}>
-            Professional tools designed specifically for ERLC livery creators. From concept to completion, we've got you covered.
+          <p style={{ fontSize:16, color:'rgba(255,255,255,0.8)', lineHeight:1.8, margin:'0 auto', fontWeight:500, maxWidth:600 }}>
+            Cutting-edge solutions designed to elevate your creative workflow and streamline your design process
           </p>
         </div>
 
-        <div className="feature-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:32 }}>
-          {FEATURES.map((feature, i) => (
-            <div key={i} className="glass-card" style={{ textAlign:'center', padding:'32px 24px', animation:`fadeInUp 0.6s ease ${i*0.1}s both`, opacity:0 }}>
-              <div style={{ margin:'0 auto 20px', fontSize:24, width:48, height:48, borderRadius:12, background:'var(--bg-glass)', border:'1px solid var(--border-glass)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24, position:'relative' }}>
+          {[
+            {
+              title: 'Academy Integration',
+              description: 'Helping students improve by joining our comprehensive academy with expert guidance and structured learning paths',
+              icon: '🎓',
+              accent: '#D8FF63'
+            },
+            {
+              title: 'Premium Asset Library',
+              description: 'Access to top-tier assets with exclusive designs, professional templates, and industry-standard quality',
+              icon: '💎',
+              accent: '#D8FF63'
+            },
+            {
+              title: 'Efficiency Tools',
+              description: 'Providing intelligent tools to improve workflow efficiency and reduce design time significantly',
+              icon: '⚡',
+              accent: '#D8FF63'
+            },
+            {
+              title: 'Cloud Storage',
+              description: 'Secure cloud-based storage with automatic backups, version control, and seamless collaboration features',
+              icon: '☁️',
+              accent: '#D8FF63'
+            },
+            {
+              title: 'Real-Time 3D Preview',
+              description: 'Instant 3D visualization with real-time rendering, accurate lighting, and material preview',
+              icon: '🎯',
+              accent: '#D8FF63'
+            },
+            {
+              title: 'Protection & Safety',
+              description: 'Advanced safety policies with data protection, secure authentication, and community guidelines enforcement',
+              icon: '🛡️',
+              accent: '#D8FF63'
+            }
+          ].map((feature, i) => (
+            <div key={i}
+              style={{ 
+                position:'relative',
+                borderRadius: '20px',
+                border: '1px solid rgba(216,255,99,0.15)',
+                background:'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)',
+                backdropFilter:'blur(15px)',
+                WebkitBackdropFilter:'blur(15px)',
+                overflow:'hidden',
+                transition:'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor:'pointer',
+                padding:'40px 32px',
+                height:'100%',
+                display:'flex',
+                flexDirection:'column',
+                justifyContent:'center',
+                textAlign:'center'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform='translateY(-8px) scale(1.02)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.3)';
+                e.currentTarget.style.boxShadow='0 20px 40px rgba(216,255,99,0.2)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform='translateY(0) scale(1)';
+                e.currentTarget.style.borderColor='rgba(216,255,99,0.15)';
+                e.currentTarget.style.boxShadow='none';
+              }}
+            >
+              {/* Feature Icon */}
+              <div style={{ 
+                marginBottom:24,
+                width:64,
+                height:64,
+                borderRadius:'16px',
+                background:'linear-gradient(135deg, rgba(216,255,99,0.2), rgba(216,255,99,0.05))',
+                border:'2px solid rgba(216,255,99,0.3)',
+                display:'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                fontSize:28,
+                filter:'drop-shadow(0 0 20px rgba(216,255,99,0.4))'
+              }}>
                 {feature.icon}
               </div>
-              <h3 style={{ fontSize:18, fontWeight:700, color:'var(--text-primary)', margin:'0 0 12px', letterSpacing:'-0.01em' }}>
+
+              {/* Feature Content */}
+              <h3 style={{ 
+                fontSize:20, 
+                fontWeight:800, 
+                letterSpacing:'-0.02em', 
+                margin:'0 0 16px', 
+                color:'#FFFFFF', 
+                lineHeight:1.2 
+              }}>
                 {feature.title}
               </h3>
-              <p style={{ fontSize:14, color:'var(--text-secondary)', lineHeight:1.6, margin:0 }}>
+              <p style={{ 
+                fontSize:14, 
+                color:'rgba(255,255,255,0.8)', 
+                lineHeight:1.7, 
+                margin:0, 
+                fontWeight:500 
+              }}>
                 {feature.description}
               </p>
+
+              {/* Subtle Glow Effect */}
+              <div style={{ 
+                position:'absolute',
+                top:0,
+                left:0,
+                right:0,
+                bottom:0,
+                borderRadius:'20px',
+                background:'linear-gradient(45deg, transparent, rgba(216,255,99,0.05), transparent)',
+                pointerEvents:'none',
+                zIndex:1
+              }} />
             </div>
           ))}
         </div>

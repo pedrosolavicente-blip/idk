@@ -207,6 +207,17 @@ const LANDING_STYLES = `
     .feature-grid { grid-template-columns: 1fr !important; }
   }
 
+  /* Marquee Animation */
+  .lp-marquee-track {
+    display: flex;
+    animation: marquee 30s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   @media (max-width: 480px) {
     .neon-button { padding: 14px 24px; font-size: 13px; }
     .feature-badge { padding: 4px 8px; font-size: 11px; }

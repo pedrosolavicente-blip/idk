@@ -273,7 +273,7 @@ const PRODUCTS = [
 ];
 
 const STATS = [
-  { value: '25+',   label: 'Vehicle Models' },
+  { value: '800+',   label: 'Members' },
   { value: '100%',  label: 'Free to Use'    },
   { value: 'ERLC',  label: 'Focused'        },
   { value: '24/7',  label: 'Available'      },

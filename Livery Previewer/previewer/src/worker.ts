@@ -57,10 +57,23 @@ export default {
       return new Response(null, { status: 204, headers: h });
     }
     
+// ── Maintenance mode ──────────────────────────────────────────────────────────
 const MAINTENANCE = true;
 
 if (MAINTENANCE && (path === '/' || path === '/index.html')) {
-  return new Response(`...`, { status: 503, headers: { 'Content-Type': 'text/html' } });
+  return new Response(`
+    <!DOCTYPE html>
+    <html>
+      <head><title>Down for Maintenance</title></head>
+      <body style="background:#0a0a0a;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;">
+        <h1>🔧 Down for Maintenance</h1>
+        <p>We'll be back shortly.</p>
+      </body>
+    </html>
+  `, {
+    status: 503,
+    headers: { 'Content-Type': 'text/html' },
+  });
 }
     
     // ── Vehicle model proxy ───────────────────────────────────────────────────

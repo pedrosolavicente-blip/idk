@@ -764,11 +764,6 @@ export default function LandingPage() {
               title: 'Real-Time 3D Preview',
               description: 'Instant 3D visualization with real-time rendering, accurate lighting, and material preview',
               accent: '#D8FF63'
-            },
-            {
-              title: 'Protection & Safety',
-              description: 'Advanced safety policies with data protection, secure authentication, and community guidelines enforcement',
-              accent: '#D8FF63'
             }
           ].map((feature, i) => (
             <div key={i}

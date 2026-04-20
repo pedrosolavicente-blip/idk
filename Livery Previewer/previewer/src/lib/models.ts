@@ -8,7 +8,7 @@ export interface VehicleModel {
 }
 
 // Served through the Worker so CORS is never an issue
-const R2 = "/api/models";
+const R2 = "/previewer/api/models";
 
 const MODELS: VehicleModel[] = [
   {

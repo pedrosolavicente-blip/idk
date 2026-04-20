@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+const BASE = import.meta.env.BASE_URL;
+
 interface Props {
   onLogin: () => void;
   onDisclaimer: () => void;
@@ -151,7 +153,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
       {/* ── Background layer ── */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <img
-          src="/Vector_(7).svg"
+          src={`${BASE}Vector_(7).svg`}
           alt=""
           aria-hidden="true"
           style={{
@@ -185,7 +187,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
           boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
         }}
       >
-        <img src="/itzz.svg" alt="itzz" className="h-7 w-auto" />
+        <img src={`${BASE}itzz.svg`} alt="itzz" className="h-7 w-auto" />
 
         <div className="flex items-center gap-2">
           <button
@@ -275,7 +277,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
       <div className="relative z-10 flex flex-col justify-center px-16 w-[44%] gap-7">
 
         <img
-          src="/Group_15.svg"
+          src={`${BASE}Group_15.svg`}
           alt="Livery Previewer"
           style={{
             width: '540px',

@@ -536,11 +536,10 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Premium Heading */}
-            <h1 className="neon-text" style={{ fontSize:'clamp(56px,7vw,120px)', fontWeight:900, lineHeight:0.95, letterSpacing:'-0.04em', margin:'0 0 40px', animation:'fadeInUp 0.8s ease 0.15s both', opacity:0 }}>
-              <span style={{ display:'block', marginBottom:8 }}>itzz all</span>
-              <span style={{ display:'block' }}>quality.</span>
-            </h1>
+            {/* Logo Heading */}
+            <div style={{ animation:'fadeInUp 0.8s ease 0.15s both', opacity:0, marginBottom:40 }}>
+              <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:400, height:'auto' }} />
+            </div>
 
             <p style={{ fontSize:18, color:'var(--text-secondary)', lineHeight:1.8, maxWidth:520, margin:'0 0 64px', fontWeight:400, animation:'fadeInUp 0.8s ease 0.25s both', opacity:0 }}>
               A community built around ERLC — creating tools, designs, and experiences for players who care about the details.

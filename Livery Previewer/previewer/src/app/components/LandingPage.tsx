@@ -427,6 +427,47 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={() => navigate('/previewer')}
+            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
+            style={{
+              color: '#c4ff0d',
+              background: 'rgba(196,255,13,0.07)',
+              border: '1px solid rgba(196,255,13,0.22)',
+            }}
+          >
+            Livery Previewer
+          </button>
+          <button
+            onClick={() => {}}
+            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            Shop
+          </button>
+          <button
+            onClick={() => {}}
+            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            Portfolio
+          </button>
+          <button
+            onClick={() => {}}
+            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            Reviews
+          </button>
+          <button
             onClick={() => window.open('https://discord.gg/itzz', '_blank')}
             className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
             style={{
@@ -435,27 +476,7 @@ export default function LandingPage() {
               border: '1px solid rgba(196,255,13,0.22)',
             }}
           >
-            Contact Us
-          </button>
-          <button
-            onClick={() => {}}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Legal
-          </button>
-          <button
-            onClick={() => {}}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Cookie
+            Discord Server
           </button>
         </div>
       </nav>

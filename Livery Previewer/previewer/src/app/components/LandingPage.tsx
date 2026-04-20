@@ -661,7 +661,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:4, position:'relative' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:4, position:'relative', alignItems:'stretch' }}>
           {PRODUCTS.map((p, i) => (
             <div key={p.id}
               style={{ 
@@ -708,33 +708,6 @@ export default function LandingPage() {
                 <h3 style={{ fontSize:32, fontWeight:900, letterSpacing:'-0.025em', margin:'0 0 16px', color:'#FFFFFF', lineHeight:1.2 }}>{p.name}</h3>
                 <p style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.8, margin:0, fontWeight:500 }}>{p.desc}</p>
 
-                {/* Premium CTA */}
-                {p.link && (
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:32 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                      <div style={{ width:4, height:4, borderRadius:'50%', background:'linear-gradient(45deg, #D8FF63, #c0ff40)' }} />
-                      <span style={{ fontSize:12, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(255,255,255,0.6)' }}>
-                        {p.isInternal ? 'Premium Tool' : p.tag==='Community' ? 'Join Community' : 'Explore More'}
-                      </span>
-                    </div>
-                    <div style={{ 
-                      width:40, 
-                      height:40, 
-                      borderRadius:'50%', 
-                      background:'linear-gradient(135deg, #D8FF63, #c0ff40)', 
-                      display:'flex', 
-                      alignItems:'center', 
-                      justifyContent:'center',
-                      fontSize:18,
-                      fontWeight:700,
-                      color:'#080808',
-                      boxShadow:'0 8px 24px rgba(216,255,99,0.4)',
-                      transition:'all 0.3s ease'
-                    }}>
-                      →
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           ))}

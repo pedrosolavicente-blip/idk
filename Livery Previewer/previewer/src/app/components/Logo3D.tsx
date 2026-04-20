@@ -170,10 +170,16 @@ export default function Logo3D({ size = 200, className = "", style = {}, onClick
       
       {/* 3D Logo */}
       <div className="logo-3d">
-        <div style={{ textAlign: 'center' }}>
-          <div className="logo-3d-text">itzz</div>
-          <div className="logo-3d-subtitle">industries</div>
-        </div>
+        <img 
+          src="/Vector (8).svg" 
+          alt="itzz" 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            filter: 'brightness(0) invert(1)',
+            animation: 'lp-spin 8s linear infinite'
+          }} 
+        />
       </div>
     </div>
   );

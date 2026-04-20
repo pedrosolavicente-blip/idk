@@ -1,6 +1,6 @@
 import { DISCORD_CLIENT_ID, DISCORD_GUILD_ID } from './config';
 
-const REDIRECT_URI = window.location.origin + window.location.pathname;
+const REDIRECT_URI = 'https://itzz.uk/previewer';
 
 export interface DiscordUser {
   id: string;

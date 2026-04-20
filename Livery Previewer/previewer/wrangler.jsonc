@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "liverypreviewer",
+  "name": "itzzwebsite",
   "main": "src/worker.ts",
   "compatibility_date": "2026-04-12",
   "observability": {

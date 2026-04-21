@@ -432,74 +432,39 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-      {/* Floating Car Image - Ultra Premium Implementation */}
-      <div 
-        style={{
-          position: 'absolute',
-          right: '30px',
-          top: '750px', // Position right next to Core Features section
-          zIndex: 1000,
-          opacity: scrollY > 650 && scrollY < 950 ? 1 : 0,
-          transform: `translateX(${scrollY > 650 && scrollY < 950 ? Math.sin(scrollY * 0.01) * 30 : 0}px)`,
-          transition: 'opacity 0.3s ease-in-out, transform 0.1s ease-out',
-        }}
-      >
-        {/* Premium Glass Panel Background */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(135deg, rgba(4,4,4,0.85) 0%, rgba(216,255,99,0.05) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderRadius: '16px',
-          border: '1px solid rgba(216,255,99,0.12)',
-          boxShadow: '0 1px 0 rgba(216,255,99,0.06), 0 8px 32px rgba(0,0,0,0.4)',
-          overflow: 'hidden',
-        }}>
-          {/* Left Side Clipping Effect */}
-          <div style={{
-            position: 'absolute',
-            left: -20,
-            top: 0,
-            width: 40,
-            height: '100%',
-            background: 'linear-gradient(90deg, transparent 0%, rgba(216,255,99,0.1) 50%, transparent 100%)',
-            transform: 'skewX(-15deg)',
-          }} />
-          
-          {/* Premium Glow Effect */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '16px',
-            background: 'radial-gradient(circle at 30% 30%, rgba(216,255,99,0.08) 0%, transparent 60%)',
-          }} />
-        </div>
-        
-        {/* Car Image */}
-        <img 
-          src="/previewer/image 65.png"
-          alt="Floating Car"
-          style={{
-            width: '120px',
-            height: '120px',
-            position: 'relative',
-            zIndex: 1,
-            borderRadius: '12px',
-            objectFit: 'cover',
-          }}
-        />
-        
-        {/* Premium Accent Border */}
-        <div style={{
-          position: 'absolute',
-          inset: -1,
-          borderRadius: '17px',
-          background: 'linear-gradient(135deg, rgba(216,255,99,0.2) 0%, transparent 50%, rgba(216,255,99,0.1) 100%)',
-          pointerEvents: 'none',
-          zIndex: 2,
-        }} />
-      </div>
+{/* Floating Car Image - Ultra Premium Implementation */}
+<div 
+  style={{
+    position: 'fixed',
+    left: scrollY > 900 && scrollY < 1600 
+      ? '80px' 
+      : '-1000px',
+    top: '58%',
+    transform: 'translateY(-50%)',
+    zIndex: 5,
+    opacity: scrollY > 900 && scrollY < 1600 ? 0.92 : 0,
+    transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
+    pointerEvents: 'none',
+    width: '850px',
+    height: '580px',
+    willChange: 'left, opacity',
+  }}
+>
+  <img 
+    src="/previewer/image 65.png"
+    alt="Police Car"
+    style={{
+      width: '100%',
+      height: '100%',
+      objectFit: 'contain',
+      objectPosition: 'left center',
+      filter: 'brightness(1.08) contrast(1.12) saturate(1.05)',
+      imageRendering: '-webkit-optimize-contrast',
+      backfaceVisibility: 'hidden',
+      WebkitFontSmoothing: 'antialiased',
+    }}
+  />
+</div>
 
       {/* Ambient glows */}
       <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }}>

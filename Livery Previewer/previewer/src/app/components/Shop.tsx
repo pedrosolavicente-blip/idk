@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Heart, Star, Package, Truck, Shield, TrendingUp, Sparkles, Zap, Award } from 'lucide-react';
+import { Heart, Star, Package, Truck, Shield } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import { useShoppingCart, CartSidebar } from './ShoppingCart';
+import SearchBar from './SearchBar';
 
 // Types
 interface Product {
@@ -143,27 +144,11 @@ const PRODUCTS: Product[] = [
   }
 ];
 
-const CATEGORIES = [
-  { id: 'all', name: 'All Products', icon: Package, color: '#c4ff0d' },
-  { id: 'software', name: 'Software', icon: Zap, color: '#3b82f6' },
-  { id: 'digital', name: 'Digital Goods', icon: Sparkles, color: '#8b5cf6' },
-  { id: 'merchandise', name: 'Merchandise', icon: Award, color: '#f59e0b' }
-];
-
 const PRICE_RANGES = [
   { id: 'all', name: 'All Prices', min: 0, max: Infinity },
   { id: '0-25', name: 'Under $25', min: 0, max: 25 },
   { id: '25-50', name: '$25 - $50', min: 25, max: 50 },
   { id: '50+', name: 'Over $50', min: 50, max: Infinity }
-];
-
-const SORT_OPTIONS = [
-  { id: 'featured', name: 'Featured', icon: Star },
-  { id: 'newest', name: 'Newest', icon: Sparkles },
-  { id: 'price-low', name: 'Price: Low to High', icon: TrendingUp },
-  { id: 'price-high', name: 'Price: High to Low', icon: TrendingUp },
-  { id: 'rating', name: 'Highest Rated', icon: Star },
-  { id: 'reviews', name: 'Most Reviews', icon: Star }
 ];
 
 export default function Shop() {
@@ -483,73 +468,17 @@ export default function Shop() {
       <SharedNavbar />
 
       {/* Fixed Search/Filter Bar */}
-      <div className="sticky top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-[#c4ff0d]/50 text-white placeholder-gray-400"
-                />
-              </div>
-            </div>
-            
-            {/* Filter Controls */}
-            <div className="flex items-center gap-4">
-              {/* Category Filter */}
-              <div className="hidden lg:flex items-center space-x-2">
-                <span className="text-sm text-gray-400">Category:</span>
-                <div className="flex gap-2">
-                  {CATEGORIES.map(category => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        selectedCategory === category.id
-                          ? 'bg-[#c4ff0d]/10 text-[#c4ff0d] border border-[#c4ff0d]/30'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <category.icon className="w-4 h-4 inline mr-1" style={{ color: category.color }} />
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sort Options */}
-              <div className="hidden lg:flex items-center space-x-2">
-                <span className="text-sm text-gray-400">Sort:</span>
-                <div className="flex gap-2">
-                  {SORT_OPTIONS.map(option => (
-                    <button
-                      key={option.id}
-                      onClick={() => setSortBy(option.id)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        sortBy === option.id
-                          ? 'bg-[#c4ff0d]/10 text-[#c4ff0d] border border-[#c4ff0d]/30'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <option.icon className="w-4 h-4 inline mr-1" />
-                      {option.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Results Count */}
-              <span className="text-sm text-gray-400">
-                {filteredProducts.length} products
-              </span>
-            </div>
-          </div>
+      <div className="sticky top-20 z-40 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto">
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedSort={sortBy}
+            setSelectedSort={setSortBy}
+            uploadCount={filteredProducts.length}
+          />
         </div>
       </div>
 

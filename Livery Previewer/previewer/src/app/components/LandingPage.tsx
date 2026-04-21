@@ -445,8 +445,8 @@ export default function LandingPage() {
     opacity: scrollY > 900 && scrollY < 1600 ? 0.92 : 0,
     transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
     pointerEvents: 'none',
-    width: '600px',
-    height: '400px',
+    width: '800px',
+    height: '500px',
     willChange: 'left, opacity',
     overflow: 'hidden',
   }}
@@ -467,8 +467,8 @@ export default function LandingPage() {
     src="/previewer/image 65.png"
     alt="Police Car"
     style={{
-      width: '140%',
-      height: '140%',
+      width: '160%',
+      height: '160%',
       objectFit: 'contain',
       objectPosition: 'left center',
       filter: 'brightness(1.08) contrast(1.12) saturate(1.05)',

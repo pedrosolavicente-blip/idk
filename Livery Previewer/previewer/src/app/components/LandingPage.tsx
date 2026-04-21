@@ -443,11 +443,11 @@ export default function LandingPage() {
     transform: 'translateY(-50%)',
     zIndex: 5,
     opacity: scrollY > 900 && scrollY < 1600 ? 0.92 : 0,
-    transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
+    transition: 'left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease-out',
     pointerEvents: 'none',
-    width: '800px',
-    height: '500px',
-    willChange: 'left, opacity',
+    width: '900px',
+    height: '600px',
+    willChange: 'transform',
     overflow: 'hidden',
   }}
 >
@@ -467,15 +467,15 @@ export default function LandingPage() {
     src="/previewer/image 65.png"
     alt="Police Car"
     style={{
-      width: '160%',
-      height: '160%',
+      width: '150%',
+      height: '150%',
       objectFit: 'contain',
       objectPosition: 'left center',
       filter: 'brightness(1.08) contrast(1.12) saturate(1.05)',
       imageRendering: '-webkit-optimize-contrast',
       backfaceVisibility: 'hidden',
       WebkitFontSmoothing: 'antialiased',
-      marginLeft: '-20px', // Shift slightly left for clipping effect
+      marginLeft: '-30px', // Shift slightly left for clipping effect
     }}
   />
 </div>

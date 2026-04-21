@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './app/App.tsx'
 import LandingPage from './app/components/LandingPage.tsx'
+import Shop from './app/components/Shop.tsx'
+import ProductDetail from './app/components/ProductDetail.tsx'
 import './styles/index.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -11,6 +13,8 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/"          element={<LandingPage />} />
         <Route path="/previewer" element={<App />} />
+        <Route path="/shop"      element={<Shop />} />
+        <Route path="/shop/:id"  element={<ProductDetail />} />
         <Route path="*"          element={<LandingPage />} />
       </Routes>
     </BrowserRouter>

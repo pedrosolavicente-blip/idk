@@ -424,7 +424,7 @@ export default function LandingPage() {
     { id: 'livery',    label: 'Livery Previewer', action: () => navigate('/previewer') },
     { id: 'portfolio', label: 'Portfolio',         action: () => {} },
     { id: 'about',     label: 'Who We Are',        action: () => document.getElementById('about')?.scrollIntoView({ behavior:'smooth' }) },
-    { id: 'shop',      label: 'Shop',              action: () => {} },
+    { id: 'shop',      label: 'Shop',              action: () => navigate('/shop') },
   ];
 
   return (

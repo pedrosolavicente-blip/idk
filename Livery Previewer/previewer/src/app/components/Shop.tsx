@@ -60,7 +60,7 @@ const PRODUCTS: Product[] = [
     price: 39.99,
     category: 'merchandise',
     subcategory: 'clothing',
-    description: 'Exclusive itzz branded clothing and accessories bundle.',
+    description: 'Exclusive itzz branded clothing and hehe bundle.',
     features: ['T-Shirt', 'Hoodie', 'Cap', 'Sticker Pack', 'Premium Quality'],
     images: ['/placeholder-product-3.jpg', '/placeholder-product-3-2.jpg'],
     rating: 4.9,

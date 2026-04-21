@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import SharedNavbar from './SharedNavbar';
 import { 
-  ShoppingCart, Heart, Star, Truck, Shield, CreditCard, Package, 
-  ChevronLeft, ChevronRight, Plus, Minus, Share2, ArrowLeft 
+  ChevronLeft, ChevronRight, Star, Heart, Share2, ArrowLeft 
 } from 'lucide-react';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
@@ -30,15 +29,6 @@ interface Product {
   returnPolicy?: string;
 }
 
-interface Review {
-  id: string;
-  user: string;
-  rating: number;
-  date: string;
-  verified: boolean;
-  helpful: number;
-  content: string;
-}
 
 // Mock data - in real app this would come from API
 const MOCK_PRODUCTS: Record<string, Product> = {
@@ -114,44 +104,14 @@ const MOCK_PRODUCTS: Record<string, Product> = {
   }
 };
 
-const MOCK_REVIEWS: Review[] = [
-  {
-    id: '1',
-    user: 'Alex Designer',
-    rating: 5,
-    date: '2024-01-15',
-    verified: true,
-    helpful: 23,
-    content: 'Absolutely amazing software! The export quality is incredible and the templates save me so much time. Worth every penny!'
-  },
-  {
-    id: '2', 
-    user: 'Sarah Creator',
-    rating: 4,
-    date: '2024-01-10',
-    verified: true,
-    helpful: 15,
-    content: 'Great tool for livery design. The interface is intuitive and the real-time preview is fantastic. Only wish it had more font options.'
-  },
-  {
-    id: '3',
-    user: 'Mike Artist',
-    rating: 5,
-    date: '2024-01-05',
-    verified: true,
-    helpful: 31,
-    content: 'This has revolutionized my workflow. The cloud storage feature means I can work from anywhere. Highly recommend!'
-  }
-];
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
   const [currentImage, setCurrentImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'description' | 'specifications' | 'reviews'>('description');
+  const [reviews] = useState<any[]>([]);
 
   useEffect(() => {
     // In real app, this would be an API call
@@ -159,6 +119,16 @@ export default function ProductDetail() {
       setProduct(MOCK_PRODUCTS[id]);
     }
   }, [id]);
+
+  const nextImage = () => {
+    if (!product) return;
+    setCurrentImage((prev) => (prev + 1) % product.images.length);
+  };
+
+  const prevImage = () => {
+    if (!product) return;
+    setCurrentImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
 
   if (!product) {
     return (
@@ -173,19 +143,7 @@ export default function ProductDetail() {
     );
   }
 
-  const nextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % product.images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImage((prev) => (prev - 1 + product.images.length) % product.images.length);
-  };
-
-  const addToCart = () => {
-    // Cart functionality would be implemented here
-    console.log(`Added ${quantity} of ${product.name} to cart`);
-  };
-
+  
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -234,11 +192,11 @@ export default function ProductDetail() {
           {/* Image Gallery */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative aspect-square bg-gradient-to-br from-[#c4ff0d]/10 to-transparent rounded-xl overflow-hidden">
+            <div className="relative aspect-video bg-gradient-to-br from-[#c4ff0d]/10 to-transparent rounded-xl overflow-hidden">
               <img
                 src={`${BASE}marketplace.svg`}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               
               {/* Navigation */}
@@ -303,105 +261,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-6">
-            {/* Title and Rating */}
-            <div>
-              <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1">
-                  {renderStars(product.rating)}
-                </div>
-                <span className="text-gray-400">
-                  {product.rating} ({product.reviewCount} reviews)
-                </span>
-              </div>
-            </div>
-
-            {/* Price */}
-            <div className="flex items-baseline space-x-3">
-              <span className="text-4xl font-bold text-white">${product.price}</span>
-              {product.originalPrice && (
-                <span className="text-xl text-gray-400 line-through">
-                  ${product.originalPrice}
-                </span>
-              )}
-              {product.isOnSale && (
-                <span className="px-2 py-1 bg-red-500 text-white text-sm font-bold rounded">
-                  Save ${product.originalPrice! - product.price}
-                </span>
-              )}
-            </div>
-
-            {/* Description */}
-            <p className="text-gray-300 leading-relaxed">{product.description}</p>
-
-            {/* Features */}
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Key Features</h3>
-              <ul className="space-y-2">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-[#c4ff0d] rounded-full" />
-                    <span className="text-gray-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Purchase Options */}
-            <div className="space-y-4">
-              {/* Quantity */}
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-400">Quantity:</span>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="w-12 text-center">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Add to Cart Button */}
-              <button
-                onClick={addToCart}
-                disabled={!product.inStock}
-                className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-all ${
-                  product.inStock
-                    ? 'bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black'
-                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-              </button>
-
-              {/* Trust Badges */}
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="flex flex-col items-center space-y-1">
-                  <Truck className="w-6 h-6 text-[#c4ff0d]" />
-                  <span className="text-xs text-gray-400">Free Shipping</span>
-                </div>
-                <div className="flex flex-col items-center space-y-1">
-                  <Shield className="w-6 h-6 text-[#c4ff0d]" />
-                  <span className="text-xs text-gray-400">Secure Payment</span>
-                </div>
-                <div className="flex flex-col items-center space-y-1">
-                  <Package className="w-6 h-6 text-[#c4ff0d]" />
-                  <span className="text-xs text-gray-400">Instant Delivery</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                  </div>
 
         {/* Product Details Tabs */}
         <div className="mt-16">

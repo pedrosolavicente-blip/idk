@@ -432,27 +432,34 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-      {/* Floating Car Image - positioned next to Core Features */}
-      <div 
-        style={{
-          position: 'absolute',
-          right: '30px',
-          top: '750px', // Position right next to Core Features section
-          zIndex: 1000,
-          opacity: scrollY > 650 && scrollY < 950 ? 1 : 0,
-          transform: `translateX(${scrollY > 650 && scrollY < 950 ? Math.sin(scrollY * 0.01) * 30 : 0}px)`,
-          transition: 'opacity 0.3s ease-in-out, transform 0.1s ease-out',
-        }}
-      >
-        <img 
-          src="/previewer/image 65.png"
-          alt="Floating Car"
-          style={{
-            width: '120px',
-            height: '120px',
-          }}
-        />
-      </div>
+      {/* Floating Car Image - appears randomly while scrolling */}
+<div 
+  style={{
+    position: 'fixed',
+    right: '-200px', // Start off-screen
+    top: '50%',
+    transform: 'translateY(-50%)',
+    zIndex: 1000,
+    opacity: scrollY > 400 && scrollY < 2000 ? 1 : 0,
+    transition: 'opacity 0.5s ease-in-out, right 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    pointerEvents: 'none',
+    right: scrollY > 400 && scrollY < 2000 
+      ? `${20 + Math.sin(scrollY * 0.005) * 50}px` 
+      : '-200px',
+  }}
+>
+  <img 
+    src="/previewer/image 65.png"
+    alt="Floating Car"
+    style={{
+      width: '150px',
+      height: '150px',
+      transform: `rotate(${Math.sin(scrollY * 0.01) * 10}deg)`,
+      transition: 'transform 0.1s ease-out',
+      filter: 'drop-shadow(0 10px 30px rgba(216,255,99,0.3))',
+    }}
+  />
+</div>
 
       {/* Ambient glows */}
       <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }}>

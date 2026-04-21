@@ -437,31 +437,45 @@ export default function LandingPage() {
   style={{
     position: 'fixed',
     left: scrollY > 900 && scrollY < 1600 
-      ? '80px' 
-      : '-1000px',
+      ? '20px' 
+      : '-500px',
     top: '58%',
     transform: 'translateY(-50%)',
     zIndex: 5,
     opacity: scrollY > 900 && scrollY < 1600 ? 0.92 : 0,
     transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
     pointerEvents: 'none',
-    width: '850px',
-    height: '580px',
+    width: '600px',
+    height: '400px',
     willChange: 'left, opacity',
+    overflow: 'hidden',
   }}
 >
+  {/* Left Border Clipping Effect */}
+  <div style={{
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: '3px',
+    height: '100%',
+    background: 'linear-gradient(180deg, transparent 0%, rgba(216,255,99,0.6) 20%, rgba(216,255,99,0.6) 80%, transparent 100%)',
+    boxShadow: '0 0 20px rgba(216,255,99,0.4)',
+    zIndex: 10,
+  }} />
+  
   <img 
     src="/previewer/image 65.png"
     alt="Police Car"
     style={{
-      width: '100%',
-      height: '100%',
+      width: '140%',
+      height: '140%',
       objectFit: 'contain',
       objectPosition: 'left center',
       filter: 'brightness(1.08) contrast(1.12) saturate(1.05)',
       imageRendering: '-webkit-optimize-contrast',
       backfaceVisibility: 'hidden',
       WebkitFontSmoothing: 'antialiased',
+      marginLeft: '-20px', // Shift slightly left for clipping effect
     }}
   />
 </div>

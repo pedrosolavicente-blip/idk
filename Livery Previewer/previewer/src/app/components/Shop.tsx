@@ -484,7 +484,13 @@ export default function Shop() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#c4ff0d]/10 to-transparent" />
+        <div className="absolute inset-0">
+          <img 
+            src="marketplace.svg" 
+            alt="Marketplace Banner" 
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
             <h1 className="text-5xl sm:text-7xl font-black mb-6 bg-gradient-to-r from-white to-[#c4ff0d] bg-clip-text text-transparent">

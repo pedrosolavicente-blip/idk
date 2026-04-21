@@ -486,7 +486,7 @@ export default function Shop() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center pt-12">
           <img 
             src={`${BASE}marketplace.svg`} 
             alt="Marketplace Banner" 

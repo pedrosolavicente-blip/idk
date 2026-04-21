@@ -6,6 +6,8 @@ import {
   ChevronLeft, ChevronRight, Plus, Minus, Share2, ArrowLeft 
 } from 'lucide-react';
 
+const BASE = (import.meta as any).env?.BASE_URL || '';
+
 // Types (same as Shop component)
 interface Product {
   id: string;
@@ -234,7 +236,7 @@ export default function ProductDetail() {
             {/* Main Image */}
             <div className="relative aspect-square bg-gradient-to-br from-[#c4ff0d]/10 to-transparent rounded-xl overflow-hidden">
               <img
-                src="marketplace.svg"
+                src={`${BASE}marketplace.svg`}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />

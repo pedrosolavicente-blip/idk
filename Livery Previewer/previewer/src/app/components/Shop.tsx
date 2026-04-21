@@ -5,6 +5,8 @@ import SharedNavbar from './SharedNavbar';
 import { useShoppingCart, CartSidebar } from './ShoppingCart';
 import SearchBar from './SearchBar';
 
+const BASE = (import.meta as any).env?.BASE_URL || '';
+
 // Types
 interface Product {
   id: string;
@@ -486,7 +488,7 @@ export default function Shop() {
       <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="marketplace.svg" 
+            src={`${BASE}marketplace.svg`} 
             alt="Marketplace Banner" 
             className="w-full h-full object-cover"
           />

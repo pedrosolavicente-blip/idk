@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, Star, Filter, X, ChevronDown, Package, Truck, Shield, CreditCard, TrendingUp, Sparkles, Zap, Award } from 'lucide-react';
+import { Search, Heart, Star, Filter, ChevronDown, Package, Truck, Shield, TrendingUp, Sparkles, Zap, Award } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
-import { useShoppingCart } from './ShoppingCart';
+import { useShoppingCart, CartSidebar } from './ShoppingCart';
 
 // Types
 interface Product {
@@ -169,10 +169,17 @@ const SORT_OPTIONS = [
 export default function Shop() {
   const { 
     addToCart, 
+    removeFromCart,
+    updateQuantity,
+    clearCart,
     itemCount, 
     cartItems,
     isOpen, 
-    setIsOpen 
+    setIsOpen,
+    subtotal,
+    shipping,
+    tax,
+    total
   } = useShoppingCart();
 
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(PRODUCTS);
@@ -183,7 +190,6 @@ export default function Shop() {
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let filtered = PRODUCTS;
@@ -674,13 +680,13 @@ export default function Shop() {
         cartItems={cartItems}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        updateQuantity={() => {}}
-        removeFromCart={() => {}}
-        clearCart={() => {}}
-        subtotal={0}
-        shipping={0}
-        tax={0}
-        total={0}
+        updateQuantity={updateQuantity}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
+        subtotal={subtotal}
+        shipping={shipping}
+        tax={tax}
+        total={total}
         itemCount={itemCount}
       />
     </div>

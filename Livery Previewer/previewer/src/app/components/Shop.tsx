@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Star, Package, Truck, Shield } from 'lucide-react';
+import { Heart, Star, Package } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import { useShoppingCart, CartSidebar } from './ShoppingCart';
 import SearchBar from './SearchBar';
@@ -494,28 +494,7 @@ export default function Shop() {
             style={{ maxHeight: '120px' }}
           />
         </div>
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center">
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Discover exclusive itzz products, premium tools, and limited edition merchandise designed for professionals.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <Truck className="w-5 h-5 text-[#c4ff0d]" />
-                <span>Free Shipping</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <Shield className="w-5 h-5 text-[#c4ff0d]" />
-                <span>Secure Payment</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <Package className="w-5 h-5 text-[#c4ff0d]" />
-                <span>Instant Delivery</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+              </section>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">

@@ -234,7 +234,7 @@ export default function ProductDetail() {
             {/* Main Image */}
             <div className="relative aspect-square bg-gradient-to-br from-[#c4ff0d]/10 to-transparent rounded-xl overflow-hidden">
               <img
-                src={product.images[currentImage]}
+                src="marketplace.svg"
                 alt={product.name}
                 className="w-full h-full object-cover"
               />

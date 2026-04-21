@@ -490,7 +490,7 @@ export default function Shop() {
           <img 
             src={`${BASE}marketplace.svg`} 
             alt="Marketplace Banner" 
-            className="w-full h-full object-cover"
+            className="w-full h-32 object-cover"
           />
         </div>
         <div className="relative max-w-7xl mx-auto">

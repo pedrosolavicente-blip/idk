@@ -432,31 +432,34 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-      {/* Floating Car Image - appears randomly while scrolling */}
+{/* Floating Car Image - Premium left-side entrance */}
 <div 
   style={{
     position: 'fixed',
-    right: '-200px', // Start off-screen
+    left: scrollY > 400 && scrollY < 2000 
+      ? `${-100 + Math.sin(scrollY * 0.003) * 30}px` 
+      : '-800px',
     top: '50%',
     transform: 'translateY(-50%)',
-    zIndex: 1000,
-    opacity: scrollY > 400 && scrollY < 2000 ? 1 : 0,
-    transition: 'opacity 0.5s ease-in-out, right 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    zIndex: 5,
+    opacity: scrollY > 400 && scrollY < 2000 ? 0.95 : 0,
+    transition: 'opacity 0.6s ease-in-out, left 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
     pointerEvents: 'none',
-    right: scrollY > 400 && scrollY < 2000 
-      ? `${20 + Math.sin(scrollY * 0.005) * 50}px` 
-      : '-200px',
+    width: '900px',
+    height: '600px',
   }}
 >
   <img 
     src="/previewer/image 65.png"
-    alt="Floating Car"
+    alt="Police Car"
     style={{
-      width: '150px',
-      height: '150px',
-      transform: `rotate(${Math.sin(scrollY * 0.01) * 10}deg)`,
-      transition: 'transform 0.1s ease-out',
-      filter: 'drop-shadow(0 10px 30px rgba(216,255,99,0.3))',
+      width: '100%',
+      height: '100%',
+      objectFit: 'contain',
+      objectPosition: 'left center',
+      transform: `translateY(${Math.sin(scrollY * 0.002) * 8}px)`,
+      transition: 'transform 0.3s ease-out',
+      filter: 'brightness(1.05) contrast(1.1)',
     }}
   />
 </div>

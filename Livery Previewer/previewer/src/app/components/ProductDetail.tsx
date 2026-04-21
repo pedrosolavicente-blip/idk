@@ -519,6 +519,7 @@ export default function ProductDetail() {
             )}
           </div>
         </div>
-      </main>
+      </div>
+    </div>
   );
 }

@@ -162,11 +162,12 @@ export default function ProductDetail() {
             {/* Image Gallery */}
             <div className="lg:col-span-1">
               {/* Main Image */}
-              <div className="relative aspect-[16/9] bg-gradient-to-br from-[#c4ff0d]/3 to-transparent rounded-xl overflow-hidden shadow-2xl">
+              <div className="relative aspect-[16/9] bg-gradient-to-br from-[#c4ff0d]/3 to-transparent rounded-xl overflow-hidden shadow-2xl flex items-center justify-center">
                 <img
                   src={`${BASE}marketplace.svg`}
                   alt={product.name}
-                  className="w-full h-full object-contain scale-30"
+                  className="w-full h-full object-contain"
+                  style={{ maxHeight: '120px' }}
                 />
                 
                 {/* Navigation */}

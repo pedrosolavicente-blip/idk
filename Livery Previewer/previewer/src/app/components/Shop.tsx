@@ -486,18 +486,16 @@ export default function Shop() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 flex items-center justify-center">
           <img 
             src={`${BASE}marketplace.svg`} 
             alt="Marketplace Banner" 
-            className="w-full h-32 object-cover"
+            className="w-full h-32 object-contain"
+            style={{ maxHeight: '120px' }}
           />
         </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-5xl sm:text-7xl font-black mb-6 bg-gradient-to-r from-white to-[#c4ff0d] bg-clip-text text-transparent">
-              Premium Shop
-            </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
               Discover exclusive itzz products, premium tools, and limited edition merchandise designed for professionals.
             </p>

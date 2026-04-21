@@ -432,17 +432,17 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-{/* Floating Car Image - Premium left-side entrance */}
+{/* Floating Car Image - Clean slide-in from left */}
 <div 
   style={{
     position: 'fixed',
-    left: scrollY > 400 && scrollY < 2000 
-      ? `${-100 + Math.sin(scrollY * 0.003) * 30}px` 
+    left: scrollY > 800 && scrollY < 1800 
+      ? '50px' 
       : '-800px',
-    top: '50%',
+    top: '55%',
     transform: 'translateY(-50%)',
     zIndex: 5,
-    opacity: scrollY > 400 && scrollY < 2000 ? 0.95 : 0,
+    opacity: scrollY > 800 && scrollY < 1800 ? 0.95 : 0,
     transition: 'opacity 0.6s ease-in-out, left 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
     pointerEvents: 'none',
     width: '900px',
@@ -457,8 +457,6 @@ export default function LandingPage() {
       height: '100%',
       objectFit: 'contain',
       objectPosition: 'left center',
-      transform: `translateY(${Math.sin(scrollY * 0.002) * 8}px)`,
-      transition: 'transform 0.3s ease-out',
       filter: 'brightness(1.05) contrast(1.1)',
     }}
   />

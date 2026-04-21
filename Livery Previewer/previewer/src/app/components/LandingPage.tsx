@@ -432,21 +432,22 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
-{/* Floating Car Image - Clean slide-in from left */}
+{/* Floating Car Image - Ultra Premium Implementation */}
 <div 
   style={{
     position: 'fixed',
-    left: scrollY > 800 && scrollY < 1800 
-      ? '50px' 
-      : '-800px',
-    top: '55%',
+    left: scrollY > 900 && scrollY < 1600 
+      ? '80px' 
+      : '-1000px',
+    top: '58%',
     transform: 'translateY(-50%)',
     zIndex: 5,
-    opacity: scrollY > 800 && scrollY < 1800 ? 0.95 : 0,
-    transition: 'opacity 0.6s ease-in-out, left 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    opacity: scrollY > 900 && scrollY < 1600 ? 0.92 : 0,
+    transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
     pointerEvents: 'none',
-    width: '900px',
-    height: '600px',
+    width: '850px',
+    height: '580px',
+    willChange: 'left, opacity',
   }}
 >
   <img 
@@ -457,7 +458,10 @@ export default function LandingPage() {
       height: '100%',
       objectFit: 'contain',
       objectPosition: 'left center',
-      filter: 'brightness(1.05) contrast(1.1)',
+      filter: 'brightness(1.08) contrast(1.12) saturate(1.05)',
+      imageRendering: '-webkit-optimize-contrast',
+      backfaceVisibility: 'hidden',
+      WebkitFontSmoothing: 'antialiased',
     }}
   />
 </div>

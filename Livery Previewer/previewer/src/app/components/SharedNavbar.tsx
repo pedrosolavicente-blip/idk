@@ -67,7 +67,7 @@ export default function SharedNavbar() {
     <>
       {/* Desktop Navbar */}
       <nav
-        className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-8 transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 transition-all duration-300"
         style={{
           paddingTop: '10px',
           paddingBottom: '10px',

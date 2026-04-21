@@ -607,7 +607,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Premium Hero ── */}
-      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', padding:'0 48px', paddingTop:100 }}>
+      <section style={{ position:'relative', zIndex:10, minHeight:'100vh', padding:'0 48px', paddingTop:140 }}>
         {/* Left Content - Dashboard and Text */}
         <div style={{ position:'relative', zIndex:10, maxWidth:600, animation:'fadeInUp 0.8s ease 0.15s both', opacity:0 }}>
           <img src={`${BASE}dashboard.svg`} alt="itzz dashboard" style={{ width:'100%', maxWidth:700, height:'auto', marginBottom:40 }} />

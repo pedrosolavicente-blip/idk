@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import SharedNavbar from './SharedNavbar';
 import { 
   ShoppingCart, Heart, Star, Truck, Shield, CreditCard, Package, 
   ChevronLeft, ChevronRight, Plus, Minus, Share2, ArrowLeft 
@@ -198,8 +199,11 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-lg border-b border-white/10">
+      {/* Shared Navbar */}
+      <SharedNavbar />
+
+      {/* Main Content */}
+      <main className="pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/shop" className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">

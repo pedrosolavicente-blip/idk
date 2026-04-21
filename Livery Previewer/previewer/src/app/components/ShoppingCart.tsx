@@ -494,4 +494,4 @@ export function CartPage({
       </main>
     </div>
   );
-
+}

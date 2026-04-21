@@ -166,7 +166,7 @@ export default function ProductDetail() {
                 <img
                   src={`${BASE}marketplace.svg`}
                   alt={product.name}
-                  className="w-full h-full object-contain scale-90"
+                  className="w-full h-full object-contain scale-30"
                 />
                 
                 {/* Navigation */}

@@ -116,35 +116,41 @@ export default function SharedNavbar() {
             <button
               key={item.id}
               onClick={() => handleNavClick(item)}
-              className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all duration-300"
+              className="text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
               style={{
                 color: item.isPrimary ? '#c4ff0d' : '#a1a1aa',
                 background: item.isPrimary 
-                  ? 'rgba(196,255,13,0.07)' 
-                  : 'rgba(255,255,255,0.04)',
+                  ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                  : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
                 border: item.isPrimary 
-                  ? '1px solid rgba(196,255,13,0.22)' 
-                  : '1px solid rgba(255,255,255,0.08)',
+                  ? '1px solid rgba(196,255,13,0.25)' 
+                  : '1px solid rgba(255,255,255,0.12)',
                 transform: item.isPrimary ? 'scale(1.02)' : 'scale(1)',
+                boxShadow: item.isPrimary
+                  ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                  : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                backdropFilter: 'blur(8px)',
               }}
               onMouseEnter={(e) => {
                 if (!item.isPrimary) {
                   e.currentTarget.style.color = '#ffffff';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-                  e.currentTarget.style.transform = 'scale(1.02)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%)';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                  e.currentTarget.style.transform = 'scale(1.03)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!item.isPrimary) {
                   e.currentTarget.style.color = '#a1a1aa';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
                   e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
                 }
               }}
             >
-              {item.label}
+              <span className="relative z-10">{item.label}</span>
             </button>
           ))}
           
@@ -232,24 +238,30 @@ export default function SharedNavbar() {
               /* Login Button */
               <button
                 onClick={handleLogin}
-                className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all duration-300"
+                className="text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
                 style={{
                   color: '#c4ff0d',
-                  background: 'rgba(196,255,13,0.07)',
-                  border: '1px solid rgba(196,255,13,0.22)',
+                  background: 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)',
+                  border: '1px solid rgba(196,255,13,0.25)',
                   transform: 'scale(1.02)',
+                  boxShadow: '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(8px)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(196,255,13,0.15)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(196,255,13,0.18) 0%, rgba(196,255,13,0.12) 100%)';
                   e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(196,255,13,0.07)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)';
                   e.currentTarget.style.transform = 'scale(1.02)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
                 }}
               >
-                <User size={12} className="inline mr-2" />
-                Account
+                <span className="relative z-10 flex items-center">
+                  <User size={12} className="mr-2" />
+                  Account
+                </span>
               </button>
             )}
           </div>

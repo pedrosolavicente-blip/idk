@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings } from 'lucide-react';
+import { validateStoredToken, clearAuth, redirectToDiscordLogin, type DiscordUser } from '../../lib/discordAuth';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
 
@@ -15,6 +16,8 @@ export default function SharedNavbar() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<DiscordUser | null>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
   // Handle scroll effect
   useEffect(() => {
@@ -25,14 +28,36 @@ export default function SharedNavbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Check for stored user on mount
+  useEffect(() => {
+    const checkUser = async () => {
+      const storedUser = await validateStoredToken();
+      setUser(storedUser);
+    };
+    checkUser();
+  }, []);
+
+  const handleLogin = async () => {
+    await redirectToDiscordLogin();
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    setUser(null);
+    setAccountMenuOpen(false);
+  };
+
   // Navigation items
   const NAV_ITEMS: NavItem[] = [
     { 
       id: 'tools', 
       label: 'Tools', 
       action: () => {
-        // TODO: Add login logic first, then navigate to previewer
-        navigate('/previewer');
+        if (user) {
+          navigate('/previewer');
+        } else {
+          handleLogin();
+        }
       },
     },
     { 
@@ -123,7 +148,112 @@ export default function SharedNavbar() {
             </button>
           ))}
           
+          {/* Account Section */}
+          <div className="relative">
+            {user ? (
+              <div className="flex items-center gap-3">
+                {/* User Profile */}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" 
+                  style={{ 
+                    background: 'rgba(255,255,255,0.05)', 
+                    border: '1px solid rgba(255,255,255,0.1)' 
+                  }}>
+                  <div className="relative">
+                    <img 
+                      src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`} 
+                      alt="" 
+                      className="w-6 h-6 rounded-full" 
+                      onError={e => {(e.target as HTMLImageElement).style.display = 'none';}}
+                    />
+                    <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full" 
+                      style={{ 
+                        background: '#c4ff0d', 
+                        border: '1.5px solid #080808' 
+                      }} />
                   </div>
+                  <div className="hidden lg:block">
+                    <p className="text-[10px] font-semibold leading-none" 
+                      style={{ color: '#ffffff' }}>
+                      {user.global_name ?? user.username}
+                    </p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest leading-none mt-0.5" 
+                      style={{ color: '#c4ff0d' }}>
+                      Member
+                    </p>
+                  </div>
+                </div>
+
+                {/* Account Dropdown */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                    className="p-2 text-zinc-400 hover:text-white transition-colors"
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <Settings size={16} />
+                  </button>
+                  
+                  {accountMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl overflow-hidden z-60"
+                      style={{ 
+                        background: 'rgba(5,5,5,0.99)', 
+                        border: '1px solid rgba(255,255,255,0.08)', 
+                        backdropFilter: 'blur(32px)', 
+                        boxShadow: '0 24px 64px rgba(0,0,0,0.8)',
+                        animation: 'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both'
+                      }}>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-semibold transition-colors"
+                        style={{ 
+                          color: '#ef4444', 
+                          background: 'transparent', 
+                          border: 'none' 
+                        }}
+                        onMouseEnter={e => {
+                          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)';
+                        }}
+                        onMouseLeave={e => {
+                          (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                        }}
+                      >
+                        <LogOut size={12} />
+                        Log Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Login Button */
+              <button
+                onClick={handleLogin}
+                className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all duration-300"
+                style={{
+                  color: '#c4ff0d',
+                  background: 'rgba(196,255,13,0.07)',
+                  border: '1px solid rgba(196,255,13,0.22)',
+                  transform: 'scale(1.02)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(196,255,13,0.15)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(196,255,13,0.07)';
+                  e.currentTarget.style.transform = 'scale(1.02)';
+                }}
+              >
+                <User size={12} className="inline mr-2" />
+                Account
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Mobile Menu Button */}
         <button

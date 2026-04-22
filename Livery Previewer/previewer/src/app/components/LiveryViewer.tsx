@@ -1195,7 +1195,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div style={{ animation:'slideDown 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both', opacity:0 }}>
             <img src={`${BASE}Group_15.svg`} alt="Livery Previewer" style={{ height:50, width:'auto', mixBlendMode:'lighten', display:'block' }} />
           </div>
-          <div style={{ marginTop:12, width:'80%', height:1, background:'linear-gradient(to right, transparent, rgba(0,255,136,0.4), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
+          <div style={{ marginTop:12, width:'80%', height:1, background:'linear-gradient(to right, transparent, hsl(86, 100%, 75%), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
         </div>
 
         {/* Model */}

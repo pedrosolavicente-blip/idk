@@ -148,7 +148,7 @@ export default function LoginPage({ onLogin, onDisclaimer }: Props) {
   const [showCookies, setShowCookies] = useState(false);
 
   return (
-    <div className="relative flex h-screen bg-[#080808] text-white overflow-hidden">
+    <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
 
       {/* ── Background layer ── */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">

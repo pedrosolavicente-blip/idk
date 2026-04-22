@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "itzzwebsite",
-  "account_id": "e265b2222b91ce290030cb01ab60d9f8"
+  "account_id": "e265b2222b91ce290030cb01ab60d9f8",
   "main": "src/worker.ts",
   "compatibility_date": "2026-04-12",
   "observability": {

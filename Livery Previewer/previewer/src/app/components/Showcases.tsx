@@ -374,6 +374,19 @@ function LiveryView3D({ config }: { config: LiveryConfig }) {
       
       // Load the livery after successful initialization
       console.log('Loading livery with config:', config);
+      
+      // Validate model path before attempting to load
+      if (!config.modelPath) {
+        setError('No model path provided in livery config');
+        return;
+      }
+      
+      // Log the full URL for debugging
+      const fullModelUrl = config.modelPath.startsWith('http') 
+        ? config.modelPath 
+        : `${window.location.origin}/${config.modelPath.replace(/^\//, '')}`;
+      console.log('Attempting to load model from:', fullModelUrl);
+      
       viewer.loadLivery(
         config.modelPath, 
         config.vehicleColor, 
@@ -389,10 +402,25 @@ function LiveryView3D({ config }: { config: LiveryConfig }) {
           console.error('Failed to load livery:', err);
           console.error('Config details:', {
             modelPath: config.modelPath,
+            fullModelUrl: fullModelUrl,
             vehicleColor: config.vehicleColor,
-            texturesCount: Object.keys(config.textures || {}).length
+            texturesCount: Object.keys(config.textures || {}).length,
+            configKeys: Object.keys(config)
           });
-          setError(`Failed to load 3D model: ${err.message || 'Unknown error'}`);
+          
+          // Try to determine the specific cause
+          let errorMessage = 'Failed to load 3D model';
+          if (err.message.includes('404')) {
+            errorMessage = 'Model file not found (404)';
+          } else if (err.message.includes('network') || err.message.includes('fetch')) {
+            errorMessage = 'Network error loading model';
+          } else if (err.message.includes('CORS')) {
+            errorMessage = 'CORS error - model file blocked by browser';
+          } else if (err.message.includes('glb') || err.message.includes('gltf')) {
+            errorMessage = 'Invalid or corrupted GLB/GLTF file';
+          }
+          
+          setError(`${errorMessage}: ${err.message || 'Unknown error'}`);
         });
     } catch (err) {
       console.error('Failed to initialize 3D viewer:', err);

@@ -56,6 +56,12 @@ export default function SharedNavbar() {
       action: () => window.open('https://discord.gg/itzz', '_blank'),
       isPrimary: true
     },
+    { 
+      id: 'admin', 
+      label: 'Admin Panel', 
+      action: () => navigate('/admin'),
+      isPrimary: false
+    },
   ];
 
   const handleNavClick = (item: NavItem) => {

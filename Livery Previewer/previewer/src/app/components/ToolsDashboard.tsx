@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SharedNavbar from './SharedNavbar';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -185,7 +186,11 @@ export default function ToolsDashboard({ onDisclaimer }: Props) {
   ];
 
   const handleToolClick = (tool: Tool) => {
-    navigate(tool.route);
+    if (tool.id === 'battenburg' || tool.id === 'chevron') {
+      alert(`${tool.title} unavailable for the moment`);
+    } else {
+      navigate(tool.route);
+    }
   };
 
   return (
@@ -215,55 +220,8 @@ export default function ToolsDashboard({ onDisclaimer }: Props) {
         <div className="absolute rounded-full" style={{ width: 280, height: 280, top: '33%', left: '22%', opacity: 0.07, background: 'radial-gradient(circle, #aaff00 0%, transparent 70%)' }} />
       </div>
 
-      {/* Navbar */}
-      <nav
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8"
-        style={{
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
-        }}
-      >
-        <img src={`${BASE}itzz.svg`} alt="itzz" className="h-7 w-auto" />
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => window.open('https://discord.gg/itzz', '_blank')}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
-            style={{
-              color: '#c4ff0d',
-              background: 'rgba(196,255,13,0.07)',
-              border: '1px solid rgba(196,255,13,0.22)',
-            }}
-          >
-            Contact Us
-          </button>
-          <button
-            onClick={onDisclaimer}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Legal
-          </button>
-          <button
-            onClick={() => setShowCookies(true)}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Cookie
-          </button>
-        </div>
-      </nav>
+      {/* SharedNavbar */}
+      <SharedNavbar />
 
       {/* Cookie modal */}
       {showCookies && (
@@ -449,15 +407,52 @@ export default function ToolsDashboard({ onDisclaimer }: Props) {
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-5 left-8 z-20 pointer-events-none flex items-center gap-2">
-        <div className="h-px w-4 bg-[#c4ff0d]/30" />
-        <p className="text-[10px] text-zinc-600 tracking-[0.18em] uppercase">
-          Developed by itzz industries
-        </p>
-        <span className="text-zinc-700 text-[10px]">·</span>
-        <p className="text-[10px] text-zinc-700 tracking-[0.12em] uppercase">
-          sonar & itzz_link
-        </p>
+      <div className="absolute bottom-5 left-8 z-20 flex items-center gap-6">
+        <div className="flex items-center gap-2 pointer-events-none">
+          <div className="h-px w-4 bg-[#c4ff0d]/30" />
+          <p className="text-[10px] text-zinc-600 tracking-[0.18em] uppercase">
+            Developed by itzz industries
+          </p>
+          <span className="text-zinc-700 text-[10px]">·</span>
+          <p className="text-[10px] text-zinc-700 tracking-[0.12em] uppercase">
+            sonar & itzz_link
+          </p>
+        </div>
+        
+        {/* Legal and Cookie Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.open('https://discord.gg/itzz', '_blank')}
+            className="text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg transition-all"
+            style={{
+              color: '#c4ff0d',
+              background: 'rgba(196,255,13,0.07)',
+              border: '1px solid rgba(196,255,13,0.22)',
+            }}
+          >
+            Contact Us
+          </button>
+          <button
+            onClick={onDisclaimer}
+            className="text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg transition-all text-zinc-400 hover:text-white"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            Legal
+          </button>
+          <button
+            onClick={() => setShowCookies(true)}
+            className="text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg transition-all text-zinc-400 hover:text-white"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            Cookie
+          </button>
+        </div>
       </div>
 
     </div>

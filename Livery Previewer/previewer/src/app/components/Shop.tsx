@@ -490,8 +490,7 @@ export default function Shop() {
           <img 
             src={`${BASE}marketplace.svg`} 
             alt="Marketplace Banner" 
-            className="w-full h-32 object-contain"
-            style={{ maxHeight: '120px' }}
+            className="w-full h-48 object-contain"
           />
         </div>
               </section>

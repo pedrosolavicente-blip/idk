@@ -880,7 +880,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   // ─── render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--surface0)', color: 'var(--text-1)', fontFamily: 'Inter, sans-serif' }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ background: 'var(--surface0)', color: 'var(--text-1)', fontFamily: 'Inter, sans-serif' }}>
 
       {/* ── Viewport ── */}
       <div className="relative flex-1 overflow-hidden" ref={containerRef}>

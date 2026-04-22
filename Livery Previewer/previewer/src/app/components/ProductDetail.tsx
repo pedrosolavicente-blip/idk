@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import SharedNavbar from './SharedNavbar';
 import { ChevronLeft, ChevronRight, Star, Heart, Share2, Package, ShoppingCart, Check } from 'lucide-react';
 import { useShoppingCart, CartSidebar } from './ShoppingCart';
-import type { Product, Review } from './types';
+import type { Product, Review } from '../hooks/Types';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
 

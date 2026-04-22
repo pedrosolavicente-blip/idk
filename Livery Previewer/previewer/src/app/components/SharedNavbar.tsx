@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingCart } from 'lucide-react';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
 
@@ -11,7 +11,12 @@ interface NavItem {
   isPrimary?: boolean;
 }
 
-export default function SharedNavbar() {
+interface SharedNavbarProps {
+  cartItemCount?: number;
+  onCartClick?: () => void;
+}
+
+export default function SharedNavbar({ cartItemCount = 0, onCartClick }: SharedNavbarProps = {}) {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,6 +140,32 @@ export default function SharedNavbar() {
               {item.label}
             </button>
           ))}
+          
+          {/* Cart Button */}
+          <button
+            onClick={onCartClick}
+            className="relative p-2 text-zinc-400 hover:text-white transition-colors"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '8px',
+            }}
+          >
+            <ShoppingCart className="w-4 h-4" />
+            {cartItemCount > 0 && (
+              <span 
+                className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#c4ff0d] text-black text-[10px] font-bold rounded-full flex items-center justify-center leading-none"
+                style={{
+                  background: '#c4ff0d',
+                  color: '#000000',
+                  fontSize: '10px',
+                  fontWeight: 'bold',
+                }}
+              >
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -216,7 +247,26 @@ export default function SharedNavbar() {
           </div>
 
           {/* Mobile Menu Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
+          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 space-y-3">
+            {/* Cart Button */}
+            <button
+              onClick={() => {
+                onCartClick?.();
+                setMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/10 rounded-lg transition-all duration-200 hover:bg-white/10"
+            >
+              <span className="text-white">Shopping Cart</span>
+              <div className="flex items-center gap-2">
+                <ShoppingCart size={16} className="text-zinc-400" />
+                {cartItemCount > 0 && (
+                  <span className="px-2 py-0.5 bg-[#c4ff0d] text-black text-xs font-bold rounded-full">
+                    {cartItemCount}
+                  </span>
+                )}
+              </div>
+            </button>
+            
             <button
               onClick={() => {
                 navigate('/previewer');
@@ -227,7 +277,7 @@ export default function SharedNavbar() {
                 boxShadow: '0 4px 12px rgba(196,255,13,0.3)',
               }}
             >
-              Launch App
+              Livery Previewer
             </button>
           </div>
         </div>

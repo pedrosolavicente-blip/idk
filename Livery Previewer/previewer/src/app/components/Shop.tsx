@@ -4,7 +4,7 @@ import { Heart, Star, Package, ShoppingCart as CartIcon } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
 import { useShoppingCart, CartSidebar } from './ShoppingCart';
 import SearchBar from './SearchBar';
-import type { Product } from './types';
+import type { Product } from '../hooks/Types';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
 

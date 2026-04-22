@@ -418,6 +418,10 @@ function LiveryView3D({ config }: { config: LiveryConfig }) {
             errorMessage = 'CORS error - model file blocked by browser';
           } else if (err.message.includes('glb') || err.message.includes('gltf')) {
             errorMessage = 'Invalid or corrupted GLB/GLTF file';
+          } else if (err.message.includes('DataUtils.toHalfFloat') || err.message.includes('Value out of range')) {
+            errorMessage = 'Model data processing error - invalid vertex or texture data';
+          } else if (err.message.includes('THREE.')) {
+            errorMessage = 'Three.js rendering error - model may be incompatible';
           }
           
           setError(`${errorMessage}: ${err.message || 'Unknown error'}`);

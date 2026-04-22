@@ -13,9 +13,97 @@
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#c4ff0d" />
     <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      /* Prevent white screen while loading */
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #0a0a0a;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* Loading state */
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        animation: fadeIn 0.5s ease-in;
+      }
+      
+      .loading-logo {
+        width: 120px;
+        height: 40px;
+        background: #c4ff0d;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #000;
+        font-size: 18px;
+        letter-spacing: 2px;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(196, 255, 13, 0.2);
+        border-top: 3px solid #c4ff0d;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      .loading-text {
+        color: #a1a1aa;
+        font-size: 14px;
+        letter-spacing: 1px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* Hide loading when React loads */
+      .loading-hidden {
+        display: none;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback loading state -->
+      <div class="loading-container" id="loading-state">
+        <div class="loading-logo">ITZZ</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">LOADING...</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Hide loading state when React mounts
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const loadingState = document.getElementById('loading-state');
+          if (loadingState) {
+            loadingState.classList.add('loading-hidden');
+          }
+        }, 500); // Small delay to ensure React has mounted
+      });
+    </script>
   </body>
 </html>

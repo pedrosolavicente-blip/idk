@@ -94,12 +94,12 @@ export default function SharedNavbar() {
           paddingTop: '10px',
           paddingBottom: '10px',
           background: scrolled 
-            ? 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.75) 100%)'
-            : 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.7) 100%)',
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 100%)'
+            : 'linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.85) 100%)',
           backdropFilter: 'blur(32px)',
           WebkitBackdropFilter: 'blur(32px)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.1)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.8), 0 1px 0 0 rgba(196,255,13,0.03), inset 0 1px 0 0 rgba(255,255,255,0.05)',
         }}
       >
         {/* Logo */}

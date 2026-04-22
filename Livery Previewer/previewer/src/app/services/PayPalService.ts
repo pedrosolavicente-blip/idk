@@ -217,4 +217,4 @@ export function getPayPalService(): PayPalService {
   return paypalService;
 }
 
-export default PayPalService;
+export default getPayPalService;

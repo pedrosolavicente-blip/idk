@@ -299,4 +299,4 @@ export function getRobloxService(): RobloxService {
   return robloxService;
 }
 
-export default RobloxService;
+export default getRobloxService;

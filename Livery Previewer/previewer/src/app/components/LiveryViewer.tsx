@@ -931,7 +931,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <ChevronDown size={9} style={{ transform:showAngleMenu?'rotate(180deg)':'none', transition:'transform 0.2s' }} />
               </button>
               {showAngleMenu && (
-                <div className="absolute bottom-full mb-2 right-0 rounded-xl overflow-hidden w-48 z-60" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideUp 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
+                <div className="absolute bottom-full mb-8 right-0 rounded-xl overflow-hidden w-48 z-60" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideUp 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
                   {([
                     { group:'Sides' },
                     { side:'front', label:'Front' },{ side:'back', label:'Back' },{ side:'left', label:'Left' },{ side:'right', label:'Right' },

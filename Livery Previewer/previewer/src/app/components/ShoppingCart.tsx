@@ -4,7 +4,9 @@ import {
   ShoppingCart, X, Plus, Minus, Trash2, CreditCard,
   Truck, ChevronLeft, Package, Shield,
 } from 'lucide-react';
-import type { CartItem } from './types';
+import type { CartItem } from '../hooks/Types';
+import PaymentModal from './PaymentModal';
+import OrderConfirmation from './OrderConfirmation';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
 
@@ -121,6 +123,17 @@ export function CartSidebar({
   clearCart: () => void;
   subtotal: number; shipping: number; tax: number; total: number; itemCount: number;
 }) {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showOrderConfirmation, setShowOrderConfirmation] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState<{ orderId: string; paymentMethod: 'paypal' | 'roblox'; transactionId: string } | null>(null);
+
+  const handlePaymentComplete = (transactionId: string, method: 'paypal' | 'roblox') => {
+    const orderId = `ORD-${Date.now()}`;
+    setCompletedOrder({ orderId, paymentMethod: method, transactionId });
+    setShowPaymentModal(false);
+    setShowOrderConfirmation(true);
+    clearCart();
+  };
   return (
     <>
       {/* Backdrop */}
@@ -196,7 +209,7 @@ export function CartSidebar({
             )}
 
             <button
-              onClick={() => console.log('TODO: integrate PayPal / Roblox checkout')}
+              onClick={() => setShowPaymentModal(true)}
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#c4ff0d] hover:bg-[#d4ff3d] text-black font-semibold text-sm rounded-lg transition-colors"
             >
               <CreditCard className="w-4 h-4" />
@@ -209,6 +222,28 @@ export function CartSidebar({
           </div>
         )}
       </aside>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        cartItems={cartItems}
+        total={total}
+        onPaymentComplete={handlePaymentComplete}
+      />
+
+      {/* Order Confirmation Modal */}
+      {completedOrder && (
+        <OrderConfirmation
+          isOpen={showOrderConfirmation}
+          onClose={() => setShowOrderConfirmation(false)}
+          orderId={completedOrder.orderId}
+          paymentMethod={completedOrder.paymentMethod}
+          transactionId={completedOrder.transactionId}
+          cartItems={cartItems}
+          total={total}
+        />
+      )}
     </>
   );
 }

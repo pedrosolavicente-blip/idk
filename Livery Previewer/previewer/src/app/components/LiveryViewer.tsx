@@ -1189,7 +1189,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Header */}
         <div className="relative flex flex-col items-center justify-center overflow-hidden"
-          style={{ paddingTop:28, paddingBottom:20, borderBottom:'1px solid rgba(255,255,255,0.05)', minHeight:108 }}>
+          style={{ paddingTop:68, paddingBottom:20, borderBottom:'1px solid rgba(255,255,255,0.05)', minHeight:108 }}>
           <div className="pointer-events-none absolute inset-x-0 top-0 h-16"
             style={{ background:'radial-gradient(ellipse at top, rgba(0,255,136,0.08) 0%, transparent 70%)', animation:'fadeIn 0.8s ease 0.3s both', opacity:0 }} />
           <div style={{ animation:'slideDown 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both', opacity:0 }}>

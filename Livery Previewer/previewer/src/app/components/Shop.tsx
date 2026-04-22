@@ -301,7 +301,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      <SharedNavbar cartItemCount={itemCount} onCartClick={() => setIsOpen(true)} />
+      <SharedNavbar />
 
       {/* Search bar */}
       <div className="sticky top-16 z-30 px-4 sm:px-6 lg:px-8 py-3 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/4">

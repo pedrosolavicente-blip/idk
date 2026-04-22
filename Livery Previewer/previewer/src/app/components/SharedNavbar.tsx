@@ -132,25 +132,43 @@ export default function SharedNavbar() {
                 backdropFilter: 'blur(8px)',
               }}
               onMouseEnter={(e) => {
+                const button = e.currentTarget;
                 if (!item.isPrimary) {
-                  e.currentTarget.style.color = '#ffffff';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                  e.currentTarget.style.transform = 'scale(1.03)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                  button.style.color = '#ffffff';
+                  button.style.borderColor = 'rgba(255,255,255,0.2)';
+                  button.style.transform = 'scale(1.03)';
+                  button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                } else {
+                  button.style.transform = 'scale(1.05)';
+                  button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
                 }
+                // Trigger sliding animations
+                const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                if (overlay1) overlay1.style.transform = 'translateX(100%)';
+                if (overlay2) overlay2.style.transform = 'translateX(100%) translateY(100%) rotate(45deg)';
               }}
               onMouseLeave={(e) => {
+                const button = e.currentTarget;
                 if (!item.isPrimary) {
-                  e.currentTarget.style.color = '#a1a1aa';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                  button.style.color = '#a1a1aa';
+                  button.style.borderColor = 'rgba(255,255,255,0.12)';
+                  button.style.transform = 'scale(1)';
+                  button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                } else {
+                  button.style.transform = 'scale(1.02)';
+                  button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
                 }
+                // Reset sliding animations
+                const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                if (overlay1) overlay1.style.transform = 'translateX(-100%)';
+                if (overlay2) overlay2.style.transform = 'translateX(-100%) translateY(-100%) rotate(45deg)';
               }}
             >
               {/* Sliding overlay */}
               <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                className="slide-overlay-1 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
                 style={{
                   background: item.isPrimary
                     ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
@@ -158,17 +176,11 @@ export default function SharedNavbar() {
                   transform: 'translateX(-100%)',
                   transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateX(100%)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateX(-100%)';
-                }}
               />
               
               {/* Secondary shimmer effect */}
               <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
+                className="slide-overlay-2 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
                 style={{
                   background: item.isPrimary
                     ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.2) 30%, rgba(196,255,13,0.4) 50%, rgba(196,255,13,0.2) 70%, transparent 100%)'
@@ -179,12 +191,6 @@ export default function SharedNavbar() {
                   height: '200%',
                   top: '-50%',
                   left: '-50%',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateX(100%) translateY(100%) rotate(45deg)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateX(-100%) translateY(-100%) rotate(45deg)';
                 }}
               />
               
@@ -286,33 +292,39 @@ export default function SharedNavbar() {
                   backdropFilter: 'blur(8px)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                  const button = e.currentTarget;
+                  button.style.transform = 'scale(1.05)';
+                  button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                  // Trigger sliding animations
+                  const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                  const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                  if (overlay1) overlay1.style.transform = 'translateX(100%)';
+                  if (overlay2) overlay2.style.transform = 'translateX(100%) translateY(100%) rotate(45deg)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                  const button = e.currentTarget;
+                  button.style.transform = 'scale(1.02)';
+                  button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                  // Reset sliding animations
+                  const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                  const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                  if (overlay1) overlay1.style.transform = 'translateX(-100%)';
+                  if (overlay2) overlay2.style.transform = 'translateX(-100%) translateY(-100%) rotate(45deg)';
                 }}
               >
                 {/* Sliding overlay */}
                 <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                  className="slide-overlay-1 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
                   style={{
                     background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)',
                     transform: 'translateX(-100%)',
                     transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = 'translateX(100%)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = 'translateX(-100%)';
-                  }}
                 />
                 
                 {/* Secondary shimmer effect */}
                 <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
+                  className="slide-overlay-2 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
                   style={{
                     background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.2) 30%, rgba(196,255,13,0.4) 50%, rgba(196,255,13,0.2) 70%, transparent 100%)',
                     transform: 'translateX(-100%) translateY(-100%) rotate(45deg)',
@@ -321,12 +333,6 @@ export default function SharedNavbar() {
                     height: '200%',
                     top: '-50%',
                     left: '-50%',
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = 'translateX(100%) translateY(100%) rotate(45deg)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = 'translateX(-100%) translateY(-100%) rotate(45deg)';
                   }}
                 />
                 

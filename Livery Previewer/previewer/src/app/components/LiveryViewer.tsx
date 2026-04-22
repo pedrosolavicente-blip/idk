@@ -1203,9 +1203,49 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           {/* Category */}
           <div className="flex gap-1.5 mb-3">
             {(['All', ...AVAILABLE_CATEGORIES] as const).map(cat => (
-              <button key={cat} onClick={() => setFilterCat(cat as VehicleCategory | 'All')}
-                className={`pill-btn flex-1 ${filterCat === cat ? 'active' : ''}`}>
-                {cat}
+              <button 
+                key={cat} 
+                onClick={() => setFilterCat(cat as VehicleCategory | 'All')}
+                className={`pill-btn flex-1 relative overflow-hidden group transition-all duration-300 ${
+                  filterCat === cat ? 'active' : ''
+                }`}
+                style={{
+                  transform: filterCat === cat ? 'scale(1.05)' : 'scale(1)',
+                  boxShadow: filterCat === cat 
+                    ? '0 2px 8px rgba(216,255,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                }}
+                onMouseEnter={(e) => {
+                  if (filterCat !== cat) {
+                    const button = e.currentTarget;
+                    button.style.transform = 'scale(1.03)';
+                    button.style.boxShadow = '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                    // Trigger sliding animation
+                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                    if (overlay) overlay.style.transform = 'translateX(100%)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (filterCat !== cat) {
+                    const button = e.currentTarget;
+                    button.style.transform = 'scale(1)';
+                    button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                    // Reset sliding animation
+                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                    if (overlay) overlay.style.transform = 'translateX(-100%)';
+                  }
+                }}
+              >
+                {/* Sliding overlay */}
+                <div 
+                  className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(216,255,99,0.2) 50%, transparent 100%)',
+                    transform: 'translateX(-100%)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
+                <span className="relative z-10">{cat}</span>
               </button>
             ))}
           </div>
@@ -1229,10 +1269,64 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             <p className="text-[9px] font-semibold uppercase tracking-widest" style={{ color:'var(--text-4)' }}>{filteredModels.length} vehicles</p>
             <div className="flex gap-1">
               {([['list', List], ['grid', Grid]] as const).map(([mode, Icon]) => (
-                <button key={mode} onClick={() => setVehicleViewMode(mode)}
-                  className="w-6 h-6 rounded flex items-center justify-center transition-all"
-                  style={{ background: vehicleViewMode===mode ? 'rgba(216,255,99,0.1)' : 'transparent', border: `1px solid ${vehicleViewMode===mode ? 'rgba(216,255,99,0.25)' : 'transparent'}`, color: vehicleViewMode===mode ? '#D8FF63' : '#D8FF63' }}>
-                  <Icon size={10} />
+                <button 
+                  key={mode} 
+                  onClick={() => setVehicleViewMode(mode)}
+                  className="w-6 h-6 rounded flex items-center justify-center transition-all duration-300 relative overflow-hidden group"
+                  style={{ 
+                    background: vehicleViewMode===mode ? 'rgba(216,255,99,0.1)' : 'transparent', 
+                    border: `1px solid ${vehicleViewMode===mode ? 'rgba(216,255,99,0.25)' : 'rgba(255,255,255,0.1)'}`, 
+                    color: vehicleViewMode===mode ? '#D8FF63' : '#a1a1aa',
+                    transform: vehicleViewMode===mode ? 'scale(1.1)' : 'scale(1)',
+                    boxShadow: vehicleViewMode===mode 
+                      ? '0 2px 8px rgba(216,255,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+                      : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                  }}
+                  onMouseEnter={(e) => {
+                    const button = e.currentTarget;
+                    if (vehicleViewMode !== mode) {
+                      button.style.background = 'rgba(255,255,255,0.05)';
+                      button.style.borderColor = 'rgba(255,255,255,0.2)';
+                      button.style.color = '#ffffff';
+                      button.style.transform = 'scale(1.05)';
+                      button.style.boxShadow = '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                    } else {
+                      button.style.transform = 'scale(1.15)';
+                      button.style.boxShadow = '0 3px 12px rgba(216,255,99,0.4), inset 0 1px 0 rgba(255,255,255,0.3)';
+                    }
+                    // Trigger sliding animation
+                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                    if (overlay) overlay.style.transform = 'translateX(100%)';
+                  }}
+                  onMouseLeave={(e) => {
+                    const button = e.currentTarget;
+                    if (vehicleViewMode !== mode) {
+                      button.style.background = 'transparent';
+                      button.style.borderColor = 'rgba(255,255,255,0.1)';
+                      button.style.color = '#a1a1aa';
+                      button.style.transform = 'scale(1)';
+                      button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                    } else {
+                      button.style.transform = 'scale(1.1)';
+                      button.style.boxShadow = '0 2px 8px rgba(216,255,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)';
+                    }
+                    // Reset sliding animation
+                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                    if (overlay) overlay.style.transform = 'translateX(-100%)';
+                  }}
+                >
+                  {/* Sliding overlay */}
+                  <div 
+                    className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                    style={{
+                      background: vehicleViewMode===mode
+                        ? 'linear-gradient(90deg, transparent 0%, rgba(216,255,99,0.3) 50%, transparent 100%)'
+                        : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                      transform: 'translateX(-100%)',
+                      transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
+                  />
+                  <Icon size={10} className="relative z-10" />
                 </button>
               ))}
             </div>

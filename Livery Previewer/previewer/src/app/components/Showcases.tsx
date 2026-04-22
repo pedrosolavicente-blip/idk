@@ -1102,7 +1102,7 @@ export default function Showcases({ onClose, onApplyLivery, currentLivery, user 
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#0a0a0a]">
+    <div className="fixed inset-0 z-60 flex flex-col bg-[#0a0a0a]">
       {showUpload && (
         <UploadModal
           onClose={() => setShowUpload(false)}

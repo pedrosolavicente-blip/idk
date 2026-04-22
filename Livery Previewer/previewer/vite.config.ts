@@ -33,6 +33,20 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    include: [
+      'three',
+      'three/examples/jsm/loaders/GLTFLoader.js',
+      'three/examples/jsm/controls/OrbitControls.js',
+      'three/examples/jsm/loaders/EXRLoader.js',
+      'three/examples/jsm/environments/RoomEnvironment.js',
+    ],
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
   server: {
     proxy: {
       '/r2-proxy': {

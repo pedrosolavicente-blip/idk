@@ -3,6 +3,7 @@ import {
   X, Package, DollarSign, Star, Edit, Trash2, Plus, Save,
   Settings, BarChart2, ShoppingBag, Users, AlertCircle,
 } from 'lucide-react';
+import SharedNavbar from './SharedNavbar';
 import type { Product, AdminStats } from './types';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
@@ -261,6 +262,7 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-[#080808] text-white font-sans">
+      <SharedNavbar />
 
       {/* Header */}
       <header className="sticky top-0 z-30 bg-[#0f0f0f]/95 backdrop-blur border-b border-white/8">

@@ -12,6 +12,7 @@ import {
 import type { ReactNode, ElementType } from 'react';
 import ColorPicker from './ColorPicker';
 import Showcases, { type CurrentLivery } from './Showcases';
+import SharedNavbar from './SharedNavbar';
 import type { LiveryConfig } from '../../lib/showcaseApi';
 const BASE = import.meta.env.BASE_URL; // ← add this line here
 
@@ -891,70 +892,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <div className="absolute -bottom-32 -left-32 rounded-full" style={{ width:600, height:600, opacity:0.05, background:'radial-gradient(circle,#D8FF63 0%,transparent 65%)' }} />
         </div>
 
-        {/* ── Navbar ── */}
-        <nav className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-6"
-          style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',          borderBottom: '0.5px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(216,255,99,0.06)' }}>
-
-          <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height: 28, width: 'auto' }} />
-
-          <div className="flex-1 flex items-center justify-center gap-2">
-            {/* Settings */}
-            <div className="relative">
-              <button className={`nav-item ${showSettings ? 'active' : ''}`} onClick={() => { setShowSettings(s=>!s); setShowMenu(false); }}>
-                <Settings size={11} /> Settings
-              </button>
-              {showSettings && (
-                <div className="absolute left-0 top-full mt-2 w-80 rounded-xl p-5 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
-                  <SceneSettingsPanel settings={settings} onUpdate={u => setSettings(s=>({...s,...u}))} onReset={() => setSettings({...DEFAULT_SETTINGS})} />
-                </div>
-              )}
-            </div>
-
-            <button className="nav-item" onClick={() => { setShowShowcases(true); setShowMenu(false); }}>
-              <Users size={11} /> Showcases
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {user && (
-              <div className="flex items-center gap-2 px-3 rounded-md" style={{ height:32, background:'rgba(255,255,255,0.03)', border:'1px solid var(--border)' }}>
-                <div className="relative">
-                  <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`} alt="" className="w-5 h-5 rounded-full" onError={e=>{(e.target as HTMLImageElement).style.display='none';}} />
-                  <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full" style={{ background:ACCENT, border:'1.5px solid #080808' }} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold leading-none" style={{ color:'var(--text-1)' }}>{user.global_name ?? user.username}</p>
-                  <p className="text-[8px] font-bold uppercase tracking-widest leading-none mt-0.5" style={{ color:ACCENT }}>Member</p>
-                </div>
-              </div>
-            )}
-
-            <div className="relative">
-              <button className={`nav-item ${showMenu ? 'active' : ''}`} onClick={() => { setShowMenu(s=>!s); setShowSettings(false); }}>
-                <MoreHorizontal size={11} /> Menu
-              </button>
-              {showMenu && (
-                <div className="absolute right-0 top-full mt-2 w-44 rounded-xl overflow-hidden z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
-                  {[
-                    { label:'Credits',    icon:Star,     action:()=>{ setShowCredits(true); setShowMenu(false); }, danger:false },
-                    { label:'Disclaimer', icon:FileText,  action:()=>{ onShowDisclaimer(); setShowMenu(false); }, danger:false },
-                    { label:'Log Out',    icon:LogOut,    action:()=>{ clearAuth(); onLogout(); },                  danger:true },
-                  ].map((item, i, arr) => (
-                    <button key={item.label} onClick={item.action}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-semibold transition-colors"
-                      style={{ background:'transparent', border:'none', borderBottom: i<arr.length-1 ? '0.5px solid rgba(255,255,255,0.04)' : 'none', color:'var(--text-3)', borderRadius:0 }}
-                      onMouseEnter={e=>{ (e.currentTarget as HTMLButtonElement).style.color=item.danger?'#f87171':'var(--text-1)'; (e.currentTarget as HTMLButtonElement).style.background=item.danger?'rgba(248,113,113,0.04)':'rgba(255,255,255,0.03)'; }}
-                      onMouseLeave={e=>{ (e.currentTarget as HTMLButtonElement).style.color='var(--text-3)'; (e.currentTarget as HTMLButtonElement).style.background='transparent'; }}
-                    >
-                      <item.icon size={11} style={{ color:item.danger?'#ef4444':ACCENT }} />
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </nav>
+        <SharedNavbar />
 
         {/* Loading */}
         {loading && (

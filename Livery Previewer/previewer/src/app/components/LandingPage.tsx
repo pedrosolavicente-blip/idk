@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useShowcase } from '../hooks/useShowcase';
 import { useNavigate } from 'react-router-dom';
 import Logo3D from './Logo3D';
+import SharedNavbar from './SharedNavbar';
 import { imageUrl } from '@/lib/showcaseApi';
 
 const BASE = import.meta.env?.BASE_URL || '';
@@ -432,6 +433,8 @@ export default function LandingPage() {
       {/* Canvas */}
       <canvas ref={canvasRef} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />
 
+<SharedNavbar />
+
 {/* Floating Car Image - Ultra Premium Implementation */}
 <div 
   style={{
@@ -479,133 +482,6 @@ export default function LandingPage() {
     }}
   />
 </div>
-
-      {/* Ambient glows */}
-      <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'-15%', right:'-8%', width:700, height:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(216,255,99,0.1) 0%,transparent 60%)', animation:'lp-glow 5s ease-in-out infinite' }} />
-        <div style={{ position:'absolute', bottom:'-20%', left:'-10%', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(216,255,99,0.05) 0%,transparent 65%)' }} />
-        <div style={{ position:'absolute', top:'40%', left:'40%', width:400, height:400, borderRadius:'50%', transform:'translate(-50%,-50%)', background:'radial-gradient(circle,rgba(216,255,99,0.04) 0%,transparent 60%)' }} />
-      </div>
-
-      {/* Background vector */}
-      <div style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none', display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <img 
-          src={`${BASE}Vector_(7).svg`} 
-          alt="" 
-          aria-hidden 
-          style={{ 
-            width:'90%', 
-            opacity:0.025, 
-            filter:'brightness(0) invert(1)'
-          }} 
-        />
-      </div>
-
-      {/* ── Navbar ── */}
-      <nav
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8"
-        style={{
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
-        }}
-      >
-        <img src={`${BASE}itzz.svg`} alt="itzz" className="h-7 w-auto" />
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/previewer')}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
-            style={{
-              color: '#c4ff0d',
-              background: 'rgba(196,255,13,0.07)',
-              border: '1px solid rgba(196,255,13,0.22)',
-            }}
-          >
-            Livery Previewer
-          </button>
-          <button
-            onClick={() => navigate('/shop')}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Shop
-          </button>
-          <button
-            onClick={() => {}}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Portfolio
-          </button>
-          <button
-            onClick={() => {}}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            Reviews
-          </button>
-          <button
-            onClick={() => window.open('https://discord.gg/itzz', '_blank')}
-            className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all"
-            style={{
-              color: '#c4ff0d',
-              background: 'rgba(196,255,13,0.07)',
-              border: '1px solid rgba(196,255,13,0.22)',
-            }}
-          >
-            Discord Server
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile Menu Overlay */}
-
-      {/* Mobile Menu Overlay */}
-      <div className={`lp-mobile-menu ${menuOpen ? 'open' : ''}`} style={{ display:'none' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
-          <img src={`${BASE}itzz.svg`} alt="itzz" style={{ height:24, width:'auto' }} />
-          <button 
-            style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', padding:'8px' }}
-            onClick={() => setMenuOpen(false)}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-          {NAV_ITEMS.map(item => (
-            <button key={item.id} className="lp-nav-link" style={{ fontSize:16, padding:'12px 0', textAlign:'left' }}
-              onClick={() => { setActiveNav(item.id); item.action(); setMenuOpen(false); }}>
-              {item.label}
-            </button>
-          ))}
-        </div>
-        <div style={{ marginTop:32, display:'flex', flexDirection:'column', gap:12 }}>
-          <button className="lp-btn-ghost" style={{ padding:'12px 24px', width:'100%' }}
-            onClick={() => { window.open('https://discord.gg/itzz','_blank'); setMenuOpen(false); }}>
-            Discord
-          </button>
-          <button className="lp-btn-primary" style={{ padding:'12px 24px', width:'100%' }} onClick={() => { navigate('/previewer'); setMenuOpen(false); }}>
-            Launch App
-          </button>
-        </div>
-      </div>
-
       {/* ── Premium Hero ── */}
       <section style={{ position:'relative', zIndex:10, minHeight:'100vh', padding:'0 48px', paddingTop:140 }}>
         {/* Left Content - Dashboard and Text */}

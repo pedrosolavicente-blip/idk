@@ -34,8 +34,8 @@ export default function SharedNavbar({ cartItemCount = 0, onCartClick }: SharedN
   // Navigation items
   const NAV_ITEMS: NavItem[] = [
     { 
-      id: 'livery', 
-      label: 'Livery Previewer', 
+      id: 'tools', 
+      label: 'Tools', 
       action: () => navigate('/previewer'),
       isPrimary: true
     },
@@ -51,21 +51,10 @@ export default function SharedNavbar({ cartItemCount = 0, onCartClick }: SharedN
       action: () => {}, 
     },
     { 
-      id: 'reviews', 
-      label: 'Reviews', 
-      action: () => {}, 
-    },
-    { 
-      id: 'discord', 
-      label: 'Discord Server', 
+      id: 'server', 
+      label: 'Server', 
       action: () => window.open('https://discord.gg/itzz', '_blank'),
       isPrimary: true
-    },
-    { 
-      id: 'admin', 
-      label: 'Admin Panel', 
-      action: () => navigate('/admin'),
-      isPrimary: false
     },
   ];
 

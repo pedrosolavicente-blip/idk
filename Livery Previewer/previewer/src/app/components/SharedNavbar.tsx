@@ -226,8 +226,12 @@ export default function SharedNavbar() {
                       style={{ color: '#ffffff' }}>
                       {user.global_name ?? user.username}
                     </p>
-                    <p className="text-[8px] font-bold uppercase tracking-widest leading-none mt-0.5" 
-                      style={{ color: '#c4ff0d' }}>
+                    <p className="text-[8px] font-bold uppercase tracking-widest leading-none mt-0.5 group-hover:animate-pulse" 
+                      style={{ 
+                        color: '#c4ff0d',
+                        textShadow: '0 0 8px rgba(196,255,13,0.3)',
+                        transition: 'all 0.3s ease'
+                      }}>
                       Member
                     </p>
                   </div>
@@ -237,14 +241,43 @@ export default function SharedNavbar() {
                 <div className="relative">
                   <button 
                     onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-                    className="p-2 text-zinc-400 hover:text-white transition-colors"
+                    className="p-2 text-zinc-400 hover:text-white transition-all duration-300 relative overflow-hidden group"
                     style={{
                       background: 'rgba(255,255,255,0.04)',
                       border: '1px solid rgba(255,255,255,0.08)',
                       borderRadius: '8px',
                     }}
+                    onMouseEnter={(e) => {
+                      const button = e.currentTarget;
+                      button.style.background = 'rgba(255,255,255,0.08)';
+                      button.style.borderColor = 'rgba(255,255,255,0.15)';
+                      button.style.transform = 'scale(1.05)';
+                      button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)';
+                      // Trigger sliding animation
+                      const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                      if (overlay) overlay.style.transform = 'translateX(100%)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const button = e.currentTarget;
+                      button.style.background = 'rgba(255,255,255,0.04)';
+                      button.style.borderColor = 'rgba(255,255,255,0.08)';
+                      button.style.transform = 'scale(1)';
+                      button.style.boxShadow = 'none';
+                      // Reset sliding animation
+                      const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                      if (overlay) overlay.style.transform = 'translateX(-100%)';
+                    }}
                   >
-                    <Settings size={16} />
+                    {/* Sliding overlay */}
+                    <div 
+                      className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                        transform: 'translateX(-100%)',
+                        transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
+                    <Settings size={16} className="relative z-10 group-hover:animate-spin" style={{ animationDuration: '0.5s' }} />
                   </button>
                   
                   {accountMenuOpen && (
@@ -337,7 +370,7 @@ export default function SharedNavbar() {
                 />
                 
                 <span className="relative z-10 flex items-center">
-                  <User size={12} className="mr-2" />
+                  <User size={12} className="mr-2 group-hover:animate-pulse" />
                   Account
                 </span>
               </button>

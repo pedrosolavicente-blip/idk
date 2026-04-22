@@ -72,16 +72,12 @@ export default function SharedNavbar({ cartItemCount = 0, onCartClick }: SharedN
           paddingTop: '10px',
           paddingBottom: '10px',
           background: scrolled 
-            ? 'linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.9) 100%)'
-            : 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: scrolled
-            ? '1px solid rgba(255,255,255,0.1)'
-            : '1px solid rgba(255,255,255,0.06)',
-          boxShadow: scrolled
-            ? '0 4px 24px rgba(0,0,0,0.4), 0 1px 0 0 rgba(196,255,13,0.05)'
-            : '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.75) 100%)'
+            : 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.7) 100%)',
+          backdropFilter: 'blur(32px)',
+          WebkitBackdropFilter: 'blur(32px)',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.1)',
         }}
       >
         {/* Logo */}

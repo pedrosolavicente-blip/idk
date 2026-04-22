@@ -373,10 +373,26 @@ function LiveryView3D({ config }: { config: LiveryConfig }) {
       setReady(true);
       
       // Load the livery after successful initialization
-      viewer.loadLivery(config.glbUrl, config.color, config.textures || {})
+      console.log('Loading livery with config:', config);
+      viewer.loadLivery(
+        config.modelPath, 
+        config.vehicleColor, 
+        config.textures || {},
+        (message, progress) => {
+          console.log(`Loading progress: ${message} (${progress}%)`);
+        }
+      )
+        .then(() => {
+          console.log('Livery loaded successfully');
+        })
         .catch(err => {
           console.error('Failed to load livery:', err);
-          setError('Failed to load 3D model');
+          console.error('Config details:', {
+            modelPath: config.modelPath,
+            vehicleColor: config.vehicleColor,
+            texturesCount: Object.keys(config.textures || {}).length
+          });
+          setError(`Failed to load 3D model: ${err.message || 'Unknown error'}`);
         });
     } catch (err) {
       console.error('Failed to initialize 3D viewer:', err);

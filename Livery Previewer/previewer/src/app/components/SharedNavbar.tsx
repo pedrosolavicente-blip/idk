@@ -53,11 +53,7 @@ export default function SharedNavbar() {
       id: 'tools', 
       label: 'Tools', 
       action: () => {
-        if (user) {
-          navigate('/previewer');
-        } else {
-          handleLogin();
-        }
+        navigate('/tools');
       },
     },
     { 

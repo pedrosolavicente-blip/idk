@@ -6,6 +6,9 @@ import LandingPage from './app/components/LandingPage.tsx'
 import Shop from './app/components/Shop.tsx'
 import AdminPanel from './app/components/AdminPanel.tsx'
 import ProductDetail from './app/components/ProductDetail.tsx'
+import ToolsDashboard from './app/components/ToolsDashboard.tsx'
+import BattenburgGenerator from './app/components/BattenburgGenerator.tsx'
+import ChevronGenerator from './app/components/ChevronGenerator.tsx'
 import './styles/index.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -17,6 +20,9 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/shop"      element={<Shop />} />
         <Route path="/shop/:id"  element={<ProductDetail />} />
         <Route path="/admin"      element={<AdminPanel />} />
+        <Route path="/tools"      element={<ToolsDashboard onDisclaimer={() => {}} />} />
+        <Route path="/tools/battenburg" element={<BattenburgGenerator />} />
+        <Route path="/tools/chevron" element={<ChevronGenerator />} />
         <Route path="*"          element={<LandingPage />} />
       </Routes>
     </BrowserRouter>

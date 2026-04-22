@@ -335,41 +335,83 @@ function PostSettings({ post, onClose, onDeleted }: {
 // ─── 3D livery viewer ─────────────────────────────────────────────────────────
 
 const DEFAULT_SCENE: SceneSettings = {
-  brightness: 1.1, skyRotX: 0, skyRotY: 0, skyRotZ: 0,
-  background: 'default', bgCustomUrl: '', bgCustomIsEXR: false,
+  brightness: 1.1,
+  skyRotX: 0,
+  skyRotY: 0,
+  skyRotZ: 0,
+  background: 'default',
+  bgCustomUrl: '',
+  bgCustomIsEXR: false,
 };
 
 function LiveryView3D({ config }: { config: LiveryConfig }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef    = useRef<Viewer | null>(null);
   const [ready, setReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     let destroyed = false;
-    initLiveryViewer(container, config, DEFAULT_SCENE).then(v => {
-      if (destroyed) { v.destroy(); return; }
-      viewerRef.current = v;
+    
+    // Check WebGL support first
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) {
+      setError('WebGL is not supported in your browser');
+      return;
+    }
+    
+    try {
+      const viewer = initLiveryViewer(container, { zoomFactor: 2 });
+      if (destroyed) { 
+        viewer.dispose(); 
+        return; 
+      }
+      viewerRef.current = viewer;
       setReady(true);
-    });
+      
+      // Load the livery after successful initialization
+      viewer.loadLivery(config.glbUrl, config.color, config.textures || {})
+        .catch(err => {
+          console.error('Failed to load livery:', err);
+          setError('Failed to load 3D model');
+        });
+    } catch (err) {
+      console.error('Failed to initialize 3D viewer:', err);
+      setError('Failed to initialize 3D viewer');
+    }
+    
     return () => {
       destroyed = true;
-      viewerRef.current?.destroy();
-      viewerRef.current = null;
+      if (viewerRef.current) {
+        try {
+          viewerRef.current.dispose();
+        } catch (err) {
+          console.error('Error disposing 3D viewer:', err);
+        }
+        viewerRef.current = null;
+      }
     };
-  }, []);
+  }, [config]);
 
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
-      {!ready && (
+      {!ready && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 gap-3 flex-col">
           <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
-          <p className="text-xs text-zinc-500 uppercase tracking-widest">Loading 3D…</p>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest">Loading 3D...</p>
         </div>
       )}
-      {ready && (
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 gap-3 flex-col">
+          <p className="text-xs text-red-400 uppercase tracking-widest text-center px-4">{error}</p>
+          <p className="text-xs text-zinc-500 text-center px-4">Try refreshing the page</p>
+        </div>
+      )}
+      {ready && !error && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none">
           <p className="text-xs text-zinc-400 bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">
             Drag to rotate · Scroll to zoom

@@ -924,35 +924,31 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Settings Button - Top Right */}
         {glbUrl && (
-          <div className="absolute top-24 right-6 z-10" style={{ animation:'slideDown 0.3s ease both' }}>
+          <div className="absolute top-20 right-6 z-10" style={{ animation:'slideDown 0.3s ease both' }}>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
               style={{
-                color: '#a1a1aa',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                transform: 'scale(1)',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
-                backdropFilter: 'blur(8px)',
+                color: '#ffffff',
+                background: 'linear-gradient(135deg, rgba(196,255,13,0.12) 0%, rgba(196,255,13,0.08) 100%)',
+                border: '1px solid rgba(196,255,13,0.3)',
+                transform: 'scale(1.02)',
+                boxShadow: '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(12px)',
                 minWidth: 140,
               }}
               onMouseEnter={(e) => {
                 const button = e.currentTarget;
-                button.style.color = '#ffffff';
-                button.style.borderColor = 'rgba(255,255,255,0.2)';
-                button.style.transform = 'scale(1.03)';
-                button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                button.style.transform = 'scale(1.05)';
+                button.style.boxShadow = '0 6px 24px rgba(196,255,13,0.4), inset 0 1px 0 rgba(255,255,255,0.25)';
                 // Trigger sliding animations
                 const overlay = button.querySelector('.slide-overlay') as HTMLElement;
                 if (overlay) overlay.style.transform = 'translateX(100%)';
               }}
               onMouseLeave={(e) => {
                 const button = e.currentTarget;
-                button.style.color = '#a1a1aa';
-                button.style.borderColor = 'rgba(255,255,255,0.12)';
-                button.style.transform = 'scale(1)';
-                button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                button.style.transform = 'scale(1.02)';
+                button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.15)';
                 // Reset sliding animations
                 const overlay = button.querySelector('.slide-overlay') as HTMLElement;
                 if (overlay) overlay.style.transform = 'translateX(-100%)';
@@ -962,7 +958,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div 
                 className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.4) 50%, transparent 100%)',
                   transform: 'translateX(-100%)',
                   transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
@@ -1316,18 +1312,18 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
 
           {/* Panel Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+          <div className="flex-1 overflow-y-auto px-6 py-3 space-y-4">
             {/* Panel Number Controls */}
             <div>
               <Label>Panel Numbers</Label>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {PANELS.map(face => (
-                  <div key={face} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <span className="text-[12px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</span>
-                    <div className="flex items-center gap-3">
+                  <div key={face} className="flex items-center justify-between p-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</span>
+                    <div className="flex items-center gap-2">
                       <button 
                         onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all"
+                        className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
                         style={{ 
                           background: 'rgba(216,255,99,0.1)', 
                           border: '1px solid rgba(216,255,99,0.3)', 
@@ -1336,12 +1332,12 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                         onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
                         onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
                       >−</button>
-                      <div className="w-12 text-center">
-                        <span className="text-[14px] font-bold" style={{ color: '#D8FF63', textShadow: '0 0 8px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
+                      <div className="w-8 text-center">
+                        <span className="text-[12px] font-bold" style={{ color: '#D8FF63', textShadow: '0 0 8px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
                       </div>
                       <button 
                         onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all"
+                        className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
                         style={{ 
                           background: 'rgba(216,255,99,0.1)', 
                           border: '1px solid rgba(216,255,99,0.3)', 
@@ -1359,20 +1355,20 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             {/* Texture Upload */}
             <div>
               <Label>Texture Management</Label>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {PANELS.map(face => (
-                  <div key={face} className="p-4 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-[12px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face} Panels</h4>
-                      <label className="flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer transition-all"
+                  <div key={face} className="p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face} Panels</h4>
+                      <label className="flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer transition-all"
                         style={{ 
                           background: 'rgba(216,255,99,0.1)', 
                           border: '1px solid rgba(216,255,99,0.3)', 
                           color: '#D8FF63',
-                          fontSize: '10px',
+                          fontSize: '9px',
                           fontWeight: '600'
                         }}>
-                        <Upload size={8} />
+                        <Upload size={7} />
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -1392,29 +1388,29 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                       </label>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-1.5">
                       {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
                         <div key={panel}>
                           {textures[panel] ? (
-                            <div className="flex items-center gap-2 p-2 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
-                              <img src={textures[panel]} className="w-8 h-8 rounded object-cover" alt={panel} />
+                            <div className="flex items-center gap-1.5 p-1.5 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
+                              <img src={textures[panel]} className="w-6 h-6 rounded object-cover" alt={panel} />
                               <div className="flex-1 min-w-0">
-                                <p className="text-[9px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
+                                <p className="text-[8px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
                               </div>
                               <button 
                                 onClick={() => handleRemoveTexture(panel)}
-                                className="w-5 h-5 rounded flex items-center justify-center transition-all"
+                                className="w-4 h-4 rounded flex items-center justify-center transition-all"
                                 style={{ color:'#ef4444', background:'rgba(239,68,68,0.1)' }}>
-                                <X size={8} />
+                                <X size={6} />
                               </button>
                             </div>
                           ) : (
-                            <label className="flex items-center gap-2 p-2 rounded cursor-pointer transition-all border border-dashed" 
+                            <label className="flex items-center gap-1.5 p-1.5 rounded cursor-pointer transition-all border border-dashed" 
                               style={{ borderColor: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.02)' }}>
-                              <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                <Upload size={8} style={{ color: 'var(--text-4)' }} />
+                              <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                <Upload size={6} style={{ color: 'var(--text-4)' }} />
                               </div>
-                              <p className="text-[9px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
+                              <p className="text-[8px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
                               <input 
                                 type="file" 
                                 accept="image/*" 
@@ -1518,73 +1514,44 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           {/* View mode toggle */}
           <div className="flex items-center justify-between mb-2">
             <p className="text-[9px] font-semibold uppercase tracking-widest" style={{ color:'var(--text-4)' }}>{filteredModels.length} vehicles</p>
-            <div className="flex gap-1">
-              {([['list', List], ['grid', Grid]] as const).map(([mode, Icon]) => (
-                <button 
-                  key={mode} 
-                  onClick={() => setVehicleViewMode(mode)}
-                  className="w-6 h-6 rounded flex items-center justify-center transition-all duration-300 relative overflow-hidden group"
-                  style={{ 
-                    background: vehicleViewMode===mode ? 'rgba(216,255,99,0.1)' : 'transparent', 
-                    border: `1px solid ${vehicleViewMode===mode ? 'rgba(216,255,99,0.25)' : 'rgba(255,255,255,0.1)'}`, 
-                    color: vehicleViewMode===mode ? '#D8FF63' : '#a1a1aa',
-                    transform: vehicleViewMode===mode ? 'scale(1.1)' : 'scale(1)',
-                    boxShadow: vehicleViewMode===mode 
-                      ? '0 2px 8px rgba(216,255,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                      : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
-                  }}
-                  onMouseEnter={(e) => {
-                    const button = e.currentTarget;
-                    if (vehicleViewMode !== mode) {
-                      button.style.background = 'rgba(255,255,255,0.05)';
-                      button.style.borderColor = 'rgba(255,255,255,0.2)';
-                      button.style.color = '#ffffff';
-                      button.style.transform = 'scale(1.05)';
-                      button.style.boxShadow = '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
-                    } else {
-                      button.style.transform = 'scale(1.15)';
-                      button.style.boxShadow = '0 3px 12px rgba(216,255,99,0.4), inset 0 1px 0 rgba(255,255,255,0.3)';
-                    }
-                    // Trigger sliding animation
-                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
-                    if (overlay) overlay.style.transform = 'translateX(100%)';
-                  }}
-                  onMouseLeave={(e) => {
-                    const button = e.currentTarget;
-                    if (vehicleViewMode !== mode) {
-                      button.style.background = 'transparent';
-                      button.style.borderColor = 'rgba(255,255,255,0.1)';
-                      button.style.color = '#a1a1aa';
-                      button.style.transform = 'scale(1)';
-                      button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
-                    } else {
-                      button.style.transform = 'scale(1.1)';
-                      button.style.boxShadow = '0 2px 8px rgba(216,255,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)';
-                    }
-                    // Reset sliding animation
-                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
-                    if (overlay) overlay.style.transform = 'translateX(-100%)';
-                  }}
-                >
-                  {/* Sliding overlay */}
-                  <div 
-                    className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
-                    style={{
-                      background: vehicleViewMode===mode
-                        ? 'linear-gradient(90deg, transparent 0%, rgba(216,255,99,0.3) 50%, transparent 100%)'
-                        : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
-                      transform: 'translateX(-100%)',
-                      transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+            <div className="flex items-center gap-2">
+              <span className="text-[8px] font-medium" style={{ color: '#a1a1aa' }}>List</span>
+              <button
+                onClick={() => setVehicleViewMode(vehicleViewMode === 'list' ? 'grid' : 'list')}
+                className="relative w-10 h-5 rounded-full transition-all duration-300"
+                style={{
+                  background: vehicleViewMode === 'grid' 
+                    ? 'linear-gradient(90deg, rgba(196,255,13,0.3) 0%, rgba(196,255,13,0.2) 100%)'
+                    : 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  boxShadow: vehicleViewMode === 'grid'
+                    ? '0 2px 8px rgba(196,255,13,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                }}
+              >
+                <div
+                  className="absolute top-0.5 w-4 h-4 rounded-full transition-all duration-300 flex items-center justify-center"
+                  style={{
+                    background: vehicleViewMode === 'grid' ? '#c4ff0d' : '#ffffff',
+                    left: vehicleViewMode === 'grid' ? 'calc(100% - 20px)' : '2px',
+                    boxShadow: vehicleViewMode === 'grid'
+                      ? '0 2px 8px rgba(196,255,13,0.4), inset 0 1px 0 rgba(255,255,255,0.3)'
+                      : '0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)',
                     }}
-                  />
-                  <Icon size={10} className="relative z-10" />
-                </button>
-              ))}
+                >
+                  {vehicleViewMode === 'grid' ? (
+                    <Grid size={8} style={{ color: '#0a0a0a' }} />
+                  ) : (
+                    <List size={8} style={{ color: '#0a0a0a' }} />
+                  )}
+                </div>
+              </button>
+              <span className="text-[8px] font-medium" style={{ color: '#a1a1aa' }}>Grid</span>
             </div>
           </div>
 
           {/* Vehicle list / grid */}
-          <div className="lv-list overflow-y-auto" style={{ maxHeight:260 }}>
+          <div className="lv-list overflow-y-auto" style={{ maxHeight:260, margin: '0 -4px', padding: '0 4px' }}>
             {filteredModels.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2">
                 <Box size={20} strokeWidth={1.5} style={{ color: ACCENT }} />

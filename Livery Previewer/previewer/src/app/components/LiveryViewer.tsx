@@ -1514,39 +1514,59 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           {/* View mode toggle */}
           <div className="flex items-center justify-between mb-2">
             <p className="text-[9px] font-semibold uppercase tracking-widest" style={{ color:'var(--text-4)' }}>{filteredModels.length} vehicles</p>
-            <div className="flex items-center gap-2">
-              <span className="text-[8px] font-medium" style={{ color: '#a1a1aa' }}>List</span>
+            <div className="flex gap-1">
               <button
-                onClick={() => setVehicleViewMode(vehicleViewMode === 'list' ? 'grid' : 'list')}
-                className="relative w-10 h-5 rounded-full transition-all duration-300"
+                onClick={() => setVehicleViewMode('list')}
+                className="px-3 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5"
                 style={{
-                  background: vehicleViewMode === 'grid' 
-                    ? 'linear-gradient(90deg, rgba(196,255,13,0.3) 0%, rgba(196,255,13,0.2) 100%)'
-                    : 'rgba(255,255,255,0.1)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  boxShadow: vehicleViewMode === 'grid'
-                    ? '0 2px 8px rgba(196,255,13,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                    : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                  background: vehicleViewMode === 'list' 
+                    ? 'rgba(196,255,13,0.15)' 
+                    : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: vehicleViewMode === 'list' ? '#c4ff0d' : '#a1a1aa',
+                }}
+                onMouseEnter={e => {
+                  if (vehicleViewMode !== 'list') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.color = '#ffffff';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (vehicleViewMode !== 'list') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = '#a1a1aa';
+                  }
                 }}
               >
-                <div
-                  className="absolute top-0.5 w-4 h-4 rounded-full transition-all duration-300 flex items-center justify-center"
-                  style={{
-                    background: vehicleViewMode === 'grid' ? '#c4ff0d' : '#ffffff',
-                    left: vehicleViewMode === 'grid' ? 'calc(100% - 20px)' : '2px',
-                    boxShadow: vehicleViewMode === 'grid'
-                      ? '0 2px 8px rgba(196,255,13,0.4), inset 0 1px 0 rgba(255,255,255,0.3)'
-                      : '0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)',
-                    }}
-                >
-                  {vehicleViewMode === 'grid' ? (
-                    <Grid size={8} style={{ color: '#0a0a0a' }} />
-                  ) : (
-                    <List size={8} style={{ color: '#0a0a0a' }} />
-                  )}
-                </div>
+                <List size={10} />
+                <span className="text-[8px] font-medium">List</span>
               </button>
-              <span className="text-[8px] font-medium" style={{ color: '#a1a1aa' }}>Grid</span>
+              <button
+                onClick={() => setVehicleViewMode('grid')}
+                className="px-3 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5"
+                style={{
+                  background: vehicleViewMode === 'grid' 
+                    ? 'rgba(196,255,13,0.15)' 
+                    : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: vehicleViewMode === 'grid' ? '#c4ff0d' : '#a1a1aa',
+                }}
+                onMouseEnter={e => {
+                  if (vehicleViewMode !== 'grid') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.color = '#ffffff';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (vehicleViewMode !== 'grid') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = '#a1a1aa';
+                  }
+                }}
+              >
+                <Grid size={10} />
+                <span className="text-[8px] font-medium">Grid</span>
+              </button>
             </div>
           </div>
 
@@ -1650,83 +1670,63 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                     <button 
                       key={m.id} 
                       onClick={() => handleSelectModel(m)}
-                      className="text-left rounded-lg transition-all duration-300 relative overflow-hidden group"
+                      className="text-left rounded-lg transition-all duration-200 relative overflow-hidden"
                       style={{
                         background: isSelected 
-                          ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                          ? 'rgba(196,255,13,0.1)' 
                           : 'rgba(255,255,255,0.03)',
                         border: isSelected 
-                          ? '1px solid rgba(196,255,13,0.25)' 
+                          ? '1px solid rgba(196,255,13,0.3)' 
                           : '1px solid rgba(255,255,255,0.08)',
                         transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                         boxShadow: isSelected
-                          ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
-                          : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
-                        backdropFilter: 'blur(8px)',
+                          ? '0 2px 8px rgba(196,255,13,0.2)'
+                          : '0 1px 4px rgba(0,0,0,0.1)',
                       }}
                       onMouseEnter={(e) => {
                         const button = e.currentTarget;
-                        button.style.transform = isSelected ? 'scale(1.03)' : 'scale(1.01)';
-                        button.style.boxShadow = isSelected
-                          ? '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'
-                          : '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
-                        // Trigger sliding animations
-                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
-                        if (overlay) overlay.style.transform = 'translateX(100%)';
+                        if (!isSelected) {
+                          button.style.background = 'rgba(255,255,255,0.08)';
+                          button.style.borderColor = 'rgba(255,255,255,0.15)';
+                          button.style.transform = 'scale(1.01)';
+                        }
                       }}
                       onMouseLeave={(e) => {
                         const button = e.currentTarget;
-                        button.style.transform = isSelected ? 'scale(1.02)' : 'scale(1)';
-                        button.style.boxShadow = isSelected
-                          ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
-                          : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
-                        // Reset sliding animations
-                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
-                        if (overlay) overlay.style.transform = 'translateX(-100%)';
+                        if (!isSelected) {
+                          button.style.background = 'rgba(255,255,255,0.03)';
+                          button.style.borderColor = 'rgba(255,255,255,0.08)';
+                          button.style.transform = 'scale(1)';
+                        }
                       }}
                     >
-                      {/* Sliding overlay */}
-                      <div 
-                        className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
-                        style={{
-                          background: isSelected 
-                            ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
-                            : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
-                          transform: 'translateX(-100%)',
-                          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-                        }}
-                      />
-                      
-
-                      <div className="relative z-10">
-                        <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
-                          <img 
-                            src={`/${m.name}-front-left.png`}
-                            alt={m.name}
-                            className="w-full h-full object-cover rounded"
-                            style={{ imageRendering:'crisp-edges' }}
-                            loading="lazy"
+                      <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
+                        <img 
+                          src={`/${m.name}-front-left.png`}
+                          alt={m.name}
+                          className="w-full h-full object-cover rounded"
+                          style={{ imageRendering:'crisp-edges' }}
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ 
+                              background: isSelected ? '#c4ff0d' : 'rgba(255,255,255,0.3)',
+                              boxShadow: isSelected ? '0 0 8px rgba(196,255,13,0.5)' : 'none'
+                            }} 
                           />
+                          {isSelected && (
+                            <span className="text-[7px] font-bold uppercase tracking-wider" style={{ color: '#c4ff0d' }}>
+                              Active
+                            </span>
+                          )}
                         </div>
-                        <div className="p-2">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div 
-                              className="w-2 h-2 rounded-full transition-all duration-300"
-                              style={{ 
-                                background: isSelected ? '#c4ff0d' : 'rgba(255,255,255,0.3)',
-                                boxShadow: isSelected ? '0 0 8px rgba(196,255,13,0.5)' : 'none'
-                              }} 
-                            />
-                            {isSelected && (
-                              <span className="text-[7px] font-bold uppercase tracking-wider animate-pulse" style={{ color: '#c4ff0d' }}>
-                                Active
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[9px] font-bold tracking-widest uppercase truncate" style={{ 
-                            color: isSelected ? '#c4ff0d' : '#a1a1aa'
-                          }}>{m.name}</p>
-                        </div>
+                        <p className="text-[9px] font-bold tracking-widest uppercase truncate" style={{ 
+                          color: isSelected ? '#c4ff0d' : '#a1a1aa'
+                        }}>{m.name}</p>
                       </div>
                     </button>
                   );

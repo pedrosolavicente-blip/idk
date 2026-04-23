@@ -809,7 +809,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     return () => v.dispose();
   }, []);
 
-  useEffect(() => { viewerRef.current?.updateScene(settings); }, [settings]);
+  useEffect(() => { viewerRef.current?.updateSettings(settings); }, [settings]);
 
   const applyLivery = useCallback(async (url: string, color: string, tex: Record<string, string>) => {
     if (!url || !viewerRef.current) return;
@@ -990,7 +990,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 settings={settings} 
                 onUpdate={(newSettings) => {
                   setSettings(prev => ({ ...prev, ...newSettings }));
-                  viewerRef.current?.updateSettings(settings);
+                  viewerRef.current?.updateSettings({ ...settings, ...newSettings });
                 }}
                 onReset={() => {
                   setSettings(DEFAULT_SETTINGS);

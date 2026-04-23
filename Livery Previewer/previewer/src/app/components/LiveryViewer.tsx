@@ -930,17 +930,17 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
               style={{
                 color: '#ffffff',
-                background: 'linear-gradient(135deg, rgba(196,255,13,0.12) 0%, rgba(196,255,13,0.08) 100%)',
-                border: '1px solid rgba(196,255,13,0.3)',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
                 transform: 'scale(1.02)',
-                boxShadow: '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(12px)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
                 minWidth: 140,
               }}
               onMouseEnter={(e) => {
                 const button = e.currentTarget;
                 button.style.transform = 'scale(1.05)';
-                button.style.boxShadow = '0 6px 24px rgba(196,255,13,0.4), inset 0 1px 0 rgba(255,255,255,0.25)';
+                button.style.boxShadow = '0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
                 // Trigger sliding animations
                 const overlay = button.querySelector('.slide-overlay') as HTMLElement;
                 if (overlay) overlay.style.transform = 'translateX(100%)';
@@ -948,7 +948,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               onMouseLeave={(e) => {
                 const button = e.currentTarget;
                 button.style.transform = 'scale(1.02)';
-                button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.15)';
+                button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
                 // Reset sliding animations
                 const overlay = button.querySelector('.slide-overlay') as HTMLElement;
                 if (overlay) overlay.style.transform = 'translateX(-100%)';
@@ -958,7 +958,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div 
                 className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.4) 50%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
                   transform: 'translateX(-100%)',
                   transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
@@ -1098,11 +1098,11 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             <button onClick={handleCapture} className="flex items-center justify-center gap-2 w-full text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
               style={{
                 color: '#c4ff0d',
-                background: 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
                 border: '1px solid rgba(196,255,13,0.25)',
                 transform: 'scale(1.02)',
-                boxShadow: '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
                 height: 40,
                 paddingLeft: 24,
                 paddingRight: 24,
@@ -1110,7 +1110,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               onMouseEnter={(e) => {
                 const button = e.currentTarget;
                 button.style.transform = 'scale(1.05)';
-                button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                button.style.boxShadow = '0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
                 // Trigger sliding animations
                 const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
                 const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
@@ -1120,7 +1120,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               onMouseLeave={(e) => {
                 const button = e.currentTarget;
                 button.style.transform = 'scale(1.02)';
-                button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
                 // Reset sliding animations
                 const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
                 const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
@@ -1132,7 +1132,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div 
                 className="slide-overlay-1 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
                   transform: 'translateX(-100%)',
                   transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
@@ -1142,7 +1142,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div 
                 className="slide-overlay-2 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.2) 30%, rgba(196,255,13,0.4) 50%, rgba(196,255,13,0.2) 70%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 70%, transparent 100%)',
                   transform: 'translateX(-100%) translateY(-100%) rotate(45deg)',
                   transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                   width: '200%',
@@ -1167,17 +1167,17 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               onClick={() => setShowLiveryPanel(true)}
               className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
               style={{
-                color: '#c4ff0d',
-                background: 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)',
-                border: '1px solid rgba(196,255,13,0.25)',
-                transform: 'scale(1.02)',
-                boxShadow: '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(8px)',
+                color: '#D8FF63',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                border: '1px solid rgba(216,255,99,0.3)',
+                transform: 'scale(1)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
               }}
               onMouseEnter={(e) => {
                 const button = e.currentTarget;
                 button.style.transform = 'scale(1.05)';
-                button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                button.style.boxShadow = '0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
                 // Trigger sliding animations
                 const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
                 const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
@@ -1186,8 +1186,8 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               }}
               onMouseLeave={(e) => {
                 const button = e.currentTarget;
-                button.style.transform = 'scale(1.02)';
-                button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                button.style.transform = 'scale(1)';
+                button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
                 // Reset sliding animations
                 const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
                 const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
@@ -1199,7 +1199,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div 
                 className="slide-overlay-1 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
                   transform: 'translateX(-100%)',
                   transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
@@ -1209,7 +1209,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               <div 
                 className="slide-overlay-2 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.2) 30%, rgba(196,255,13,0.4) 50%, rgba(196,255,13,0.2) 70%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 70%, transparent 100%)',
                   transform: 'translateX(-100%) translateY(-100%) rotate(45deg)',
                   transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                   width: '200%',

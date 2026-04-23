@@ -7,7 +7,7 @@ import {
   Upload, Camera, ChevronDown, Palette, Box, Image as ImageIcon,
   Search, LogOut, Settings, RotateCcw, Bookmark, X, MoreHorizontal,
   Users, Star, FileText, Grid, List, Plus, Trash2, Eye, EyeOff,
-  Sun, Moon, Sunset, Sliders
+  Sun, Moon, Sunset, Sliders, Layers, Minus, Save, Check
 } from 'lucide-react';
 import type { ReactNode, ElementType } from 'react';
 import ColorPicker from './ColorPicker';
@@ -22,6 +22,7 @@ const PANELS   = ['Left', 'Right', 'Top', 'Front', 'Back'] as const;
 type PanelFace = typeof PANELS[number];
 const ACCENT   = '#D8FF63'; // Neon yellow-green
 
+const DEFAULT_VEHICLE_COLOR = '#000000';
 const DEFAULT_SETTINGS: SceneSettings = {
   brightness: 1.1, skyRotX: 0, skyRotY: 0, skyRotZ: 0,
   background: 'default', bgCustomUrl: '', bgCustomIsEXR: false,
@@ -781,13 +782,13 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   const [searchQuery, setSearchQuery]           = useState('');
   const [filterCat, setFilterCat]               = useState<VehicleCategory | 'All'>('All');
   const [vehicleViewMode, setVehicleViewMode]   = useState<'list'|'grid'>('list');
-  const [showSettings, setShowSettings]         = useState(false);
-  const [showAngleMenu, setShowAngleMenu]       = useState(false);
   const [settings, setSettings]                 = useState<SceneSettings>({ ...DEFAULT_SETTINGS });
-  const [showMenu, setShowMenu]                 = useState(false);
-  const [showCredits, setShowCredits]           = useState(false);
-  const [showShowcases, setShowShowcases]       = useState(false);
-  const [showLiveryPanel, setShowLiveryPanel]   = useState(false);
+  const [showSettings, setShowSettings]         = useState(false);
+  const [showAngleMenu, setShowAngleMenu]         = useState(false);
+  const [showLiveryPanel, setShowLiveryPanel]     = useState(false);
+  const [showCredits, setShowCredits]             = useState(false);
+  const [showShowcases, setShowShowcases]         = useState(false);
+  const [activePanelTab, setActivePanelTab]       = useState<'panels' | 'textures' | 'presets'>('panels');
 
   const userId = user?.id ?? 'guest';
   const [presets, setPresets]           = useState<LiveryPreset[]>(() => loadPresets(userId));
@@ -1312,119 +1313,416 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
 
           {/* Panel Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-3 space-y-4">
-            {/* Panel Number Controls */}
-            <div>
-              <Label>Panel Numbers</Label>
-              <div className="space-y-2">
-                {PANELS.map(face => (
-                  <div key={face} className="flex items-center justify-between p-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</span>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
-                        className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
-                        style={{ 
-                          background: 'rgba(216,255,99,0.1)', 
-                          border: '1px solid rgba(216,255,99,0.3)', 
-                          color: '#D8FF63'
-                        }}
-                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
-                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
-                      >−</button>
-                      <div className="w-8 text-center">
-                        <span className="text-[12px] font-bold" style={{ color: '#D8FF63', textShadow: '0 0 8px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
-                      </div>
-                      <button 
-                        onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
-                        className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
-                        style={{ 
-                          background: 'rgba(216,255,99,0.1)', 
-                          border: '1px solid rgba(216,255,99,0.3)', 
-                          color: '#D8FF63'
-                        }}
-                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
-                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
-                      >+</button>
-                    </div>
-                  </div>
+          <div className="flex-1 flex flex-col">
+            {/* Tab Navigation */}
+            <div className="px-6 pt-4 pb-2">
+              <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                {[
+                  { id: 'panels', label: 'Panels', icon: Layers },
+                  { id: 'textures', label: 'Textures', icon: Image },
+                  { id: 'presets', label: 'Presets', icon: Bookmark },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActivePanelTab(tab.id)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 relative overflow-hidden group"
+                    style={{
+                      background: activePanelTab === tab.id 
+                        ? 'rgba(196,255,13,0.15)' 
+                        : 'transparent',
+                      border: activePanelTab === tab.id 
+                        ? '1px solid rgba(196,255,13,0.3)' 
+                        : '1px solid transparent',
+                      color: activePanelTab === tab.id ? '#c4ff0d' : '#a1a1aa',
+                    }}
+                    onMouseEnter={e => {
+                      if (activePanelTab !== tab.id) {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.color = '#ffffff';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (activePanelTab !== tab.id) {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = '#a1a1aa';
+                      }
+                    }}
+                  >
+                    <tab.icon size={10} />
+                    <span className="text-[9px] font-medium">{tab.label}</span>
+                    {activePanelTab === tab.id && (
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via #c4ff0d to-transparent"
+                        style={{ animation: 'slideIn 0.3s ease-out' }}
+                      />
+                    )}
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* Texture Upload */}
-            <div>
-              <Label>Texture Management</Label>
-              <div className="space-y-3">
-                {PANELS.map(face => (
-                  <div key={face} className="p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face} Panels</h4>
-                      <label className="flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer transition-all"
-                        style={{ 
-                          background: 'rgba(216,255,99,0.1)', 
-                          border: '1px solid rgba(216,255,99,0.3)', 
-                          color: '#D8FF63',
-                          fontSize: '9px',
-                          fontWeight: '600'
-                        }}>
-                        <Upload size={7} />
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          multiple
-                          className="hidden"
-                          onChange={e => {
-                            const files = Array.from(e.target.files || []);
-                            files.forEach(file => {
-                              const availableSlots = Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`)
-                                .filter(slot => !textures[slot]);
-                              if (availableSlots.length > 0) {
-                                handleTextureUpload(availableSlots[0], file);
-                              }
-                            });
-                          }} 
-                        />
-                      </label>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
-                        <div key={panel}>
-                          {textures[panel] ? (
-                            <div className="flex items-center gap-1.5 p-1.5 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
-                              <img src={textures[panel]} className="w-6 h-6 rounded object-cover" alt={panel} />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[8px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
-                              </div>
-                              <button 
-                                onClick={() => handleRemoveTexture(panel)}
-                                className="w-4 h-4 rounded flex items-center justify-center transition-all"
-                                style={{ color:'#ef4444', background:'rgba(239,68,68,0.1)' }}>
-                                <X size={6} />
-                              </button>
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
+              {/* Panels Tab */}
+              {activePanelTab === 'panels' && (
+                <div className="space-y-4 animate-fadeIn">
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        const newPanelNums = PANELS.reduce((acc, face) => ({ ...acc, [face]: Math.max(1, panelNums[face] - 1) }), {});
+                        setPanelNums(newPanelNums);
+                      }}
+                      className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all duration-200 relative overflow-hidden group"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backdropFilter: 'blur(20px)',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                      }}
+                    >
+                      <Minus size={10} style={{ color: '#a1a1aa' }} />
+                      <span className="text-[8px] font-medium" style={{ color: '#a1a1aa' }}>Reduce All</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newPanelNums = PANELS.reduce((acc, face) => ({ ...acc, [face]: panelNums[face] + 1 }), {});
+                        setPanelNums(newPanelNums);
+                      }}
+                      className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all duration-200 relative overflow-hidden group"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backdropFilter: 'blur(20px)',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                      }}
+                    >
+                      <Plus size={10} style={{ color: '#a1a1aa' }} />
+                      <span className="text-[8px] font-medium" style={{ color: '#a1a1aa' }}>Expand All</span>
+                    </button>
+                  </div>
+
+                  {/* Individual Panel Controls */}
+                  <div>
+                    <Label>Panel Configuration</Label>
+                    <div className="space-y-2">
+                      {PANELS.map(face => (
+                        <div key={face} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)' }}>
+                              <span className="text-[10px] font-bold" style={{ color: '#D8FF63' }}>{face[0]}</span>
                             </div>
-                          ) : (
-                            <label className="flex items-center gap-1.5 p-1.5 rounded cursor-pointer transition-all border border-dashed" 
-                              style={{ borderColor: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.02)' }}>
-                              <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                <Upload size={6} style={{ color: 'var(--text-4)' }} />
-                              </div>
-                              <p className="text-[8px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
-                              <input 
-                                type="file" 
-                                accept="image/*" 
-                                className="hidden"
-                                onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])} 
-                              />
-                            </label>
-                          )}
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</p>
+                              <p className="text-[8px]" style={{ color: 'var(--text-4)' }}>{panelNums[face]} panels</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
+                              className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
+                              style={{ 
+                                background: 'rgba(216,255,99,0.1)', 
+                                border: '1px solid rgba(216,255,99,0.3)', 
+                                color: '#D8FF63'
+                              }}
+                              onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                              onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
+                            >−</button>
+                            <div className="w-8 text-center">
+                              <span className="text-[12px] font-bold" style={{ color: '#D8FF63', textShadow: '0 0 8px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
+                            </div>
+                            <button 
+                              onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
+                              className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
+                              style={{ 
+                                background: 'rgba(216,255,99,0.1)', 
+                                border: '1px solid rgba(216,255,99,0.3)', 
+                                color: '#D8FF63'
+                              }}
+                              onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                              onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
+                            >+</button>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* Textures Tab */}
+              {activePanelTab === 'textures' && (
+                <div className="space-y-4 animate-fadeIn">
+                  {/* Bulk Actions */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        Object.keys(textures).forEach(panel => handleRemoveTexture(panel));
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 p-2 rounded-lg transition-all duration-200"
+                      style={{
+                        background: 'rgba(239,68,68,0.1)',
+                        border: '1px solid rgba(239,68,68,0.3)',
+                        color: '#ef4444',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(239,68,68,0.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
+                      }}
+                    >
+                      <Trash2 size={8} />
+                      <span className="text-[8px] font-medium">Clear All</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.multiple = true;
+                        input.onchange = (e) => {
+                          const files = Array.from((e.target as HTMLInputElement).files || []);
+                          let availableSlots: string[] = [];
+                          PANELS.forEach(face => {
+                            for (let i = 1; i <= panelNums[face]; i++) {
+                              const slot = `${face}${i}`;
+                              if (!textures[slot]) availableSlots.push(slot);
+                            }
+                          });
+                          files.slice(0, availableSlots.length).forEach((file, index) => {
+                            handleTextureUpload(availableSlots[index], file);
+                          });
+                        };
+                        input.click();
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 p-2 rounded-lg transition-all duration-200"
+                      style={{
+                        background: 'rgba(216,255,99,0.1)',
+                        border: '1px solid rgba(216,255,99,0.3)',
+                        color: '#D8FF63',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(216,255,99,0.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(216,255,99,0.1)';
+                      }}
+                    >
+                      <Upload size={8} />
+                      <span className="text-[8px] font-medium">Bulk Upload</span>
+                    </button>
+                  </div>
+
+                  {/* Texture Grid */}
+                  <div className="space-y-3">
+                    {PANELS.map(face => (
+                      <div key={face} className="p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)' }}>
+                              <span className="text-[8px] font-bold" style={{ color: '#D8FF63' }}>{face[0]}</span>
+                            </div>
+                            <h4 className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face} Panels</h4>
+                            <span className="text-[8px]" style={{ color: 'var(--text-4)' }}>
+                              {Object.keys(textures).filter(t => t.startsWith(face)).length}/{panelNums[face]}
+                            </span>
+                          </div>
+                          <label className="flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer transition-all"
+                            style={{ 
+                              background: 'rgba(216,255,99,0.1)', 
+                              border: '1px solid rgba(216,255,99,0.3)', 
+                              color: '#D8FF63',
+                              fontSize: '9px',
+                              fontWeight: '600'
+                            }}>
+                            <Upload size={7} />
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              multiple
+                              className="hidden"
+                              onChange={e => {
+                                const files = Array.from(e.target.files || []);
+                                const availableSlots = Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`)
+                                  .filter(slot => !textures[slot]);
+                                files.slice(0, availableSlots.length).forEach((file, index) => {
+                                  handleTextureUpload(availableSlots[index], file);
+                                });
+                              }} 
+                            />
+                          </label>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
+                            <div key={panel}>
+                              {textures[panel] ? (
+                                <div className="flex items-center gap-1.5 p-1.5 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
+                                  <img src={textures[panel]} className="w-6 h-6 rounded object-cover" alt={panel} />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[8px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
+                                  </div>
+                                  <button 
+                                    onClick={() => handleRemoveTexture(panel)}
+                                    className="w-4 h-4 rounded flex items-center justify-center transition-all"
+                                    style={{ color:'#ef4444', background:'rgba(239,68,68,0.1)' }}>
+                                    <X size={6} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <label className="flex items-center gap-1.5 p-1.5 rounded cursor-pointer transition-all border border-dashed" 
+                                  style={{ borderColor: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.02)' }}>
+                                  <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                    <Upload size={6} style={{ color: 'var(--text-4)' }} />
+                                  </div>
+                                  <p className="text-[8px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
+                                  <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    className="hidden"
+                                    onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])} 
+                                  />
+                                </label>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Presets Tab */}
+              {activePanelTab === 'presets' && (
+                <div className="space-y-4 animate-fadeIn">
+                  {/* Quick Preset Actions */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        const presetName = `Quick-${Date.now()}`;
+                        const presetData = { vehicleColor, panelNums, textures };
+                        const preset = { id: Date.now().toString(), name: presetName, data: presetData, createdAt: new Date().toISOString() };
+                        setPresets(p => [...p, preset]);
+                      }}
+                      className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all duration-200"
+                      style={{
+                        background: 'rgba(216,255,99,0.1)',
+                        border: '1px solid rgba(216,255,99,0.3)',
+                        color: '#D8FF63',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(216,255,99,0.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(216,255,99,0.1)';
+                      }}
+                    >
+                      <Save size={10} />
+                      <span className="text-[8px] font-medium">Save Current</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setVehicleColor(DEFAULT_VEHICLE_COLOR);
+                        setPanelNums({ front: 1, back: 1, left: 1, right: 1 });
+                        setTextures({});
+                      }}
+                      className="flex items-center justify-center gap-2 p-3 rounded-lg transition-all duration-200"
+                      style={{
+                        background: 'rgba(239,68,68,0.1)',
+                        border: '1px solid rgba(239,68,68,0.3)',
+                        color: '#ef4444',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(239,68,68,0.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
+                      }}
+                    >
+                      <RotateCcw size={10} />
+                      <span className="text-[8px] font-medium">Reset All</span>
+                    </button>
+                  </div>
+
+                  {/* Preset List */}
+                  <div>
+                    <Label>Saved Presets</Label>
+                    <div className="space-y-2">
+                      {presets.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Bookmark size={20} style={{ color: 'var(--text-4)' }} />
+                          <p className="text-[10px] font-medium mt-2" style={{ color: 'var(--text-4)' }}>No presets saved</p>
+                        </div>
+                      ) : (
+                        presets.map(preset => (
+                          <div key={preset.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)' }}>
+                                <Bookmark size={10} style={{ color: '#D8FF63' }} />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-medium" style={{ color: 'var(--text-1)' }}>{preset.name}</p>
+                                <p className="text-[8px]" style={{ color: 'var(--text-4)' }}>
+                                  {new Date(preset.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => {
+                                  setVehicleColor(preset.data.vehicleColor);
+                                  setPanelNums(preset.data.panelNums);
+                                  setTextures(preset.data.textures);
+                                }}
+                                className="w-6 h-6 rounded flex items-center justify-center transition-all"
+                                style={{ 
+                                  background: 'rgba(216,255,99,0.1)', 
+                                  border: '1px solid rgba(216,255,99,0.3)', 
+                                  color: '#D8FF63'
+                                }}
+                                onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                                onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
+                              >
+                                <Check size={8} />
+                              </button>
+                              <button
+                                onClick={() => setPresets(p => p.filter(pr => pr.id !== preset.id))}
+                                className="w-6 h-6 rounded flex items-center justify-center transition-all"
+                                style={{ 
+                                  background: 'rgba(239,68,68,0.1)', 
+                                  border: '1px solid rgba(239,68,68,0.3)', 
+                                  color: '#ef4444'
+                                }}
+                                onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.2)'}
+                                onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'}
+                              >
+                                <X size={8} />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -118,6 +118,8 @@ const GLOBAL_STYLES = `
   @keyframes slideUp    { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
   @keyframes expandX    { from { transform:scaleX(0); opacity:0; } to { transform:scaleX(1); opacity:1; } }
   @keyframes fadeIn     { from { opacity:0; } to { opacity:1; } }
+  
+  .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
 
   .lv-sidebar::-webkit-scrollbar       { width: 2px; }
   .lv-sidebar::-webkit-scrollbar-track { background: transparent; }

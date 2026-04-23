@@ -922,10 +922,9 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         )}
 
-        {/* Capture */}
+        {/* Settings Button - Top Right */}
         {glbUrl && (
-          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 z-10" style={{ animation:'slideUp 0.3s ease both' }}>
-            {/* Settings Button */}
+          <div className="absolute top-24 right-6 z-10" style={{ animation:'slideDown 0.3s ease both' }}>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
@@ -974,10 +973,108 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 Settings
               </span>
             </button>
+          </div>
+        )}
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="fixed top-24 right-6 z-50 w-80 rounded-xl overflow-hidden shadow-2xl" 
+            style={{ 
+              background: 'rgba(5,5,5,0.98)', 
+              border: '1px solid rgba(255,255,255,0.08)', 
+              backdropFilter: 'blur(32px)', 
+              boxShadow: '0 24px 64px rgba(0,0,0,0.8)',
+              animation: 'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both'
+            }}
+            onMouseDown={e => { if (e.target === e.currentTarget) setShowSettings(false); }}
+          >
+            <div className="p-6">
+              <SceneSettingsPanel 
+                settings={settings} 
+                onUpdate={(newSettings) => {
+                  setSettings(prev => ({ ...prev, ...newSettings }));
+                  viewerRef.current?.updateSettings(settings);
+                }}
+                onReset={() => {
+                  setSettings(DEFAULT_SETTINGS);
+                  viewerRef.current?.updateSettings(DEFAULT_SETTINGS);
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Capture */}
+        {glbUrl && (
+          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 z-10" style={{ animation:'slideUp 0.3s ease both' }}>
             
             <div className="relative">
-              <button className={`nav-item ${showAngleMenu ? 'active' : ''}`} onClick={() => setShowAngleMenu(o=>!o)} style={{ minWidth:140, justifyContent:'space-between' }}>
-                <span className="flex items-center gap-1.5"><ImageIcon size={10} /> Angle Shots</span>
+              <button 
+                onClick={() => setShowAngleMenu(o=>!o)} 
+                className={`flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group ${showAngleMenu ? 'active' : ''}`}
+                style={{
+                  color: showAngleMenu ? '#c4ff0d' : '#a1a1aa',
+                  background: showAngleMenu 
+                    ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                    : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                  border: showAngleMenu 
+                    ? '1px solid rgba(196,255,13,0.25)' 
+                    : '1px solid rgba(255,255,255,0.12)',
+                  transform: showAngleMenu ? 'scale(1.02)' : 'scale(1)',
+                  boxShadow: showAngleMenu
+                    ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                    : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                  backdropFilter: 'blur(8px)',
+                  minWidth: 140,
+                  justifyContent: 'space-between'
+                }}
+                onMouseEnter={(e) => {
+                  const button = e.currentTarget;
+                  if (!showAngleMenu) {
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = 'rgba(255,255,255,0.2)';
+                    button.style.transform = 'scale(1.03)';
+                    button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                  } else {
+                    button.style.transform = 'scale(1.05)';
+                    button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                  }
+                  // Trigger sliding animations
+                  const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                  if (overlay) overlay.style.transform = 'translateX(100%)';
+                }}
+                onMouseLeave={(e) => {
+                  const button = e.currentTarget;
+                  if (!showAngleMenu) {
+                    button.style.color = '#a1a1aa';
+                    button.style.borderColor = 'rgba(255,255,255,0.12)';
+                    button.style.transform = 'scale(1)';
+                    button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                  } else {
+                    button.style.transform = 'scale(1.02)';
+                    button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                  }
+                  // Reset sliding animations
+                  const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                  if (overlay) overlay.style.transform = 'translateX(-100%)';
+                }}
+              >
+                {/* Sliding overlay */}
+                <div 
+                  className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                  style={{
+                    background: showAngleMenu 
+                      ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
+                      : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                    transform: 'translateX(-100%)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
+                
+                <span className="relative z-10 flex items-center gap-2">
+                  <ImageIcon size={10} className="group-hover:animate-pulse" />
+                  Angle Shots
+                </span>
                 <ChevronDown size={9} style={{ transform:showAngleMenu?'rotate(180deg)':'none', transition:'transform 0.2s' }} />
               </button>
               {showAngleMenu && (
@@ -1128,7 +1225,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               
               <span className="relative z-10 flex items-center gap-2">
                 <FileText size={13} className="group-hover:animate-pulse" />
-                .livery
+                Decals
               </span>
             </button>
           </div>
@@ -1494,50 +1591,179 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color:'var(--text-4)' }}>No vehicles found</p>
               </div>
             ) : vehicleViewMode === 'list' ? (
-              <div className="space-y-px">
-                {filteredModels.map(m => (
-                  <button key={m.id} onClick={() => handleSelectModel(m)}
-                    className={`vehicle-row w-full text-left ${selectedModel?.id===m.id ? 'sel' : ''}`}>
-                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: selectedModel?.id===m.id ? ACCENT : 'var(--text-4)' }} />
-                    <span className="text-[11px] font-medium truncate flex-1" style={{ color: selectedModel?.id===m.id ? 'var(--text-1)' : 'var(--text-3)' }}>{m.name}</span>
-                    {selectedModel?.id===m.id && <span className="text-[8px] font-bold uppercase tracking-wider shrink-0" style={{ color: ACCENT }}>Active</span>}
-                  </button>
-                ))}
+              <div className="space-y-1">
+                {filteredModels.map(m => {
+                  const isSelected = selectedModel?.id === m.id;
+                  return (
+                    <button 
+                      key={m.id} 
+                      onClick={() => handleSelectModel(m)}
+                      className="flex items-center gap-3 text-[10px] font-bold tracking-widest uppercase px-3 py-2 rounded-lg transition-all duration-300 relative overflow-hidden group w-full text-left"
+                      style={{
+                        color: isSelected ? '#c4ff0d' : '#a1a1aa',
+                        background: isSelected 
+                          ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                          : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                        border: isSelected 
+                          ? '1px solid rgba(196,255,13,0.25)' 
+                          : '1px solid rgba(255,255,255,0.12)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        boxShadow: isSelected
+                          ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                          : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                        backdropFilter: 'blur(8px)',
+                      }}
+                      onMouseEnter={(e) => {
+                        const button = e.currentTarget;
+                        if (!isSelected) {
+                          button.style.color = '#ffffff';
+                          button.style.borderColor = 'rgba(255,255,255,0.2)';
+                          button.style.transform = 'scale(1.01)';
+                          button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                        } else {
+                          button.style.transform = 'scale(1.03)';
+                          button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                        }
+                        // Trigger sliding animations
+                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                        if (overlay) overlay.style.transform = 'translateX(100%)';
+                      }}
+                      onMouseLeave={(e) => {
+                        const button = e.currentTarget;
+                        if (!isSelected) {
+                          button.style.color = '#a1a1aa';
+                          button.style.borderColor = 'rgba(255,255,255,0.12)';
+                          button.style.transform = 'scale(1)';
+                          button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                        } else {
+                          button.style.transform = 'scale(1.02)';
+                          button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                        }
+                        // Reset sliding animations
+                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                        if (overlay) overlay.style.transform = 'translateX(-100%)';
+                      }}
+                    >
+                      {/* Sliding overlay */}
+                      <div 
+                        className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                        style={{
+                          background: isSelected 
+                            ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
+                            : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                          transform: 'translateX(-100%)',
+                          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                        }}
+                      />
+                      
+                      <span className="relative z-10 flex items-center gap-3 w-full">
+                        <div 
+                          className="w-2 h-2 rounded-full shrink-0 transition-all duration-300"
+                          style={{ 
+                            background: isSelected ? '#c4ff0d' : 'rgba(255,255,255,0.3)',
+                            boxShadow: isSelected ? '0 0 8px rgba(196,255,13,0.5)' : 'none'
+                          }} 
+                        />
+                        <span className="truncate flex-1">{m.name}</span>
+                        {isSelected && (
+                          <span className="text-[8px] font-bold uppercase tracking-wider shrink-0 animate-pulse" style={{ color: '#c4ff0d' }}>
+                            Active
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
-                {filteredModels.map(m => (
-                  <button key={m.id} onClick={() => handleSelectModel(m)}
-                    className={`vehicle-card text-left ${selectedModel?.id===m.id ? 'sel' : ''}`}>
-                    <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
-                      <img 
-                        src={`/${m.name}-front-left.png`}
-                        alt={m.name}
-                        className="w-full h-full object-cover"
-                        style={{ opacity: selectedModel?.id===m.id ? 1 : 0.7 }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'block';
+                {filteredModels.map(m => {
+                  const isSelected = selectedModel?.id === m.id;
+                  return (
+                    <button 
+                      key={m.id} 
+                      onClick={() => handleSelectModel(m)}
+                      className="text-left rounded-lg transition-all duration-300 relative overflow-hidden group"
+                      style={{
+                        background: isSelected 
+                          ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                          : 'rgba(255,255,255,0.03)',
+                        border: isSelected 
+                          ? '1px solid rgba(196,255,13,0.25)' 
+                          : '1px solid rgba(255,255,255,0.08)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        boxShadow: isSelected
+                          ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                          : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                        backdropFilter: 'blur(8px)',
+                      }}
+                      onMouseEnter={(e) => {
+                        const button = e.currentTarget;
+                        button.style.transform = isSelected ? 'scale(1.03)' : 'scale(1.01)';
+                        button.style.boxShadow = isSelected
+                          ? '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'
+                          : '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                        // Trigger sliding animations
+                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                        if (overlay) overlay.style.transform = 'translateX(100%)';
+                      }}
+                      onMouseLeave={(e) => {
+                        const button = e.currentTarget;
+                        button.style.transform = isSelected ? 'scale(1.02)' : 'scale(1)';
+                        button.style.boxShadow = isSelected
+                          ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                          : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                        // Reset sliding animations
+                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                        if (overlay) overlay.style.transform = 'translateX(-100%)';
+                      }}
+                    >
+                      {/* Sliding overlay */}
+                      <div 
+                        className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                        style={{
+                          background: isSelected 
+                            ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
+                            : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                          transform: 'translateX(-100%)',
+                          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                         }}
                       />
-                      <Box 
-                        size={20} 
-                        strokeWidth={1} 
-                        style={{ 
-                          color: selectedModel?.id===m.id ? ACCENT : 'var(--text-4)', 
-                          opacity:0.5,
-                          display: 'none'
-                        }} 
-                      />
-                    </div>
-                    <div className="px-2 py-1.5" style={{ borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                      <p className="text-[9px] font-semibold truncate" style={{ color: selectedModel?.id===m.id ? ACCENT : 'var(--text-2)' }}>{m.name}</p>
-                      <p className="text-[8px]" style={{ color:'var(--text-4)' }}>{m.category}</p>
-                    </div>
-                  </button>
-                ))}
+                      
+
+                      <div className="relative z-10">
+                        <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
+                          <img 
+                            src={`/${m.name}-front-left.png`}
+                            alt={m.name}
+                            className="w-full h-full object-cover rounded"
+                            style={{ imageRendering:'crisp-edges' }}
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="p-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div 
+                              className="w-2 h-2 rounded-full transition-all duration-300"
+                              style={{ 
+                                background: isSelected ? '#c4ff0d' : 'rgba(255,255,255,0.3)',
+                                boxShadow: isSelected ? '0 0 8px rgba(196,255,13,0.5)' : 'none'
+                              }} 
+                            />
+                            {isSelected && (
+                              <span className="text-[7px] font-bold uppercase tracking-wider animate-pulse" style={{ color: '#c4ff0d' }}>
+                                Active
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[9px] font-bold tracking-widest uppercase truncate" style={{ 
+                            color: isSelected ? '#c4ff0d' : '#a1a1aa'
+                          }}>{m.name}</p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

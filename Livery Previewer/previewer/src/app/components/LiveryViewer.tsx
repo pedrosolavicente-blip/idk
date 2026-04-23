@@ -12,7 +12,9 @@ import {
 import type { ReactNode, ElementType } from 'react';
 import ColorPicker from './ColorPicker';
 import Showcases, { type CurrentLivery } from './Showcases';
+import SharedNavbar from './SharedNavbar';
 import type { LiveryConfig } from '../../lib/showcaseApi';
+const BASE = import.meta.env.BASE_URL; // ← add this line here
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -276,12 +278,7 @@ const GLOBAL_STYLES = `
   }
   .section-toggle:hover { background: rgba(255,255,255,0.02); }
 
-  .capture-btn {
-    background: linear-gradient(135deg, rgba(216,255,99,0.12) 0%, rgba(216,255,99,0.08) 100%);
-    border: 1px solid rgba(216,255,99,0.3);
-    color: #D8FF63;
-    box-shadow: 0 0 16px rgba(216,255,99,0.08);
-    border-radius: 8px;
+  .capture-btn { background: linear-gradient(135deg, rgba(216,255,99,0.12) 0%, rgba(216,255,99,0.08) 100%); border: 1px solid rgba(216,255,99,0.3); color: #D8FF63; box-shadow: 0 0 16px rgba(216,255,99,0.08); transition: all 0.3s ease; border-radius: 8px; }
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -370,12 +367,14 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDragging = useRef(false);
 
+  // sync when color prop changes externally
   useEffect(() => {
     const newHsl = hexToHsl(color);
     setHsl(newHsl);
     setHexInput(color.replace('#','').toUpperCase());
   }, [color]);
 
+  // draw SL square
   useEffect(() => {
     if (mode !== 'advanced') return;
     const canvas = canvasRef.current;
@@ -403,8 +402,9 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+    // x = saturation (0..100), y = lightness inversion
     const s = Math.round(x * 100);
-    const l = Math.round((1 - y) * 50);
+    const l = Math.round((1 - y) * 50); // 0..50
     const newHsl: [number,number,number] = [hsl[0], s, l];
     setHsl(newHsl);
     const hex = hslToHex(newHsl[0], newHsl[1], newHsl[2]);
@@ -437,6 +437,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
   };
 
   const rgb = hexToRgb(color.length === 7 ? color : '#000000');
+  // cursor pos on SL canvas
   const cursorX = `${hsl[1]}%`;
   const cursorY = `${100 - (hsl[2] / 50) * 100}%`;
 
@@ -444,6 +445,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
 
   return (
     <div>
+      {/* Mode toggle */}
       <div className="flex gap-1.5 mb-3">
         {(['basic','advanced'] as const).map(m => (
           <button key={m} onClick={() => setMode(m)}
@@ -461,6 +463,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
 
       {mode === 'basic' ? (
         <div className="space-y-3">
+          {/* Color preview + hex */}
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-md shrink-0 overflow-hidden" style={{ border: '2px solid rgba(255,255,255,0.1)' }}>
               <div className="absolute inset-0" style={{ background: color }} />
@@ -481,6 +484,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
               />
             </div>
           </div>
+          {/* Swatches */}
           <div className="flex flex-wrap gap-1.5">
             {SWATCHES.map(c => (
               <button key={c} onClick={() => { onChange(c); setHsl(hexToHsl(c)); setHexInput(c.replace('#','').toUpperCase()); }}
@@ -497,6 +501,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
         </div>
       ) : (
         <div className="space-y-3">
+          {/* SL Canvas */}
           <div className="relative rounded-md overflow-hidden" style={{ aspectRatio: '2/1', cursor: 'crosshair' }}>
             <canvas
               ref={canvasRef}
@@ -507,6 +512,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
               onMouseUp={() => { isDragging.current = false; }}
               onMouseLeave={() => { isDragging.current = false; }}
             />
+            {/* Cursor */}
             <div className="pointer-events-none absolute w-3 h-3 rounded-full -translate-x-1/2 -translate-y-1/2"
               style={{
                 left: cursorX, top: cursorY,
@@ -517,6 +523,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
             />
           </div>
 
+          {/* Hue */}
           <div>
             <Label>Hue — {hsl[0]}°</Label>
             <input type="range" min={0} max={360} step={1} value={hsl[0]}
@@ -524,6 +531,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
               className="hue-range w-full" />
           </div>
 
+          {/* Saturation */}
           <div>
             <Label>Saturation — {hsl[1]}%</Label>
             <input type="range" min={0} max={100} step={1} value={hsl[1]}
@@ -533,6 +541,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
             />
           </div>
 
+          {/* Lightness */}
           <div>
             <Label>Lightness — {hsl[2]}%</Label>
             <input type="range" min={0} max={100} step={1} value={hsl[2]}
@@ -542,6 +551,7 @@ function AdvancedColorPicker({ color, onChange }: { color: string; onChange: (c:
             />
           </div>
 
+          {/* Values row */}
           <div className="grid grid-cols-3 gap-1.5">
             {[
               { label: 'HEX', value: `#${hexInput}` },
@@ -579,6 +589,7 @@ function PanelCard({
 
   return (
     <div className="panel-card" style={{ borderColor: loadedCount > 0 ? 'rgba(216,255,99,0.2)' : 'var(--border)' }}>
+      {/* Header */}
       <div className="flex items-center justify-between px-3 py-2.5" style={{ borderBottom: '0.5px solid rgba(255,255,255,0.05)', background: loadedCount > 0 ? 'rgba(216,255,99,0.04)' : 'rgba(255,255,255,0.02)' }}>
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: loadedCount > 0 ? ACCENT : '#3f3f46' }} />
@@ -589,6 +600,7 @@ function PanelCard({
             </span>
           )}
         </div>
+        {/* Panel count control */}
         <div className="flex items-center gap-1.5 rounded-md px-2 py-1" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)' }}>
           <button onClick={onDecrement} className="w-3.5 h-3.5 flex items-center justify-center text-xs font-bold transition-colors" style={{ color: '#52525b' }}
             onMouseEnter={e => (e.currentTarget.style.color = ACCENT)} onMouseLeave={e => (e.currentTarget.style.color = '#52525b')}>−</button>
@@ -598,10 +610,12 @@ function PanelCard({
         </div>
       </div>
 
+      {/* Panel slots */}
       <div className="p-2.5 space-y-1.5">
         {panels.map(panel => (
           <div key={panel}>
             {textures[panel] ? (
+              /* Loaded state */
               <div className="flex items-center gap-2 px-3 py-2 rounded-md" style={{ background: 'rgba(216,255,99,0.06)', border: '1px solid rgba(216,255,99,0.15)' }}>
                 <div className="w-7 h-7 rounded shrink-0 overflow-hidden" style={{ border: '1px solid rgba(216,255,99,0.2)' }}>
                   <img src={textures[panel]} className="w-full h-full object-cover" alt={panel} />
@@ -616,6 +630,7 @@ function PanelCard({
                 </button>
               </div>
             ) : (
+              /* Drop zone */
               <label
                 className={`drop-zone flex items-center gap-2.5 px-3 py-2 ${dragOver === panel ? 'dragover' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragOver(panel); }}
@@ -666,6 +681,7 @@ function SceneSettingsPanel({ settings, onUpdate, onReset }: {
         </button>
       </div>
 
+      {/* Brightness */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label className="mb-0">Brightness</Label>
@@ -681,6 +697,7 @@ function SceneSettingsPanel({ settings, onUpdate, onReset }: {
         </div>
       </div>
 
+      {/* Sky Rotation */}
       <div>
         <Label>Sky Rotation</Label>
         <div className="space-y-3">
@@ -699,6 +716,7 @@ function SceneSettingsPanel({ settings, onUpdate, onReset }: {
         </div>
       </div>
 
+      {/* Skybox */}
       <div>
         <Label>Environment</Label>
         <div className="grid grid-cols-3 gap-1.5 mb-2">
@@ -861,80 +879,20 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
   const totalLoadedTextures = Object.keys(textures).length;
 
   // ─── render ───────────────────────────────────────────────────────────────
+
   return (
     <div className="flex h-screen w-full overflow-hidden" style={{ background: 'var(--surface0)', color: 'var(--text-1)', fontFamily: 'Inter, sans-serif' }}>
 
       {/* ── Viewport ── */}
       <div className="relative flex-1 overflow-hidden" ref={containerRef}>
+
         {/* Ambient */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
           <div className="absolute -top-48 -right-48 rounded-full" style={{ width:800, height:800, opacity:0.1, background:'radial-gradient(circle,#D8FF63 0%,transparent 60%)' }} />
           <div className="absolute -bottom-32 -left-32 rounded-full" style={{ width:600, height:600, opacity:0.05, background:'radial-gradient(circle,#D8FF63 0%,transparent 65%)' }} />
         </div>
 
-        {/* ── Navbar ── */}
-        <nav className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-6"
-          style={{ height: 52, background: 'rgba(4,4,4,0.97)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '0.5px solid rgba(255,255,255,0.05)', boxShadow: '0 1px 0 rgba(216,255,99,0.06)' }}>
-
-          <img src="/itzz.svg" alt="itzz" style={{ height: 28, width: 'auto' }} />
-
-          <div className="flex-1 flex items-center justify-center gap-2">
-            <div className="relative">
-              <button className={`nav-item ${showSettings ? 'active' : ''}`} onClick={() => { setShowSettings(s=>!s); setShowMenu(false); }}>
-                <Settings size={11} /> Settings
-              </button>
-              {showSettings && (
-                <div className="absolute left-0 top-full mt-2 w-80 rounded-xl p-5 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
-                  <SceneSettingsPanel settings={settings} onUpdate={u => setSettings(s=>({...s,...u}))} onReset={() => setSettings({...DEFAULT_SETTINGS})} />
-                </div>
-              )}
-            </div>
-
-            <button className="nav-item" onClick={() => { setShowShowcases(true); setShowMenu(false); }}>
-              <Users size={11} /> Showcases
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {user && (
-              <div className="flex items-center gap-2 px-3 rounded-md" style={{ height:32, background:'rgba(255,255,255,0.03)', border:'1px solid var(--border)' }}>
-                <div className="relative">
-                  <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`} alt="" className="w-5 h-5 rounded-full" onError={e=>{(e.target as HTMLImageElement).style.display='none';}} />
-                  <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full" style={{ background:ACCENT, border:'1.5px solid #080808' }} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold leading-none" style={{ color:'var(--text-1)' }}>{user.global_name ?? user.username}</p>
-                  <p className="text-[8px] font-bold uppercase tracking-widest leading-none mt-0.5" style={{ color:ACCENT }}>Member</p>
-                </div>
-              </div>
-            )}
-
-            <div className="relative">
-              <button className={`nav-item ${showMenu ? 'active' : ''}`} onClick={() => { setShowMenu(s=>!s); setShowSettings(false); }}>
-                <MoreHorizontal size={11} /> Menu
-              </button>
-              {showMenu && (
-                <div className="absolute right-0 top-full mt-2 w-44 rounded-xl overflow-hidden z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', WebkitBackdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
-                  {[
-                    { label:'Credits',    icon:Star,     action:()=>{ setShowCredits(true); setShowMenu(false); }, danger:false },
-                    { label:'Disclaimer', icon:FileText,  action:()=>{ onShowDisclaimer(); setShowMenu(false); }, danger:false },
-                    { label:'Log Out',    icon:LogOut,    action:()=>{ clearAuth(); onLogout(); },                  danger:true },
-                  ].map((item, i, arr) => (
-                    <button key={item.label} onClick={item.action}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-semibold transition-colors"
-                      style={{ background:'transparent', border:'none', borderBottom: i<arr.length-1 ? '0.5px solid rgba(255,255,255,0.04)' : 'none', color:'var(--text-3)', borderRadius:0 }}
-                      onMouseEnter={e=>{ (e.currentTarget as HTMLButtonElement).style.color=item.danger?'#f87171':'var(--text-1)'; (e.currentTarget as HTMLButtonElement).style.background=item.danger?'rgba(248,113,113,0.04)':'rgba(255,255,255,0.03)'; }}
-                      onMouseLeave={e=>{ (e.currentTarget as HTMLButtonElement).style.color='var(--text-3)'; (e.currentTarget as HTMLButtonElement).style.background='transparent'; }}
-                    >
-                      <item.icon size={11} style={{ color:item.danger?'#ef4444':ACCENT }} />
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </nav>
+        <SharedNavbar />
 
         {/* Loading */}
         {loading && (
@@ -964,16 +922,159 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           </div>
         )}
 
+        {/* Settings Button - Top Right */}
+        {glbUrl && (
+          <div className="absolute top-20 right-6 z-10" style={{ animation:'slideDown 0.3s ease both' }}>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
+              style={{
+                color: '#ffffff',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                transform: 'scale(1.02)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
+                minWidth: 140,
+              }}
+              onMouseEnter={(e) => {
+                const button = e.currentTarget;
+                button.style.transform = 'scale(1.05)';
+                button.style.boxShadow = '0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
+                // Trigger sliding animations
+                const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                if (overlay) overlay.style.transform = 'translateX(100%)';
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget;
+                button.style.transform = 'scale(1.02)';
+                button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+                // Reset sliding animations
+                const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                if (overlay) overlay.style.transform = 'translateX(-100%)';
+              }}
+            >
+              {/* Sliding overlay */}
+              <div 
+                className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                  transform: 'translateX(-100%)',
+                  transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                <Settings size={13} className="group-hover:animate-spin" style={{ animationDuration: '0.5s' }} />
+                Settings
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="fixed top-24 right-6 z-50 w-80 rounded-xl overflow-hidden shadow-2xl" 
+            style={{ 
+              background: 'rgba(5,5,5,0.98)', 
+              border: '1px solid rgba(255,255,255,0.08)', 
+              backdropFilter: 'blur(32px)', 
+              boxShadow: '0 24px 64px rgba(0,0,0,0.8)',
+              animation: 'slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both'
+            }}
+            onMouseDown={e => { if (e.target === e.currentTarget) setShowSettings(false); }}
+          >
+            <div className="p-6">
+              <SceneSettingsPanel 
+                settings={settings} 
+                onUpdate={(newSettings) => {
+                  setSettings(prev => ({ ...prev, ...newSettings }));
+                  viewerRef.current?.updateSettings(settings);
+                }}
+                onReset={() => {
+                  setSettings(DEFAULT_SETTINGS);
+                  viewerRef.current?.updateSettings(DEFAULT_SETTINGS);
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Capture */}
         {glbUrl && (
           <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 z-10" style={{ animation:'slideUp 0.3s ease both' }}>
+            
             <div className="relative">
-              <button className={`nav-item ${showAngleMenu ? 'active' : ''}`} onClick={() => setShowAngleMenu(o=>!o)} style={{ minWidth:140, justifyContent:'space-between' }}>
-                <span className="flex items-center gap-1.5"><ImageIcon size={10} /> Angle Shots</span>
+              <button 
+                onClick={() => setShowAngleMenu(o=>!o)} 
+                className={`flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group ${showAngleMenu ? 'active' : ''}`}
+                style={{
+                  color: showAngleMenu ? '#c4ff0d' : '#a1a1aa',
+                  background: showAngleMenu 
+                    ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                    : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                  border: showAngleMenu 
+                    ? '1px solid rgba(196,255,13,0.25)' 
+                    : '1px solid rgba(255,255,255,0.12)',
+                  transform: showAngleMenu ? 'scale(1.02)' : 'scale(1)',
+                  boxShadow: showAngleMenu
+                    ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                    : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                  backdropFilter: 'blur(8px)',
+                  minWidth: 140,
+                  justifyContent: 'space-between'
+                }}
+                onMouseEnter={(e) => {
+                  const button = e.currentTarget;
+                  if (!showAngleMenu) {
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = 'rgba(255,255,255,0.2)';
+                    button.style.transform = 'scale(1.03)';
+                    button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                  } else {
+                    button.style.transform = 'scale(1.05)';
+                    button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                  }
+                  // Trigger sliding animations
+                  const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                  if (overlay) overlay.style.transform = 'translateX(100%)';
+                }}
+                onMouseLeave={(e) => {
+                  const button = e.currentTarget;
+                  if (!showAngleMenu) {
+                    button.style.color = '#a1a1aa';
+                    button.style.borderColor = 'rgba(255,255,255,0.12)';
+                    button.style.transform = 'scale(1)';
+                    button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                  } else {
+                    button.style.transform = 'scale(1.02)';
+                    button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                  }
+                  // Reset sliding animations
+                  const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                  if (overlay) overlay.style.transform = 'translateX(-100%)';
+                }}
+              >
+                {/* Sliding overlay */}
+                <div 
+                  className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                  style={{
+                    background: showAngleMenu 
+                      ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
+                      : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                    transform: 'translateX(-100%)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
+                
+                <span className="relative z-10 flex items-center gap-2">
+                  <ImageIcon size={10} className="group-hover:animate-pulse" />
+                  Angle Shots
+                </span>
                 <ChevronDown size={9} style={{ transform:showAngleMenu?'rotate(180deg)':'none', transition:'transform 0.2s' }} />
               </button>
               {showAngleMenu && (
-                <div className="absolute bottom-full mb-2 right-0 rounded-xl overflow-hidden w-48 z-30" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideUp 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
+                <div className="absolute bottom-full mb-8 right-0 rounded-xl overflow-hidden w-48 z-60" style={{ background:'rgba(5,5,5,0.99)', border:'1px solid rgba(255,255,255,0.08)', backdropFilter:'blur(32px)', boxShadow:'0 24px 64px rgba(0,0,0,0.8)', animation:'slideUp 0.18s cubic-bezier(0.16,1,0.3,1) both' }}>
                   {([
                     { group:'Sides' },
                     { side:'front', label:'Front' },{ side:'back', label:'Back' },{ side:'left', label:'Left' },{ side:'right', label:'Right' },
@@ -994,8 +1095,67 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 </div>
               )}
             </div>
-            <button onClick={handleCapture} className="capture-btn flex items-center justify-center gap-2 w-full" style={{ height:40, paddingLeft:24, paddingRight:24 }}>
-              <Camera size={13} /> Capture
+            <button onClick={handleCapture} className="flex items-center justify-center gap-2 w-full text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
+              style={{
+                color: '#c4ff0d',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                border: '1px solid rgba(196,255,13,0.25)',
+                transform: 'scale(1.02)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
+                height: 40,
+                paddingLeft: 24,
+                paddingRight: 24,
+              }}
+              onMouseEnter={(e) => {
+                const button = e.currentTarget;
+                button.style.transform = 'scale(1.05)';
+                button.style.boxShadow = '0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
+                // Trigger sliding animations
+                const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                if (overlay1) overlay1.style.transform = 'translateX(100%)';
+                if (overlay2) overlay2.style.transform = 'translateX(100%) translateY(100%) rotate(45deg)';
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget;
+                button.style.transform = 'scale(1.02)';
+                button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+                // Reset sliding animations
+                const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                if (overlay1) overlay1.style.transform = 'translateX(-100%)';
+                if (overlay2) overlay2.style.transform = 'translateX(-100%) translateY(-100%) rotate(45deg)';
+              }}
+            >
+              {/* Sliding overlay */}
+              <div 
+                className="slide-overlay-1 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                  transform: 'translateX(-100%)',
+                  transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              />
+              
+              {/* Secondary shimmer effect */}
+              <div 
+                className="slide-overlay-2 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 70%, transparent 100%)',
+                  transform: 'translateX(-100%) translateY(-100%) rotate(45deg)',
+                  transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                  width: '200%',
+                  height: '200%',
+                  top: '-50%',
+                  left: '-50%',
+                }}
+              />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                <Camera size={13} className="group-hover:animate-pulse" />
+                Capture
+              </span>
             </button>
           </div>
         )}
@@ -1003,21 +1163,66 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
         {/* Livery Panel Trigger */}
         {selectedModel && (
           <div className="absolute bottom-12 left-6 z-20 pointer-events-auto">
-            <button
+            <button 
               onClick={() => setShowLiveryPanel(true)}
-              className="px-4 py-2.5 flex items-center justify-center gap-2 rounded-md transition-all capture-btn"
+              className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
               style={{
-                background: 'rgba(216,255,99,0.1)',
+                color: '#D8FF63',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
                 border: '1px solid rgba(216,255,99,0.3)',
-                color: ACCENT,
-                animation:'fadeIn 1s ease 0.5s both',
-                opacity:0
+                transform: 'scale(1)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(216,255,99,0.2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(216,255,99,0.1)')}
+              onMouseEnter={(e) => {
+                const button = e.currentTarget;
+                button.style.transform = 'scale(1.05)';
+                button.style.boxShadow = '0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
+                // Trigger sliding animations
+                const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                if (overlay1) overlay1.style.transform = 'translateX(100%)';
+                if (overlay2) overlay2.style.transform = 'translateX(100%) translateY(100%) rotate(45deg)';
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget;
+                button.style.transform = 'scale(1)';
+                button.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+                // Reset sliding animations
+                const overlay1 = button.querySelector('.slide-overlay-1') as HTMLElement;
+                const overlay2 = button.querySelector('.slide-overlay-2') as HTMLElement;
+                if (overlay1) overlay1.style.transform = 'translateX(-100%)';
+                if (overlay2) overlay2.style.transform = 'translateX(-100%) translateY(-100%) rotate(45deg)';
+              }}
             >
-              <ImageIcon size={12} />
-              <span className="text-[10px] font-semibold">Open Livery Panel</span>
+              {/* Sliding overlay */}
+              <div 
+                className="slide-overlay-1 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                  transform: 'translateX(-100%)',
+                  transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              />
+              
+              {/* Secondary shimmer effect */}
+              <div 
+                className="slide-overlay-2 absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 70%, transparent 100%)',
+                  transform: 'translateX(-100%) translateY(-100%) rotate(45deg)',
+                  transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                  width: '200%',
+                  height: '200%',
+                  top: '-50%',
+                  left: '-50%',
+                }}
+              />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                <FileText size={13} className="group-hover:animate-pulse" />
+                Decals
+              </span>
             </button>
           </div>
         )}
@@ -1074,8 +1279,8 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
       {/* ── Left Livery Panel ── */}
       {selectedModel && (
-        <div
-          className="fixed left-0 top-0 h-full w-80 z-30 flex flex-col overflow-hidden"
+        <div 
+          className="fixed left-0 top-0 h-full w-80 z-60 flex flex-col overflow-hidden"
           style={{
             background: 'rgba(0,0,0,0.98)',
             borderRight: '1px solid rgba(216,255,99,0.2)',
@@ -1095,43 +1300,51 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                 <p className="text-[10px]" style={{ color: '#D8FF63' }}>Livery Panel</p>
               </div>
             </div>
-            <button
+            <button 
               onClick={() => setShowLiveryPanel(false)}
               className="w-8 h-8 rounded-md flex items-center justify-center transition-all hover:scale-110"
               style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+              onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)'}
+              onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'}
             >
               <X size={14} style={{ color: 'var(--text-3)' }} />
             </button>
           </div>
 
           {/* Panel Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+          <div className="flex-1 overflow-y-auto px-6 py-3 space-y-4">
             {/* Panel Number Controls */}
             <div>
               <Label>Panel Numbers</Label>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {PANELS.map(face => (
-                  <div key={face} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <span className="text-[12px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</span>
-                    <div className="flex items-center gap-3">
-                      <button
+                  <div key={face} className="flex items-center justify-between p-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face}</span>
+                    <div className="flex items-center gap-2">
+                      <button 
                         onClick={() => setPanelNums(p => ({...p, [face]: Math.max(1, p[face] - 1)}))}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all"
-                        style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: '#D8FF63' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(216,255,99,0.2)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(216,255,99,0.1)')}
+                        className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
+                        style={{ 
+                          background: 'rgba(216,255,99,0.1)', 
+                          border: '1px solid rgba(216,255,99,0.3)', 
+                          color: '#D8FF63'
+                        }}
+                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
                       >−</button>
-                      <div className="w-12 text-center">
-                        <span className="text-[14px] font-bold" style={{ color: '#D8FF63', textShadow: '0 0 8px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
+                      <div className="w-8 text-center">
+                        <span className="text-[12px] font-bold" style={{ color: '#D8FF63', textShadow: '0 0 8px rgba(216,255,99,0.5)' }}>{panelNums[face]}</span>
                       </div>
-                      <button
+                      <button 
                         onClick={() => setPanelNums(p => ({...p, [face]: p[face] + 1}))}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all"
-                        style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: '#D8FF63' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(216,255,99,0.2)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(216,255,99,0.1)')}
+                        className="w-6 h-6 rounded flex items-center justify-center text-sm font-bold transition-all"
+                        style={{ 
+                          background: 'rgba(216,255,99,0.1)', 
+                          border: '1px solid rgba(216,255,99,0.3)', 
+                          color: '#D8FF63'
+                        }}
+                        onMouseEnter={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.2)'}
+                        onMouseLeave={e => (e.target as HTMLButtonElement).style.background = 'rgba(216,255,99,0.1)'}
                       >+</button>
                     </div>
                   </div>
@@ -1142,17 +1355,23 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             {/* Texture Upload */}
             <div>
               <Label>Texture Management</Label>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {PANELS.map(face => (
-                  <div key={face} className="p-4 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-[12px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face} Panels</h4>
-                      <label className="flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer transition-all"
-                        style={{ background: 'rgba(216,255,99,0.1)', border: '1px solid rgba(216,255,99,0.3)', color: '#D8FF63', fontSize: '10px', fontWeight: '600' }}>
-                        <Upload size={8} />
-                        <input
-                          type="file"
-                          accept="image/*"
+                  <div key={face} className="p-3 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-2)' }}>{face} Panels</h4>
+                      <label className="flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer transition-all"
+                        style={{ 
+                          background: 'rgba(216,255,99,0.1)', 
+                          border: '1px solid rgba(216,255,99,0.3)', 
+                          color: '#D8FF63',
+                          fontSize: '9px',
+                          fontWeight: '600'
+                        }}>
+                        <Upload size={7} />
+                        <input 
+                          type="file" 
+                          accept="image/*" 
                           multiple
                           className="hidden"
                           onChange={e => {
@@ -1164,39 +1383,39 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
                                 handleTextureUpload(availableSlots[0], file);
                               }
                             });
-                          }}
+                          }} 
                         />
                       </label>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-2">
+                    
+                    <div className="grid grid-cols-2 gap-1.5">
                       {Array.from({ length: panelNums[face] }, (_, i) => `${face}${i + 1}`).map(panel => (
                         <div key={panel}>
                           {textures[panel] ? (
-                            <div className="flex items-center gap-2 p-2 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
-                              <img src={textures[panel]} className="w-8 h-8 rounded object-cover" alt={panel} />
+                            <div className="flex items-center gap-1.5 p-1.5 rounded" style={{ background: 'rgba(216,255,99,0.05)', border: '1px solid rgba(216,255,99,0.15)' }}>
+                              <img src={textures[panel]} className="w-6 h-6 rounded object-cover" alt={panel} />
                               <div className="flex-1 min-w-0">
-                                <p className="text-[9px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
+                                <p className="text-[8px] font-medium truncate" style={{ color: '#D8FF63' }}>{panel}</p>
                               </div>
-                              <button
+                              <button 
                                 onClick={() => handleRemoveTexture(panel)}
-                                className="w-5 h-5 rounded flex items-center justify-center transition-all"
+                                className="w-4 h-4 rounded flex items-center justify-center transition-all"
                                 style={{ color:'#ef4444', background:'rgba(239,68,68,0.1)' }}>
-                                <X size={8} />
+                                <X size={6} />
                               </button>
                             </div>
                           ) : (
-                            <label className="flex items-center gap-2 p-2 rounded cursor-pointer transition-all border border-dashed"
+                            <label className="flex items-center gap-1.5 p-1.5 rounded cursor-pointer transition-all border border-dashed" 
                               style={{ borderColor: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.02)' }}>
-                              <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                <Upload size={8} style={{ color: 'var(--text-4)' }} />
+                              <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                <Upload size={6} style={{ color: 'var(--text-4)' }} />
                               </div>
-                              <p className="text-[9px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
-                              <input
-                                type="file"
-                                accept="image/*"
+                              <p className="text-[8px] font-medium" style={{ color: 'var(--text-4)' }}>{panel}</p>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
                                 className="hidden"
-                                onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])}
+                                onChange={e => e.target.files?.[0] && handleTextureUpload(panel, e.target.files[0])} 
                               />
                             </label>
                           )}
@@ -1213,30 +1432,72 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
       {/* ── Sidebar ── */}
       <div className="lv-sidebar w-64 flex flex-col overflow-y-auto shrink-0"
-        style={{ background:'rgba(5,5,5,0.99)', borderLeft:'1px solid rgba(255,255,255,0.05)', boxShadow:'-1px 0 0 rgba(0,255,136,0.03)' }}>
+          style={{ background:'rgba(5,5,5,0.99)', borderLeft:'1px solid rgba(255,255,255,0.05)', boxShadow:'-1px 0 0 rgba(0,255,136,0.03)' }}>
 
         {/* Header */}
         <div className="relative flex flex-col items-center justify-center overflow-hidden"
-          style={{ paddingTop:28, paddingBottom:20, borderBottom:'1px solid rgba(255,255,255,0.05)', minHeight:108 }}>
+          style={{ paddingTop:68, paddingBottom:20, borderBottom:'1px solid rgba(255,255,255,0.05)', minHeight:108 }}>
           <div className="pointer-events-none absolute inset-x-0 top-0 h-16"
             style={{ background:'radial-gradient(ellipse at top, rgba(0,255,136,0.08) 0%, transparent 70%)', animation:'fadeIn 0.8s ease 0.3s both', opacity:0 }} />
           <div style={{ animation:'slideDown 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both', opacity:0 }}>
-            <img src="/Group_15.svg" alt="Livery Previewer" style={{ height:50, width:'auto', mixBlendMode:'lighten', display:'block' }} />
+            <img src={`${BASE}Group_15.svg`} alt="Livery Previewer" style={{ height:50, width:'auto', mixBlendMode:'lighten', display:'block' }} />
           </div>
-          <div style={{ marginTop:12, width:'80%', height:1, background:'linear-gradient(to right, transparent, rgba(0,255,136,0.4), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
+          <div style={{ marginTop:12, width:'80%', height:1, background:'linear-gradient(to right, transparent, hsl(86, 100%, 75%), transparent)', transformOrigin:'center', animation:'expandX 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both', opacity:0 }} />
         </div>
 
         {/* Model */}
         <Section title="Model" icon={Box} defaultOpen={true} count={filteredModels.length}>
+          {/* Category */}
           <div className="flex gap-1.5 mb-3">
             {(['All', ...AVAILABLE_CATEGORIES] as const).map(cat => (
-              <button key={cat} onClick={() => setFilterCat(cat as VehicleCategory | 'All')}
-                className={`pill-btn flex-1 ${filterCat === cat ? 'active' : ''}`}>
-                {cat}
+              <button 
+                key={cat} 
+                onClick={() => setFilterCat(cat as VehicleCategory | 'All')}
+                className={`pill-btn flex-1 relative overflow-hidden group transition-all duration-300 ${
+                  filterCat === cat ? 'active' : ''
+                }`}
+                style={{
+                  transform: filterCat === cat ? 'scale(1.05)' : 'scale(1)',
+                  boxShadow: filterCat === cat 
+                    ? '0 2px 8px rgba(216,255,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                }}
+                onMouseEnter={(e) => {
+                  if (filterCat !== cat) {
+                    const button = e.currentTarget;
+                    button.style.transform = 'scale(1.03)';
+                    button.style.boxShadow = '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                    // Trigger sliding animation
+                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                    if (overlay) overlay.style.transform = 'translateX(100%)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (filterCat !== cat) {
+                    const button = e.currentTarget;
+                    button.style.transform = 'scale(1)';
+                    button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                    // Reset sliding animation
+                    const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                    if (overlay) overlay.style.transform = 'translateX(-100%)';
+                  }
+                }}
+              >
+                {/* Sliding overlay */}
+                <div 
+                  className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(216,255,99,0.2) 50%, transparent 100%)',
+                    transform: 'translateX(-100%)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
+                <span className="relative z-10">{cat}</span>
               </button>
             ))}
           </div>
 
+          {/* Search */}
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2" size={10} style={{ color: '#D8FF63' }} />
             <input type="text" placeholder="Search vehicles…" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
@@ -1250,66 +1511,226 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
             )}
           </div>
 
+          {/* View mode toggle */}
           <div className="flex items-center justify-between mb-2">
             <p className="text-[9px] font-semibold uppercase tracking-widest" style={{ color:'var(--text-4)' }}>{filteredModels.length} vehicles</p>
             <div className="flex gap-1">
-              {([['list', List], ['grid', Grid]] as const).map(([mode, Icon]) => (
-                <button key={mode} onClick={() => setVehicleViewMode(mode)}
-                  className="w-6 h-6 rounded flex items-center justify-center transition-all"
-                  style={{ background: vehicleViewMode===mode ? 'rgba(216,255,99,0.1)' : 'transparent', border: `1px solid ${vehicleViewMode===mode ? 'rgba(216,255,99,0.25)' : 'transparent'}`, color: '#D8FF63' }}>
-                  <Icon size={10} />
-                </button>
-              ))}
+              <button
+                onClick={() => setVehicleViewMode('list')}
+                className="px-3 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5"
+                style={{
+                  background: vehicleViewMode === 'list' 
+                    ? 'rgba(196,255,13,0.15)' 
+                    : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: vehicleViewMode === 'list' ? '#c4ff0d' : '#a1a1aa',
+                }}
+                onMouseEnter={e => {
+                  if (vehicleViewMode !== 'list') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.color = '#ffffff';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (vehicleViewMode !== 'list') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = '#a1a1aa';
+                  }
+                }}
+              >
+                <List size={10} />
+                <span className="text-[8px] font-medium">List</span>
+              </button>
+              <button
+                onClick={() => setVehicleViewMode('grid')}
+                className="px-3 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5"
+                style={{
+                  background: vehicleViewMode === 'grid' 
+                    ? 'rgba(196,255,13,0.15)' 
+                    : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: vehicleViewMode === 'grid' ? '#c4ff0d' : '#a1a1aa',
+                }}
+                onMouseEnter={e => {
+                  if (vehicleViewMode !== 'grid') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.color = '#ffffff';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (vehicleViewMode !== 'grid') {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = '#a1a1aa';
+                  }
+                }}
+              >
+                <Grid size={10} />
+                <span className="text-[8px] font-medium">Grid</span>
+              </button>
             </div>
           </div>
 
-          <div className="lv-list overflow-y-auto" style={{ maxHeight:260 }}>
+          {/* Vehicle list / grid */}
+          <div className="lv-list overflow-y-auto" style={{ maxHeight:260, margin: '0 -4px', padding: '0 4px' }}>
             {filteredModels.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2">
                 <Box size={20} strokeWidth={1.5} style={{ color: ACCENT }} />
                 <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color:'var(--text-4)' }}>No vehicles found</p>
               </div>
             ) : vehicleViewMode === 'list' ? (
-              <div className="space-y-px">
-                {filteredModels.map(m => (
-                  <button key={m.id} onClick={() => handleSelectModel(m)}
-                    className={`vehicle-row w-full text-left ${selectedModel?.id===m.id ? 'sel' : ''}`}>
-                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: selectedModel?.id===m.id ? ACCENT : 'var(--text-4)' }} />
-                    <span className="text-[11px] font-medium truncate flex-1" style={{ color: selectedModel?.id===m.id ? 'var(--text-1)' : 'var(--text-3)' }}>{m.name}</span>
-                    {selectedModel?.id===m.id && <span className="text-[8px] font-bold uppercase tracking-wider shrink-0" style={{ color: ACCENT }}>Active</span>}
-                  </button>
-                ))}
+              <div className="space-y-1">
+                {filteredModels.map(m => {
+                  const isSelected = selectedModel?.id === m.id;
+                  return (
+                    <button 
+                      key={m.id} 
+                      onClick={() => handleSelectModel(m)}
+                      className="flex items-center gap-3 text-[10px] font-bold tracking-widest uppercase px-3 py-2 rounded-lg transition-all duration-300 relative overflow-hidden group w-full text-left"
+                      style={{
+                        color: isSelected ? '#c4ff0d' : '#a1a1aa',
+                        background: isSelected 
+                          ? 'linear-gradient(135deg, rgba(196,255,13,0.08) 0%, rgba(196,255,13,0.05) 100%)' 
+                          : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                        border: isSelected 
+                          ? '1px solid rgba(196,255,13,0.25)' 
+                          : '1px solid rgba(255,255,255,0.12)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        boxShadow: isSelected
+                          ? '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                          : '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+                        backdropFilter: 'blur(8px)',
+                      }}
+                      onMouseEnter={(e) => {
+                        const button = e.currentTarget;
+                        if (!isSelected) {
+                          button.style.color = '#ffffff';
+                          button.style.borderColor = 'rgba(255,255,255,0.2)';
+                          button.style.transform = 'scale(1.01)';
+                          button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)';
+                        } else {
+                          button.style.transform = 'scale(1.03)';
+                          button.style.boxShadow = '0 4px 16px rgba(196,255,13,0.25), inset 0 1px 0 rgba(255,255,255,0.2)';
+                        }
+                        // Trigger sliding animations
+                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                        if (overlay) overlay.style.transform = 'translateX(100%)';
+                      }}
+                      onMouseLeave={(e) => {
+                        const button = e.currentTarget;
+                        if (!isSelected) {
+                          button.style.color = '#a1a1aa';
+                          button.style.borderColor = 'rgba(255,255,255,0.12)';
+                          button.style.transform = 'scale(1)';
+                          button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)';
+                        } else {
+                          button.style.transform = 'scale(1.02)';
+                          button.style.boxShadow = '0 2px 8px rgba(196,255,13,0.15), inset 0 1px 0 rgba(255,255,255,0.1)';
+                        }
+                        // Reset sliding animations
+                        const overlay = button.querySelector('.slide-overlay') as HTMLElement;
+                        if (overlay) overlay.style.transform = 'translateX(-100%)';
+                      }}
+                    >
+                      {/* Sliding overlay */}
+                      <div 
+                        className="slide-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+                        style={{
+                          background: isSelected 
+                            ? 'linear-gradient(90deg, transparent 0%, rgba(196,255,13,0.3) 50%, transparent 100%)'
+                            : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                          transform: 'translateX(-100%)',
+                          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                        }}
+                      />
+                      
+                      <span className="relative z-10 flex items-center gap-3 w-full">
+                        <div 
+                          className="w-2 h-2 rounded-full shrink-0 transition-all duration-300"
+                          style={{ 
+                            background: isSelected ? '#c4ff0d' : 'rgba(255,255,255,0.3)',
+                            boxShadow: isSelected ? '0 0 8px rgba(196,255,13,0.5)' : 'none'
+                          }} 
+                        />
+                        <span className="truncate flex-1">{m.name}</span>
+                        {isSelected && (
+                          <span className="text-[8px] font-bold uppercase tracking-wider shrink-0 animate-pulse" style={{ color: '#c4ff0d' }}>
+                            Active
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
-                {filteredModels.map(m => (
-                  <button key={m.id} onClick={() => handleSelectModel(m)}
-                    className={`vehicle-card text-left ${selectedModel?.id===m.id ? 'sel' : ''}`}>
-                    <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
-                      <img
-                        src={`/${m.name}-front-left.png`}
-                        alt={m.name}
-                        className="w-full h-full object-cover"
-                        style={{ opacity: selectedModel?.id===m.id ? 1 : 0.7 }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'block';
-                        }}
-                      />
-                      <Box
-                        size={20}
-                        strokeWidth={1}
-                        style={{ color: selectedModel?.id===m.id ? ACCENT : 'var(--text-4)', opacity:0.5, display: 'none' }}
-                      />
-                    </div>
-                    <div className="px-2 py-1.5" style={{ borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                      <p className="text-[9px] font-semibold truncate" style={{ color: selectedModel?.id===m.id ? ACCENT : 'var(--text-2)' }}>{m.name}</p>
-                      <p className="text-[8px]" style={{ color:'var(--text-4)' }}>{m.category}</p>
-                    </div>
-                  </button>
-                ))}
+                {filteredModels.map(m => {
+                  const isSelected = selectedModel?.id === m.id;
+                  return (
+                    <button 
+                      key={m.id} 
+                      onClick={() => handleSelectModel(m)}
+                      className="text-left rounded-lg transition-all duration-200 relative overflow-hidden"
+                      style={{
+                        background: isSelected 
+                          ? 'rgba(196,255,13,0.1)' 
+                          : 'rgba(255,255,255,0.03)',
+                        border: isSelected 
+                          ? '1px solid rgba(196,255,13,0.3)' 
+                          : '1px solid rgba(255,255,255,0.08)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        boxShadow: isSelected
+                          ? '0 2px 8px rgba(196,255,13,0.2)'
+                          : '0 1px 4px rgba(0,0,0,0.1)',
+                      }}
+                      onMouseEnter={(e) => {
+                        const button = e.currentTarget;
+                        if (!isSelected) {
+                          button.style.background = 'rgba(255,255,255,0.08)';
+                          button.style.borderColor = 'rgba(255,255,255,0.15)';
+                          button.style.transform = 'scale(1.01)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        const button = e.currentTarget;
+                        if (!isSelected) {
+                          button.style.background = 'rgba(255,255,255,0.03)';
+                          button.style.borderColor = 'rgba(255,255,255,0.08)';
+                          button.style.transform = 'scale(1)';
+                        }
+                      }}
+                    >
+                      <div className="flex-1 flex items-center justify-center" style={{ background:'var(--surface3)', minHeight:56 }}>
+                        <img 
+                          src={`/${m.name}-front-left.png`}
+                          alt={m.name}
+                          className="w-full h-full object-cover rounded"
+                          style={{ imageRendering:'crisp-edges' }}
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ 
+                              background: isSelected ? '#c4ff0d' : 'rgba(255,255,255,0.3)',
+                              boxShadow: isSelected ? '0 0 8px rgba(196,255,13,0.5)' : 'none'
+                            }} 
+                          />
+                          {isSelected && (
+                            <span className="text-[7px] font-bold uppercase tracking-wider" style={{ color: '#c4ff0d' }}>
+                              Active
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[9px] font-bold tracking-widest uppercase truncate" style={{ 
+                          color: isSelected ? '#c4ff0d' : '#a1a1aa'
+                        }}>{m.name}</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1340,6 +1761,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
               {presets.map(p => (
                 <div key={p.id} className="preset-card group" onClick={()=>handleLoadPreset(p)}>
                   <div className="flex items-center gap-3 px-3 py-3">
+                    {/* Color dot */}
                     <div className="w-7 h-7 rounded-md shrink-0" style={{ background: p.vehicleColor, border:'1.5px solid rgba(255,255,255,0.1)' }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-semibold truncate" style={{ color:'var(--text-1)' }}>{p.name}</p>
@@ -1366,6 +1788,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
           <AdvancedColorPicker color={vehicleColor} onChange={handleColorChange} />
         </Section>
 
+        
       </div>
     </div>
   );

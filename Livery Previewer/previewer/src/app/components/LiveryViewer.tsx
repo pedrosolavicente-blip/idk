@@ -885,7 +885,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
     <div className="flex h-screen w-full overflow-hidden" style={{ background: 'var(--surface0)', color: 'var(--text-1)', fontFamily: 'Inter, sans-serif' }}>
 
       {/* ── Viewport ── */}
-      <div className="relative flex-1 overflow-hidden" style={{ background: '#1a1a1a' }} ref={containerRef}>
+      <div className="relative flex-1 overflow-hidden" ref={containerRef}>
 
         {/* Ambient */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -897,7 +897,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Loading */}
         {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background:'rgba(0,0,0,0.6)', backdropFilter:'blur(4px)', zIndex: 10 }}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-4" style={{ background:'rgba(0,0,0,0.6)', backdropFilter:'blur(4px)' }}>
             <div className="relative w-8 h-8">
               <div className="absolute inset-0 rounded-full" style={{ border:'2px solid rgba(216,255,99,0.15)' }} />
               <div className="absolute inset-0 rounded-full animate-spin" style={{ border:'2px solid transparent', borderTopColor:ACCENT }} />
@@ -908,15 +908,15 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Error */}
         {error && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-lg text-[11px] font-semibold"
-            style={{ background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', animation:'slideDown 0.2s ease both', zIndex: 10 }}>
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-lg z-10 text-[11px] font-semibold"
+            style={{ background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', animation:'slideDown 0.2s ease both' }}>
             {error}
           </div>
         )}
 
         {/* Empty */}
         {!glbUrl && !loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3" style={{ zIndex: 10 }}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3 z-10">
             <Box size={40} strokeWidth={0.75} style={{ color:'rgba(216,255,99,0.15)' }} />
             <p className="text-[11px] font-bold tracking-widest uppercase" style={{ color:'#27272a' }}>Select a Vehicle</p>
             <p className="text-[10px]" style={{ color:'#1f1f23' }}>Choose a model from the panel</p>
@@ -925,7 +925,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Settings Button - Top Right */}
         {glbUrl && (
-          <div className="absolute top-20 right-6" style={{ animation:'slideDown 0.3s ease both', zIndex: 10 }}>
+          <div className="absolute top-20 right-6 z-10" style={{ animation:'slideDown 0.3s ease both' }}>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
@@ -1003,7 +1003,7 @@ export default function LiveryViewer({ user, onLogout, onShowDisclaimer }: Props
 
         {/* Capture */}
         {glbUrl && (
-          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2" style={{ animation:'slideUp 0.3s ease both', zIndex: 10 }}>
+          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 z-10" style={{ animation:'slideUp 0.3s ease both' }}>
             
             <div className="relative">
               <button 

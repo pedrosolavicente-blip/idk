@@ -11,6 +11,11 @@ const LIVERY_IMAGES = [
   `${BASE}Rectangle_38 (1).png`,
 ];
 
+const TEXTURE_IMAGES = [
+  `${BASE}Rectangle_38.png`,
+  `${BASE}Rectangle_38 (1).png`,
+];
+
 interface BattenburgPattern {
   rows: number;
   cols: number;
@@ -27,6 +32,7 @@ export default function BattenburgGenerator() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
   const [activeLivery, setActiveLivery] = useState(0);
+  const [activeTexture, setActiveTexture] = useState(0);
   const [pattern, setPattern] = useState<BattenburgPattern>({
     rows: 2,
     cols: 7,
@@ -45,21 +51,22 @@ export default function BattenburgGenerator() {
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.onload = () => { textureImgRef.current = img; };
-    img.onerror = () => {
-      const c = document.createElement('canvas');
-      c.width = 16; c.height = 16;
-      const ctx = c.getContext('2d')!;
-      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-      ctx.lineWidth = 0.6;
-      ctx.beginPath(); ctx.moveTo(8,0); ctx.lineTo(16,16); ctx.lineTo(0,16); ctx.closePath(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(16,0); ctx.lineTo(8,16); ctx.closePath(); ctx.stroke();
-      const fb = new Image();
-      fb.onload = () => { textureImgRef.current = fb; };
-      fb.src = c.toDataURL();
+    img.onload = () => { 
+      textureImgRef.current = img; 
+      console.log('Texture loaded successfully');
     };
-    img.src = `${BASE}textures/battenburg.png`;
-  }, []);
+    img.onerror = () => {
+      console.log('Texture failed to load, trying fallback');
+      const fb = new Image();
+      fb.onload = () => { 
+        textureImgRef.current = fb; 
+        console.log('Fallback texture loaded');
+      };
+      fb.src = TEXTURE_IMAGES[0]; // Fallback to first texture
+    };
+    img.src = TEXTURE_IMAGES[activeTexture];
+    console.log('Loading texture from:', TEXTURE_IMAGES[activeTexture]);
+  }, [activeTexture]);
 
   const generateColors = useCallback((rows: number, cols: number, c1: string, c2: string): string[] => {
     const out: string[] = [];
@@ -110,13 +117,26 @@ export default function BattenburgGenerator() {
       ctx.fillStyle = color;
       ctx.fill();
       if (textureEnabled && textureImgRef.current) {
-        ctx.save(); ctx.clip();
+        ctx.save(); 
+        ctx.clip();
         ctx.globalAlpha = textureOpacity / 100;
-        const tSize = 16;
-        for (let ty = y; ty < y + cellHeight; ty += tSize)
-          for (let tx = x; tx < x + cellWidth; tx += tSize)
-            ctx.drawImage(textureImgRef.current, tx, ty, tSize, tSize);
-        ctx.globalAlpha = 1; ctx.restore();
+        
+        // Scale the texture to fit the cell
+        const scale = Math.max(cellWidth / textureImgRef.current.width, cellHeight / textureImgRef.current.height);
+        const scaledWidth = textureImgRef.current.width * scale;
+        const scaledHeight = textureImgRef.current.height * scale;
+        const offsetX = (cellWidth - scaledWidth) / 2;
+        const offsetY = (cellHeight - scaledHeight) / 2;
+        
+        ctx.drawImage(
+          textureImgRef.current,
+          x + offsetX,
+          y + offsetY,
+          scaledWidth,
+          scaledHeight
+        );
+        
+        ctx.restore();
       }
     });
 
@@ -370,8 +390,24 @@ export default function BattenburgGenerator() {
             {/* TEXTURE */}
             <div className="section-card">
               <div className="section-title"><Layers size={13} style={{ color: ACCENT }} />Texture Overlay</div>
+              
+              {/* Texture Selection */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>TEXTURE IMAGE</div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button 
+                    className={`livery-tab ${activeTexture === 0 ? 'active' : ''}`} 
+                    onClick={() => setActiveTexture(0)}
+                  >Rect 38</button>
+                  <button 
+                    className={`livery-tab ${activeTexture === 1 ? 'active' : ''}`} 
+                    onClick={() => setActiveTexture(1)}
+                  >Rect 38 (1)</button>
+                </div>
+              </div>
+              
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: pattern.textureEnabled ? 14 : 0 }}>
-                <span style={{ color: 'var(--text-2)', fontSize: 11 }}>Battenburg texture</span>
+                <span style={{ color: 'var(--text-2)', fontSize: 11 }}>Enable texture overlay</span>
                 <div className="toggle-track"
                   style={{ background: pattern.textureEnabled ? 'rgba(216,255,99,0.2)' : 'var(--surface2)' }}
                   onClick={() => setPattern(p => ({ ...p, textureEnabled: !p.textureEnabled }))}>
@@ -447,15 +483,17 @@ export default function BattenburgGenerator() {
                       position: 'relative', overflow: 'hidden',
                       width: pattern.cellWidth, height: pattern.cellHeight,
                     }}>
-                      {pattern.textureEnabled && (
-                        <div style={{
-                          position: 'absolute', inset: 0,
-                          backgroundImage: `url(${BASE}textures/battenburg.png)`,
-                          backgroundSize: '16px 16px', backgroundRepeat: 'repeat',
-                          opacity: pattern.textureOpacity / 100,
-                          mixBlendMode: 'overlay',
-                        }} />
-                      )}
+      {pattern.textureEnabled && textureImgRef.current && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${textureImgRef.current.src})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: pattern.textureOpacity / 100,
+          mixBlendMode: 'multiply',
+          pointerEvents: 'none',
+        }} />
+      )}
                     </div>
                   );
                 })}

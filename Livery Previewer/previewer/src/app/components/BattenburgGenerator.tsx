@@ -12,8 +12,7 @@ const LIVERY_IMAGES = [
 ];
 
 const TEXTURE_IMAGES = [
-  `${BASE}Rectangle_38.png`,
-  `${BASE}Rectangle_38 (1).png`,
+  `${BASE}waves.png`,
 ];
 
 interface BattenburgPattern {
@@ -53,20 +52,14 @@ export default function BattenburgGenerator() {
     img.crossOrigin = 'anonymous';
     img.onload = () => { 
       textureImgRef.current = img; 
-      console.log('Texture loaded successfully');
+      console.log('Waves texture loaded successfully');
     };
     img.onerror = () => {
-      console.log('Texture failed to load, trying fallback');
-      const fb = new Image();
-      fb.onload = () => { 
-        textureImgRef.current = fb; 
-        console.log('Fallback texture loaded');
-      };
-      fb.src = TEXTURE_IMAGES[0]; // Fallback to first texture
+      console.log('Waves texture failed to load');
     };
-    img.src = TEXTURE_IMAGES[activeTexture];
-    console.log('Loading texture from:', TEXTURE_IMAGES[activeTexture]);
-  }, [activeTexture]);
+    img.src = TEXTURE_IMAGES[0];
+    console.log('Loading waves texture from:', TEXTURE_IMAGES[0]);
+  }, []);
 
   const generateColors = useCallback((rows: number, cols: number, c1: string, c2: string): string[] => {
     const out: string[] = [];
@@ -118,22 +111,13 @@ export default function BattenburgGenerator() {
       ctx.fill();
       if (textureEnabled && textureImgRef.current) {
         ctx.save(); 
-        ctx.clip();
         ctx.globalAlpha = textureOpacity / 100;
         
-        // Scale the texture to fit the cell
-        const scale = Math.max(cellWidth / textureImgRef.current.width, cellHeight / textureImgRef.current.height);
-        const scaledWidth = textureImgRef.current.width * scale;
-        const scaledHeight = textureImgRef.current.height * scale;
-        const offsetX = (cellWidth - scaledWidth) / 2;
-        const offsetY = (cellHeight - scaledHeight) / 2;
-        
+        // Draw waves texture over entire battenburg pattern
         ctx.drawImage(
           textureImgRef.current,
-          x + offsetX,
-          y + offsetY,
-          scaledWidth,
-          scaledHeight
+          0, 0,
+          totalW, totalH
         );
         
         ctx.restore();
@@ -391,23 +375,8 @@ export default function BattenburgGenerator() {
             <div className="section-card">
               <div className="section-title"><Layers size={13} style={{ color: ACCENT }} />Texture Overlay</div>
               
-              {/* Texture Selection */}
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>TEXTURE IMAGE</div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button 
-                    className={`livery-tab ${activeTexture === 0 ? 'active' : ''}`} 
-                    onClick={() => setActiveTexture(0)}
-                  >Rect 38</button>
-                  <button 
-                    className={`livery-tab ${activeTexture === 1 ? 'active' : ''}`} 
-                    onClick={() => setActiveTexture(1)}
-                  >Rect 38 (1)</button>
-                </div>
-              </div>
-              
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: pattern.textureEnabled ? 14 : 0 }}>
-                <span style={{ color: 'var(--text-2)', fontSize: 11 }}>Enable texture overlay</span>
+                <span style={{ color: 'var(--text-2)', fontSize: 11 }}>Waves overlay</span>
                 <div className="toggle-track"
                   style={{ background: pattern.textureEnabled ? 'rgba(216,255,99,0.2)' : 'var(--surface2)' }}
                   onClick={() => setPattern(p => ({ ...p, textureEnabled: !p.textureEnabled }))}>
@@ -482,22 +451,23 @@ export default function BattenburgGenerator() {
                       borderRadius: rx,
                       position: 'relative', overflow: 'hidden',
                       width: pattern.cellWidth, height: pattern.cellHeight,
-                    }}>
-      {pattern.textureEnabled && textureImgRef.current && (
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: `url(${textureImgRef.current.src})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: pattern.textureOpacity / 100,
-          mixBlendMode: 'multiply',
-          pointerEvents: 'none',
-        }} />
-      )}
-                    </div>
+                    }} />
                   );
                 })}
               </div>
+              
+              {/* Waves overlay - covers entire pattern */}
+              {pattern.textureEnabled && textureImgRef.current && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: `url(${textureImgRef.current.src})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  opacity: pattern.textureOpacity / 100,
+                  mixBlendMode: 'multiply',
+                  pointerEvents: 'none',
+                }} />
+              )}
             </div>
           </div>
         </div>

@@ -1,15 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Layers, Sliders, Palette, Grid, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Download, Copy, Layers, Sliders, Palette, Grid, Plus, Minus, X } from 'lucide-react';
 import ColorPicker from './ColorPicker';
 
 const ACCENT = '#D8FF63';
 const BASE = (import.meta as any).env?.BASE_URL || '';
-
-const LIVERY_IMAGES = [
-  `${BASE}Rectangle_38.png`,
-  `${BASE}Rectangle_38 (1).png`,
-];
 
 const TEXTURE_IMAGES = [
   `${BASE}waves.png`,
@@ -27,10 +22,21 @@ interface BattenburgPattern {
   borderRadius: number;
 }
 
+const PRESET_SIZES = [
+  { label: '2x2', rows: 2, cols: 2 },
+  { label: '2x3', rows: 2, cols: 3 },
+  { label: '2x4', rows: 2, cols: 4 },
+  { label: '2x5', rows: 2, cols: 5 },
+  { label: '2x6', rows: 2, cols: 6 },
+  { label: '2x7', rows: 2, cols: 7 },
+  { label: '2x8', rows: 2, cols: 8 },
+  { label: '3x3', rows: 3, cols: 3 },
+  { label: '3x4', rows: 3, cols: 4 },
+  { label: '4x4', rows: 4, cols: 4 },
+];
+
 export default function BattenburgGenerator() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
-  const [activeLivery, setActiveLivery] = useState(0);
   const [pattern, setPattern] = useState<BattenburgPattern>({
     rows: 2,
     cols: 7,
@@ -67,6 +73,7 @@ export default function BattenburgGenerator() {
     }
   }, []);
 
+  // Generate battenburg colors
   const generateColors = useCallback((rows: number, cols: number, c1: string, c2: string): string[] => {
     const out: string[] = [];
     for (let r = 0; r < rows; r++)
@@ -75,25 +82,33 @@ export default function BattenburgGenerator() {
     return out;
   }, []);
 
+  // Update pattern size
   const updateSize = useCallback((rows: number, cols: number) => {
-    const r = Math.max(1, Math.min(12, rows));
-    const c = Math.max(1, Math.min(16, cols));
     setPattern(prev => ({
-      ...prev, rows: r, cols: c,
-      colors: generateColors(r, c, prev.colors[0] || '#C4FF0D', prev.colors[1] || '#006B2B'),
+      ...prev,
+      rows: Math.max(1, Math.min(12, rows)),
+      cols: Math.max(1, Math.min(16, cols)),
+      colors: generateColors(Math.max(1, Math.min(12, rows)), Math.max(1, Math.min(16, cols)), prev.colors[0] || '#C4FF0D', prev.colors[1] || '#006B2B')
     }));
   }, [generateColors]);
 
+  // Update basic colors
   const updateBasicColors = useCallback((c1: string, c2: string) => {
-    setPattern(prev => ({ ...prev, colors: generateColors(prev.rows, prev.cols, c1, c2) }));
+    setPattern(prev => ({
+      ...prev,
+      colors: generateColors(prev.rows, prev.cols, c1, c2)
+    }));
   }, [generateColors]);
 
+  // Update individual cell color
   const updateCellColor = useCallback((index: number, color: string) => {
     setPattern(prev => {
-      const next = [...prev.colors];
-      next[index] = color;
-      return { ...prev, colors: next };
+      const newColors = [...prev.colors];
+      newColors[index] = color;
+      return { ...prev, colors: newColors };
     });
+    setSelectedCellIndex(null);
+    setShowAdvancedColorPicker(false);
   }, []);
 
   const exportAsPNG = useCallback(() => {

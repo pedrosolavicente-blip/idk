@@ -16,12 +16,7 @@ interface BattenburgPattern {
 }
 
 const DEFAULT_TEXTURES = [
-  { id: 'none', name: 'None', url: '' },
-  { id: 'grid', name: 'Grid', url: `${BASE}textures/grid.png` },
-  { id: 'dots', name: 'Dots', url: `${BASE}textures/dots.png` },
-  { id: 'lines', name: 'Lines', url: `${BASE}textures/lines.png` },
-  { id: 'chevron', name: 'Chevron', url: `${BASE}textures/chevron.png` },
-  { id: 'diamond', name: 'Diamond', url: `${BASE}textures/diamond.png` },
+  { id: 'battenburg', name: 'Battenburg', url: `${BASE}textures/battenburg.png` },
 ];
 
 const PRESET_SIZES = [
@@ -99,9 +94,66 @@ export default function BattenburgGenerator() {
   }, []);
 
   const exportAsPNG = useCallback(() => {
-    // TODO: Implement PNG export
-    console.log('Export as PNG');
-  }, []);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const cellSize = pattern.cellSize;
+    const totalWidth = pattern.cols * cellSize;
+    const totalHeight = pattern.rows * cellSize;
+    
+    canvas.width = totalWidth;
+    canvas.height = totalHeight;
+
+    // Save context state
+    ctx.save();
+    
+    // Apply rotation
+    ctx.translate(totalWidth / 2, totalHeight / 2);
+    ctx.rotate((pattern.rotation * Math.PI) / 180);
+    ctx.translate(-totalWidth / 2, -totalHeight / 2);
+
+    // Draw battenburg pattern
+    pattern.colors.forEach((color, index) => {
+      const row = Math.floor(index / pattern.cols);
+      const col = index % pattern.cols;
+      const x = col * cellSize;
+      const y = row * cellSize;
+      
+      // Draw base color
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, cellSize, cellSize);
+      
+      // Apply texture overlay if selected
+      if (pattern.texture === 'battenburg') {
+        const texture = DEFAULT_TEXTURES.find(t => t.id === pattern.texture);
+        if (texture?.url) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.globalAlpha = 0.5;
+            ctx.drawImage(img, x, y, cellSize, cellSize);
+            ctx.globalAlpha = 1.0;
+            
+            // Download when all textures are loaded
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `battenburg-${pattern.rows}x${pattern.cols}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }
+            }, 'image/png');
+          };
+          img.src = texture.url;
+        }
+      }
+    });
+    
+    // Restore context state
+    ctx.restore();
+  }, [pattern]);
 
   const exportAsSVG = useCallback(() => {
     // TODO: Implement SVG export
@@ -179,23 +231,54 @@ export default function BattenburgGenerator() {
         .nav-item.active { border-color: rgba(216,255,99,0.3); background: rgba(216,255,99,0.08); color: #D8FF63; box-shadow: 0 0 12px rgba(216,255,99,0.08); }
 
         .size-btn {
-          padding: 5px 10px;
+          padding: 4px 8px;
           border-radius: 6px;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 600;
           letter-spacing: 0.04em;
           border: 1px solid var(--border);
           background: var(--surface2);
           color: var(--text-3);
           cursor: pointer;
-          transition: all 0.13s ease;
+          transition: all 0.15s ease;
+          position: relative;
+          overflow: hidden;
         }
-        .size-btn:hover { border-color: rgba(216,255,99,0.15); color: var(--text-2); background: linear-gradient(to right, rgba(216,255,99,0.1), rgba(216,255,99,0.02)); transform: translateY(-1px); }
+        .size-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .size-btn:hover::before {
+          left: 100%;
+        }
+        .size-btn:hover { 
+          border-color: rgba(216,255,99,0.3); 
+          color: var(--text-2); 
+          background: linear-gradient(135deg, rgba(216,255,99,0.05), rgba(216,255,99,0.02)); 
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(216,255,99,0.15);
+        }
         .size-btn.active {
           background: #D8FF63;
           border-color: #D8FF63;
           color: #000;
-          box-shadow: 0 0 14px rgba(216,255,99,0.3);
+          box-shadow: 0 0 16px rgba(216,255,99,0.4), inset 0 0 0 1px rgba(255,255,255,0.2);
+        }
+        .size-btn.active::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+          border-radius: 6px;
         }
 
         .control-section {
@@ -233,11 +316,26 @@ export default function BattenburgGenerator() {
           letter-spacing: 0.04em;
           border: 1px solid var(--border);
           cursor: pointer;
-          transition: all 0.13s ease;
+          transition: all 0.15s ease;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 6px;
+          position: relative;
+          overflow: hidden;
+        }
+        .export-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .export-btn:hover::before {
+          left: 100%;
         }
         .export-btn.primary {
           background: rgba(216,255,99,0.1);
@@ -247,7 +345,8 @@ export default function BattenburgGenerator() {
         .export-btn.primary:hover {
           background: rgba(216,255,99,0.15);
           border-color: rgba(216,255,99,0.4);
-          box-shadow: 0 0 16px rgba(216,255,99,0.15);
+          box-shadow: 0 0 20px rgba(216,255,99,0.2);
+          transform: translateY(-1px);
         }
         .export-btn.secondary {
           background: var(--surface2);
@@ -257,6 +356,8 @@ export default function BattenburgGenerator() {
           background: var(--surface3);
           border-color: rgba(216,255,99,0.2);
           color: var(--text-1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          transform: translateY(-1px);
         }
 
         .texture-dropdown {
@@ -300,16 +401,31 @@ export default function BattenburgGenerator() {
           border: 2px solid var(--border);
           border-radius: 4px;
           cursor: pointer;
-          transition: all 0.13s ease;
+          transition: all 0.15s ease;
           position: relative;
+          overflow: hidden;
+        }
+        .color-cell-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.3), transparent);
+          transition: left 0.4s ease;
+        }
+        .color-cell-btn:hover::before {
+          left: 100%;
         }
         .color-cell-btn:hover {
           border-color: rgba(216,255,99,0.3);
           transform: scale(1.05);
+          box-shadow: 0 0 12px rgba(216,255,99,0.2);
         }
         .color-cell-btn.selected {
           border-color: var(--accent);
-          box-shadow: 0 0 8px rgba(216,255,99,0.4);
+          box-shadow: 0 0 10px rgba(216,255,99,0.4), inset 0 0 0 1px rgba(255,255,255,0.2);
         }
 
         .main-preview {
@@ -391,19 +507,51 @@ export default function BattenburgGenerator() {
               ))}
             </div>
 
-            {/* Size Presets */}
+            {/* Size Selector - Compact & Innovative */}
             <div className="mb-6">
-              <div className="control-label">Size</div>
-              <div className="grid grid-cols-5 gap-2">
-                {PRESET_SIZES.map(size => (
-                  <button
-                    key={size.label}
-                    onClick={() => updatePatternSize(size.rows, size.cols)}
-                    className={`size-btn ${pattern.rows === size.rows && pattern.cols === size.cols ? 'active' : ''}`}
-                  >
-                    {size.label}
-                  </button>
-                ))}
+              <div className="control-label mb-3">Pattern Size</div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs" style={{ color: 'var(--text-3)' }}>Rows:</span>
+                  <input
+                    type="number"
+                    min="2"
+                    max="8"
+                    value={pattern.rows}
+                    onChange={(e) => updatePatternSize(parseInt(e.target.value), pattern.cols)}
+                    className="w-16 px-2 py-1 text-xs rounded"
+                    style={{
+                      background: 'var(--surface2)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-1)',
+                    }}
+                  />
+                </div>
+                <div className="text-lg" style={{ color: 'var(--accent)' }}>×</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs" style={{ color: 'var(--text-3)' }}>Cols:</span>
+                  <input
+                    type="number"
+                    min="2"
+                    max="8"
+                    value={pattern.cols}
+                    onChange={(e) => updatePatternSize(pattern.rows, parseInt(e.target.value))}
+                    className="w-16 px-2 py-1 text-xs rounded"
+                    style={{
+                      background: 'var(--surface2)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-1)',
+                    }}
+                  />
+                </div>
+                <div className="flex-1" />
+                <div className="text-xs font-mono px-2 py-1 rounded" style={{
+                  background: 'rgba(216,255,99,0.1)',
+                  color: '#D8FF63',
+                  border: '1px solid rgba(216,255,99,0.3)',
+                }}>
+                  {pattern.rows}×{pattern.cols}
+                </div>
               </div>
             </div>
 
@@ -519,32 +667,25 @@ export default function BattenburgGenerator() {
                 Texture Overlay
               </h3>
               
-              <div className="relative">
-                <button
-                  onClick={() => setShowTextureDropdown(!showTextureDropdown)}
-                  className="export-btn secondary"
-                >
-                  <Layers size={16} />
-                  {DEFAULT_TEXTURES.find(t => t.id === pattern.texture)?.name || 'None'}
-                  <ChevronDown size={14} className={`transition-transform ${showTextureDropdown ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {showTextureDropdown && (
-                  <div className="texture-dropdown">
-                    {DEFAULT_TEXTURES.map(texture => (
-                      <div
-                        key={texture.id}
-                        className="texture-option"
-                        onClick={() => {
-                          setPattern({...pattern, texture: texture.id});
-                          setShowTextureDropdown(false);
-                        }}
-                      >
-                        {texture.name}
-                      </div>
-                    ))}
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={pattern.texture === 'battenburg'}
+                    onChange={(e) => setPattern({...pattern, texture: e.target.checked ? 'battenburg' : 'none'})}
+                    className="sr-only"
+                  />
+                  <div className="w-10 h-6 rounded-full transition-colors duration-200 ease-in-out" style={{
+                    background: pattern.texture === 'battenburg' ? 'rgba(216,255,99,0.2)' : 'var(--surface2)',
+                    border: '1px solid var(--border)',
+                  }}>
+                    <div className="w-4 h-4 rounded-full bg-white transition-transform duration-200 ease-in-out" style={{
+                      transform: pattern.texture === 'battenburg' ? 'translateX(16px)' : 'translateX(2px)',
+                      boxShadow: '0 0 4px rgba(0,0,0,0.3)',
+                    }} />
                   </div>
-                )}
+                </label>
+                <span className="text-xs" style={{ color: 'var(--text-2)' }}>Apply battenburg texture</span>
               </div>
             </div>
 
@@ -555,14 +696,6 @@ export default function BattenburgGenerator() {
                 <button onClick={exportAsPNG} className="export-btn primary">
                   <Download size={16} />
                   Download as PNG
-                </button>
-                <button onClick={exportAsSVG} className="export-btn secondary">
-                  <Download size={16} />
-                  Download as SVG
-                </button>
-                <button onClick={copyCSSCode} className="export-btn secondary">
-                  <Copy size={16} />
-                  Copy CSS Code
                 </button>
               </div>
             </div>

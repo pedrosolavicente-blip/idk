@@ -30,6 +30,7 @@ interface BattenburgPattern {
 export default function BattenburgGenerator() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
+  const [activeLivery, setActiveLivery] = useState(0);
   const [pattern, setPattern] = useState<BattenburgPattern>({
     rows: 2,
     cols: 7,
@@ -45,19 +46,25 @@ export default function BattenburgGenerator() {
   const [showAdvancedColorPicker, setShowAdvancedColorPicker] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const textureImgRef = useRef<HTMLImageElement | null>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
+  // Mouse wheel zoom
   useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => { 
-      textureImgRef.current = img; 
-      console.log('Waves texture loaded successfully');
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY < 0) {
+        // Zoom in
+        setZoomLevel(prev => Math.min(prev + 0.1, 3));
+      } else if (e.deltaY > 0) {
+        // Zoom out
+        setZoomLevel(prev => Math.max(prev - 0.1, 0.5));
+      }
     };
-    img.onerror = () => {
-      console.log('Waves texture failed to load');
-    };
-    img.src = TEXTURE_IMAGES[0];
-    console.log('Loading waves texture from:', TEXTURE_IMAGES[0]);
+
+    const element = previewRef.current;
+    if (element) {
+      element.addEventListener('wheel', handleWheel, { passive: false });
+      return () => element.removeEventListener('wheel', handleWheel);
+    }
   }, []);
 
   const generateColors = useCallback((rows: number, cols: number, c1: string, c2: string): string[] => {
@@ -223,10 +230,18 @@ export default function BattenburgGenerator() {
           color: var(--text-1);
           border-color: rgba(255,255,255,0.2);
         }
-        .navbar-btn.active {
-          color: var(--accent);
-          border-color: rgba(216,255,99,0.3);
-          background: rgba(216,255,99,0.08);
+        .navbar-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .navbar-btn:hover::before {
+          left: 100%;
         }
 
         .lv-sidebar::-webkit-scrollbar { width: 3px; }
@@ -254,8 +269,18 @@ export default function BattenburgGenerator() {
           color: var(--text-1);
           border-color: rgba(255,255,255,0.2);
         }
-        .mode-btn.active {
-          background: rgba(216,255,99,0.08); border-color: rgba(216,255,99,0.35); color: #D8FF63;
+        .mode-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .mode-btn:hover::before {
+          left: 100%;
         }
 
         .section-card { 
@@ -285,12 +310,37 @@ export default function BattenburgGenerator() {
           border: 1px solid rgba(216,255,99,0.3); background: rgba(216,255,99,0.08); color: #D8FF63;
           cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .export-btn:hover { background: rgba(216,255,99,0.15); border-color: rgba(216,255,99,0.5); box-shadow: 0 0 24px rgba(216,255,99,0.2); transform: translateY(-1px); }
+        .export-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .export-btn:hover::before {
+          left: 100%;
+        }
 
         .livery-tab {
           flex: 1; padding: 6px 8px; border-radius: 8px; font-size: 9px; font-weight: 700;
           letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid var(--border);
           background: var(--surface2); color: var(--text-3); cursor: pointer; transition: all 0.15s;
+        }
+        .livery-tab::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .livery-tab:hover::before {
+          left: 100%;
         }
         .livery-tab.active { background: rgba(216,255,99,0.08); border-color: rgba(216,255,99,0.3); color: #D8FF63; }
 
@@ -300,6 +350,19 @@ export default function BattenburgGenerator() {
           cursor: pointer; transition: all 0.15s; text-align: center;
         }
         .preset-btn:hover { border-color: rgba(216,255,99,0.3); color: var(--text-1); }
+        .preset-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .preset-btn:hover::before {
+          left: 100%;
+        }
         .preset-btn.active { background: rgba(216,255,99,0.12); border-color: rgba(216,255,99,0.4); color: #D8FF63; }
 
         .color-cell-btn {
@@ -362,10 +425,18 @@ export default function BattenburgGenerator() {
           color: var(--text-1);
           border-color: rgba(255,255,255,0.2);
         }
-        .zoom-btn.active {
-          background: rgba(216,255,99,0.08);
-          border-color: rgba(216,255,99,0.3);
-          color: #D8FF63;
+        .zoom-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        .zoom-btn:hover::before {
+          left: 100%;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
@@ -407,45 +478,19 @@ export default function BattenburgGenerator() {
               ))}
             </div>
 
-            {/* COLORS */}
+            {/* LIVERY */}
             <div className="section-card">
-              <div className="section-title"><Palette size={13} style={{ color: ACCENT }} />Colors</div>
-              
-              {/* Advanced Button */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <div style={{ color: 'var(--text-2)', fontSize: 11 }}>Color Mode</div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  {(['basic', 'advanced'] as const).map(m => (
-                    <button key={m} className={`mode-btn ${mode === m ? 'active' : ''}`} onClick={() => setMode(m)}>{m}</button>
-                  ))}
-                </div>
+              <div className="section-title"><Layers size={13} style={{ color: ACCENT }} />Livery Base</div>
+              <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+                <button className={`livery-tab ${activeLivery === 0 ? 'active' : ''}`} onClick={() => setActiveLivery(0)}>Rect 38</button>
+                <button className={`livery-tab ${activeLivery === 1 ? 'active' : ''}`} onClick={() => setActiveLivery(1)}>Rect 38 (1)</button>
               </div>
-              
-              {mode === 'basic' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div>
-                    <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>COLOR A</div>
-                    <ColorPicker color={color1} onChange={c => updateBasicColors(c, color2)} />
-                  </div>
-                  <div>
-                    <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>COLOR B</div>
-                    <ColorPicker color={color2} onChange={c => updateBasicColors(color1, c)} />
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div style={{ color: 'var(--text-3)', fontSize: 10, marginBottom: 10 }}>Click a cell to change its color.</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(pattern.cols, 8)}, 1fr)`, gap: 3, padding: 10, background: 'var(--surface2)', borderRadius: 8, border: '1px solid var(--border)' }}>
-                    {pattern.colors.map((color, idx) => (
-                      <button key={idx}
-                        className={`color-cell-btn ${selectedCellIndex === idx ? 'selected' : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => { setSelectedCellIndex(idx); setShowAdvancedColorPicker(true); }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div style={{
+                borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)',
+                height: 44, background: 'var(--surface2)',
+                backgroundImage: `url(${LIVERY_IMAGES[activeLivery]})`,
+                backgroundSize: 'cover', backgroundPosition: 'center',
+              }} />
             </div>
 
             {/* TEXTURE */}
@@ -492,7 +537,7 @@ export default function BattenburgGenerator() {
           </div>
 
           {/* PREVIEW */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface0)', overflow: 'hidden', position: 'relative' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface0)', overflow: 'hidden', position: 'relative' }} ref={previewRef}>
             {/* Dot grid bg */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
@@ -510,6 +555,11 @@ export default function BattenburgGenerator() {
                 className={`zoom-btn ${zoomLevel === 2 ? 'active' : ''}`}
                 onClick={() => setZoomLevel(2)}
               >+</button>
+            </div>
+
+            {/* Zoom Indicator */}
+            <div className="zoom-indicator">
+              {Math.round(zoomLevel * 100)}%
             </div>
 
             {/* Composite: pattern */}

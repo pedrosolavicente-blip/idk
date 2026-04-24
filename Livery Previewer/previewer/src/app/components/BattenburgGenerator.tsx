@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Copy, Layers, ChevronDown, Sliders, Palette } from 'lucide-react';
+import { Download, Layers, Sliders, Palette, RotateCw, Grid, X, ChevronUp, ChevronDown } from 'lucide-react';
 import ColorPicker from './ColorPicker';
 
 const ACCENT = '#D8FF63';
@@ -12,25 +12,11 @@ interface BattenburgPattern {
   colors: string[];
   cellSize: number;
   rotation: number;
-  texture?: string;
+  textureEnabled: boolean;
+  textureOpacity: number;
+  gap: number;
+  borderRadius: number;
 }
-
-const DEFAULT_TEXTURES = [
-  { id: 'battenburg', name: 'Battenburg', url: `${BASE}textures/battenburg.png` },
-];
-
-const PRESET_SIZES = [
-  { label: '2x2', rows: 2, cols: 2 },
-  { label: '2x3', rows: 2, cols: 3 },
-  { label: '2x4', rows: 2, cols: 4 },
-  { label: '2x5', rows: 2, cols: 5 },
-  { label: '2x6', rows: 2, cols: 6 },
-  { label: '2x7', rows: 2, cols: 7 },
-  { label: '2x8', rows: 2, cols: 8 },
-  { label: '3x3', rows: 3, cols: 3 },
-  { label: '3x4', rows: 3, cols: 4 },
-  { label: '4x4', rows: 4, cols: 4 },
-];
 
 export default function BattenburgGenerator() {
   const navigate = useNavigate();
@@ -39,136 +25,234 @@ export default function BattenburgGenerator() {
     rows: 2,
     cols: 7,
     colors: ['#ff6b6b', '#ffffff'],
-    cellSize: 50,
+    cellSize: 60,
     rotation: 0,
-    texture: 'none'
+    textureEnabled: false,
+    textureOpacity: 40,
+    gap: 2,
+    borderRadius: 0,
   });
-  const [showTextureDropdown, setShowTextureDropdown] = useState(false);
   const [selectedCellIndex, setSelectedCellIndex] = useState<number | null>(null);
   const [showAdvancedColorPicker, setShowAdvancedColorPicker] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const [textureImageLoaded, setTextureImageLoaded] = useState(false);
+  const textureImgRef = useRef<HTMLImageElement | null>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
-  const generateBattenburgColors = useCallback((rows: number, cols: number, color1: string, color2: string): string[] => {
+  // Preload texture image
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      textureImgRef.current = img;
+      setTextureImageLoaded(true);
+    };
+    img.onerror = () => {
+      // Fallback: create a canvas-based battenburg texture
+      const c = document.createElement('canvas');
+      c.width = 20; c.height = 20;
+      const ctx = c.getContext('2d')!;
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.fillRect(0, 0, 10, 10);
+      ctx.fillRect(10, 10, 10, 10);
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(10, 0, 10, 10);
+      ctx.fillRect(0, 10, 10, 10);
+      const fallbackImg = new Image();
+      fallbackImg.onload = () => {
+        textureImgRef.current = fallbackImg;
+        setTextureImageLoaded(true);
+      };
+      fallbackImg.src = c.toDataURL();
+    };
+    img.src = `${BASE}textures/battenburg.png`;
+  }, []);
+
+  const generateColors = useCallback((rows: number, cols: number, c1: string, c2: string): string[] => {
     const colors: string[] = [];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        colors.push((row + col) % 2 === 0 ? color1 : color2);
-      }
-    }
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        colors.push((r + c) % 2 === 0 ? c1 : c2);
     return colors;
   }, []);
 
-  const updatePatternSize = useCallback((rows: number, cols: number) => {
-    if (mode === 'basic') {
-      setPattern(prev => ({
-        ...prev,
-        rows,
-        cols,
-        colors: generateBattenburgColors(rows, cols, prev.colors[0] || '#ff6b6b', prev.colors[1] || '#ffffff')
-      }));
-    } else {
-      setPattern(prev => ({
-        ...prev,
-        rows,
-        cols,
-        colors: generateBattenburgColors(rows, cols, prev.colors[0] || '#ff6b6b', prev.colors[1] || '#ffffff')
-      }));
-    }
-  }, [mode, generateBattenburgColors]);
-
-  const updateBasicColors = useCallback((color1: string, color2: string) => {
+  const updateSize = useCallback((rows: number, cols: number) => {
+    const r = Math.max(1, Math.min(12, rows));
+    const c = Math.max(1, Math.min(16, cols));
     setPattern(prev => ({
       ...prev,
-      colors: generateBattenburgColors(prev.rows, prev.cols, color1, color2)
+      rows: r,
+      cols: c,
+      colors: generateColors(r, c, prev.colors[0] || '#ff6b6b', prev.colors[1] || '#ffffff'),
     }));
-  }, [generateBattenburgColors]);
+  }, [generateColors]);
 
-  const updateIndividualColor = useCallback((index: number, color: string) => {
+  const updateBasicColors = useCallback((c1: string, c2: string) => {
+    setPattern(prev => ({
+      ...prev,
+      colors: generateColors(prev.rows, prev.cols, c1, c2),
+    }));
+  }, [generateColors]);
+
+  const updateCellColor = useCallback((index: number, color: string) => {
     setPattern(prev => {
-      const newColors = [...prev.colors];
-      newColors[index] = color;
-      return { ...prev, colors: newColors };
+      const next = [...prev.colors];
+      next[index] = color;
+      return { ...prev, colors: next };
     });
-    setSelectedCellIndex(null);
-    setShowAdvancedColorPicker(false);
   }, []);
 
+  // ---- EXPORT: render to canvas and download ----
   const exportAsPNG = useCallback(() => {
+    const { rows, cols, colors, cellSize, rotation, textureEnabled, textureOpacity, gap, borderRadius } = pattern;
+    const totalW = cols * (cellSize + gap) - gap;
+    const totalH = rows * (cellSize + gap) - gap;
+
+    // Compute canvas size accounting for rotation
+    const rad = (rotation * Math.PI) / 180;
+    const cos = Math.abs(Math.cos(rad));
+    const sin = Math.abs(Math.sin(rad));
+    const canvasW = Math.ceil(totalW * cos + totalH * sin);
+    const canvasH = Math.ceil(totalW * sin + totalH * cos);
+
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    const ctx = canvas.getContext('2d')!;
 
-    const cellSize = pattern.cellSize;
-    const totalWidth = pattern.cols * cellSize;
-    const totalHeight = pattern.rows * cellSize;
-    
-    canvas.width = totalWidth;
-    canvas.height = totalHeight;
-
-    // Save context state
     ctx.save();
-    
-    // Apply rotation
-    ctx.translate(totalWidth / 2, totalHeight / 2);
-    ctx.rotate((pattern.rotation * Math.PI) / 180);
-    ctx.translate(-totalWidth / 2, -totalHeight / 2);
+    ctx.translate(canvasW / 2, canvasH / 2);
+    ctx.rotate(rad);
+    ctx.translate(-totalW / 2, -totalH / 2);
 
-    // Draw battenburg pattern
-    pattern.colors.forEach((color, index) => {
-      const row = Math.floor(index / pattern.cols);
-      const col = index % pattern.cols;
-      const x = col * cellSize;
-      const y = row * cellSize;
-      
-      // Draw base color
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y, cellSize, cellSize);
-      
-      // Apply texture overlay if selected
-      if (pattern.texture === 'battenburg') {
-        const texture = DEFAULT_TEXTURES.find(t => t.id === pattern.texture);
-        if (texture?.url) {
-          const img = new Image();
-          img.onload = () => {
-            ctx.globalAlpha = 0.5;
-            ctx.drawImage(img, x, y, cellSize, cellSize);
-            ctx.globalAlpha = 1.0;
-            
-            // Download when all textures are loaded
-            canvas.toBlob((blob) => {
-              if (blob) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `battenburg-${pattern.rows}x${pattern.cols}.png`;
-                a.click();
-                URL.revokeObjectURL(url);
-              }
-            }, 'image/png');
-          };
-          img.src = texture.url;
+    colors.forEach((color, idx) => {
+      const row = Math.floor(idx / cols);
+      const col = idx % cols;
+      const x = col * (cellSize + gap);
+      const y = row * (cellSize + gap);
+
+      if (borderRadius > 0) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, cellSize, cellSize, borderRadius);
+        ctx.fillStyle = color;
+        ctx.fill();
+      } else {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, cellSize, cellSize);
+      }
+
+      // Texture overlay
+      if (textureEnabled && textureImgRef.current) {
+        ctx.save();
+        if (borderRadius > 0) {
+          ctx.beginPath();
+          ctx.roundRect(x, y, cellSize, cellSize, borderRadius);
+          ctx.clip();
         }
+        ctx.globalAlpha = textureOpacity / 100;
+        const tSize = 20;
+        for (let ty = y; ty < y + cellSize; ty += tSize)
+          for (let tx = x; tx < x + cellSize; tx += tSize)
+            ctx.drawImage(textureImgRef.current, tx, ty, tSize, tSize);
+        ctx.globalAlpha = 1;
+        ctx.restore();
       }
     });
-    
-    // Restore context state
+
     ctx.restore();
+
+    canvas.toBlob(blob => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `battenburg-${rows}x${cols}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
   }, [pattern]);
 
-  const exportAsSVG = useCallback(() => {
-    // TODO: Implement SVG export
-    console.log('Export as SVG');
-  }, []);
+  // ---- Stepper input component ----
+  const Stepper = ({ label, value, min, max, onChange }: {
+    label: string; value: number; min: number; max: number; onChange: (v: number) => void;
+  }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', minWidth: 32 }}>{label}</span>
+      <div style={{
+        display: 'flex', alignItems: 'center',
+        background: 'var(--surface2)',
+        border: '1px solid var(--border)',
+        borderRadius: 8,
+        overflow: 'hidden',
+        height: 30,
+      }}>
+        <button
+          onClick={() => onChange(Math.max(min, value - 1))}
+          style={{
+            width: 28, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-3)', transition: 'color 0.15s',
+            borderRight: '1px solid var(--border)',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-3)')}
+        >
+          <ChevronDown size={12} />
+        </button>
+        <input
+          type="number" min={min} max={max} value={value}
+          onChange={e => onChange(Math.max(min, Math.min(max, parseInt(e.target.value) || min)))}
+          style={{
+            width: 40, height: '100%', textAlign: 'center', background: 'none',
+            border: 'none', color: 'var(--text-1)', fontSize: 12, fontWeight: 600,
+            outline: 'none', MozAppearance: 'textfield',
+          }}
+        />
+        <button
+          onClick={() => onChange(Math.min(max, value + 1))}
+          style={{
+            width: 28, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-3)', transition: 'color 0.15s',
+            borderLeft: '1px solid var(--border)',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-3)')}
+        >
+          <ChevronUp size={12} />
+        </button>
+      </div>
+    </div>
+  );
 
-  const copyCSSCode = useCallback(() => {
-    // TODO: Implement CSS export
-    console.log('Copy CSS code');
-  }, []);
+  const SliderControl = ({ label, value, min, max, unit = '', onChange }: {
+    label: string; value: number; min: number; max: number; unit?: string; onChange: (v: number) => void;
+  }) => (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ color: 'var(--text-2)', fontSize: 11, fontWeight: 500, letterSpacing: '0.02em' }}>{label}</span>
+        <span style={{
+          color: ACCENT, fontSize: 10, fontWeight: 700, fontFamily: 'monospace',
+          background: 'rgba(216,255,99,0.08)', padding: '2px 8px',
+          borderRadius: 4, border: '1px solid rgba(216,255,99,0.2)',
+        }}>{value}{unit}</span>
+      </div>
+      <input
+        type="range" min={min} max={max} value={value}
+        onChange={e => onChange(parseInt(e.target.value))}
+        className="lv-range" style={{ width: '100%' }}
+      />
+    </div>
+  );
+
+  const color1 = pattern.colors[0] || '#ff6b6b';
+  const color2 = pattern.colors[1] || '#ffffff';
 
   return (
     <>
       <style>{`
-        *, *::before, *::after { font-family: 'Inter', sans-serif !important; }
+        *, *::before, *::after { font-family: 'Inter', sans-serif !important; box-sizing: border-box; }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
         :root {
           --accent: #D8FF63;
@@ -181,10 +265,9 @@ export default function BattenburgGenerator() {
           --text-1: #f4f4f5;
           --text-2: #a1a1aa;
           --text-3: #71717a;
-          --text-4: #3f3f46;
         }
 
-        .lv-sidebar::-webkit-scrollbar       { width: 2px; }
+        .lv-sidebar::-webkit-scrollbar       { width: 3px; }
         .lv-sidebar::-webkit-scrollbar-track { background: transparent; }
         .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(216,255,99,0.2); border-radius: 99px; }
         .lv-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(216,255,99,0.45); }
@@ -192,10 +275,11 @@ export default function BattenburgGenerator() {
         .lv-range {
           -webkit-appearance: none;
           appearance: none;
-          height: 4px;
+          height: 3px;
           border-radius: 99px;
           outline: none;
           cursor: pointer;
+          background: var(--surface3);
         }
         .lv-range::-webkit-slider-thumb {
           -webkit-appearance: none;
@@ -205,539 +289,501 @@ export default function BattenburgGenerator() {
           border: 2px solid #080808;
           box-shadow: 0 0 8px rgba(216,255,99,0.5);
           cursor: pointer;
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
+          transition: transform 0.15s, box-shadow 0.15s;
         }
         .lv-range::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-          box-shadow: 0 0 14px rgba(216,255,99,0.7);
+          transform: scale(1.3);
+          box-shadow: 0 0 16px rgba(216,255,99,0.8);
         }
 
-        .nav-item {
-          display: flex; align-items: center; gap: 6px;
-          padding: 0 14px;
-          height: 32px;
+        .mode-btn {
+          flex: 1;
+          padding: 6px 0;
           border-radius: 8px;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          border: 1px solid var(--border);
-          background: var(--surface1);
-          color: var(--text-3);
-          cursor: pointer;
-          transition: all 0.15s ease;
-          white-space: nowrap;
-        }
-        .nav-item:hover { border-color: rgba(216,255,99,0.2); color: var(--text-2); }
-        .nav-item.active { border-color: rgba(216,255,99,0.3); background: rgba(216,255,99,0.08); color: #D8FF63; box-shadow: 0 0 12px rgba(216,255,99,0.08); }
-
-        .size-btn {
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
           border: 1px solid var(--border);
           background: var(--surface2);
           color: var(--text-3);
           cursor: pointer;
-          transition: all 0.15s ease;
-          position: relative;
-          overflow: hidden;
+          transition: all 0.15s;
         }
-        .size-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
-          transition: left 0.5s ease;
-        }
-        .size-btn:hover::before {
-          left: 100%;
-        }
-        .size-btn:hover { 
-          border-color: rgba(216,255,99,0.3); 
-          color: var(--text-2); 
-          background: linear-gradient(135deg, rgba(216,255,99,0.05), rgba(216,255,99,0.02)); 
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(216,255,99,0.15);
-        }
-        .size-btn.active {
-          background: #D8FF63;
-          border-color: #D8FF63;
-          color: #000;
-          box-shadow: 0 0 16px rgba(216,255,99,0.4), inset 0 0 0 1px rgba(255,255,255,0.2);
-        }
-        .size-btn.active::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
-          border-radius: 6px;
+        .mode-btn.active {
+          background: rgba(216,255,99,0.1);
+          border-color: rgba(216,255,99,0.35);
+          color: #D8FF63;
+          box-shadow: 0 0 12px rgba(216,255,99,0.1);
         }
 
-        .control-section {
+        .section-card {
           background: var(--surface1);
           border: 1px solid var(--border);
           border-radius: 12px;
           padding: 16px;
+          margin-bottom: 12px;
         }
 
         .section-title {
           color: var(--text-1);
-          font-weight: 600;
-          font-size: 13px;
-          letter-spacing: 0.04em;
-          margin-bottom: 16px;
+          font-weight: 700;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 14px;
           display: flex;
           align-items: center;
           gap: 8px;
         }
 
-        .control-label {
-          color: var(--text-2);
-          font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.02em;
-          margin-bottom: 8px;
-        }
-
         .export-btn {
           width: 100%;
-          padding: 8px 12px;
-          border-radius: 6px;
+          padding: 10px 14px;
+          border-radius: 8px;
           font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          border: 1px solid var(--border);
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          border: 1px solid rgba(216,255,99,0.3);
+          background: rgba(216,255,99,0.08);
+          color: #D8FF63;
           cursor: pointer;
-          transition: all 0.15s ease;
+          transition: all 0.15s;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          position: relative;
-          overflow: hidden;
+          gap: 8px;
         }
-        .export-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.2), transparent);
-          transition: left 0.5s ease;
-        }
-        .export-btn:hover::before {
-          left: 100%;
-        }
-        .export-btn.primary {
-          background: rgba(216,255,99,0.1);
-          border-color: rgba(216,255,99,0.3);
-          color: #D8FF63;
-        }
-        .export-btn.primary:hover {
+        .export-btn:hover {
           background: rgba(216,255,99,0.15);
-          border-color: rgba(216,255,99,0.4);
-          box-shadow: 0 0 20px rgba(216,255,99,0.2);
+          border-color: rgba(216,255,99,0.5);
+          box-shadow: 0 0 24px rgba(216,255,99,0.2);
           transform: translateY(-1px);
         }
-        .export-btn.secondary {
-          background: var(--surface2);
-          color: var(--text-2);
-        }
-        .export-btn.secondary:hover {
-          background: var(--surface3);
-          border-color: rgba(216,255,99,0.2);
-          color: var(--text-1);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-          transform: translateY(-1px);
-        }
+        .export-btn:active { transform: translateY(0); }
 
-        .texture-dropdown {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          margin-top: 4px;
-          background: var(--surface2);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          z-index: 50;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-        .texture-option {
-          padding: 8px 12px;
-          font-size: 11px;
-          color: var(--text-2);
-          cursor: pointer;
-          transition: all 0.13s ease;
-          border-bottom: 1px solid var(--border);
-        }
-        .texture-option:last-child {
-          border-bottom: none;
-        }
-        .texture-option:hover {
-          background: var(--surface3);
-          color: var(--text-1);
-        }
-
-        .individual-color-grid {
-          display: grid;
-          gap: 3px;
-          padding: 12px;
-          background: var(--surface2);
-          border-radius: 8px;
-          border: 1px solid var(--border);
-        }
         .color-cell-btn {
           aspect-ratio: 1;
-          border: 2px solid var(--border);
-          border-radius: 4px;
+          border: 2px solid rgba(255,255,255,0.1);
+          border-radius: 5px;
           cursor: pointer;
-          transition: all 0.15s ease;
+          transition: all 0.15s;
           position: relative;
-          overflow: hidden;
-        }
-        .color-cell-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.3), transparent);
-          transition: left 0.4s ease;
-        }
-        .color-cell-btn:hover::before {
-          left: 100%;
         }
         .color-cell-btn:hover {
-          border-color: rgba(216,255,99,0.3);
-          transform: scale(1.05);
-          box-shadow: 0 0 12px rgba(216,255,99,0.2);
+          border-color: rgba(216,255,99,0.5);
+          transform: scale(1.08);
+          z-index: 2;
+          box-shadow: 0 0 10px rgba(216,255,99,0.25);
         }
         .color-cell-btn.selected {
-          border-color: var(--accent);
-          box-shadow: 0 0 10px rgba(216,255,99,0.4), inset 0 0 0 1px rgba(255,255,255,0.2);
+          border-color: #D8FF63;
+          box-shadow: 0 0 12px rgba(216,255,99,0.5);
+          z-index: 3;
         }
 
-        .main-preview {
-          background: var(--surface0);
+        .toggle-track {
+          width: 36px; height: 20px;
+          border-radius: 99px;
           border: 1px solid var(--border);
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 500px;
+          cursor: pointer;
+          transition: all 0.2s;
           position: relative;
+          flex-shrink: 0;
+        }
+        .toggle-thumb {
+          position: absolute;
+          top: 2px;
+          width: 14px; height: 14px;
+          border-radius: 50%;
+          background: white;
+          transition: transform 0.2s, background 0.2s;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
         }
 
-        .controls-sidebar {
-          width: 320px;
-          background: var(--surface1);
+        .preset-grid {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 4px;
+        }
+        .preset-btn {
+          padding: 5px 2px;
+          border-radius: 6px;
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: 0.02em;
           border: 1px solid var(--border);
-          border-radius: 12px;
-          padding: 20px;
-          height: fit-content;
+          background: var(--surface2);
+          color: var(--text-3);
+          cursor: pointer;
+          transition: all 0.15s;
+          text-align: center;
+        }
+        .preset-btn:hover {
+          border-color: rgba(216,255,99,0.3);
+          color: var(--text-1);
+          background: rgba(216,255,99,0.05);
+        }
+        .preset-btn.active {
+          background: rgba(216,255,99,0.12);
+          border-color: rgba(216,255,99,0.4);
+          color: #D8FF63;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.97); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .modal-enter { animation: fadeIn 0.15s ease; }
+
+        .grid-cell {
+          transition: transform 0.1s;
+        }
+        .grid-cell:hover {
+          transform: scale(0.97);
+          z-index: 1;
         }
       `}</style>
-      
-      <div className="min-h-screen bg-container">
-        {/* Shared Navbar */}
-        <nav className="relative z-50 flex items-center justify-between px-8 transition-all duration-300"
-          style={{
-            paddingTop: '10px',
-            paddingBottom: '10px',
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 100%)',
-            backdropFilter: 'blur(32px)',
-            WebkitBackdropFilter: 'blur(32px)',
-            borderBottom: '1px solid rgba(255,255,255,0.05)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.8), 0 1px 0 0 rgba(196,255,13,0.03), inset 0 1px 0 0 rgba(255,255,255,0.05)',
-          }}
-        >
-          <img src={`${BASE}itzz.svg`} alt="itzz" className="h-7 w-auto cursor-pointer transition-transform hover:scale-105"
-            onClick={() => navigate('/')} />
-          
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/tools')}
-              className="text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-lg transition-all duration-300 relative overflow-hidden group"
-              style={{
-                color: '#a1a1aa',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              <span className="relative z-10">Back to Tools</span>
-            </button>
-          </div>
+
+      <div style={{ minHeight: '100vh', background: 'var(--surface0)' }}>
+        {/* Navbar */}
+        <nav style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 32px',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.97), rgba(0,0,0,0.92))',
+          backdropFilter: 'blur(32px)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.8)',
+        }}>
+          <img src={`${BASE}itzz.svg`} alt="itzz"
+            style={{ height: 28, cursor: 'pointer', transition: 'transform 0.2s' }}
+            onClick={() => navigate('/')}
+            onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
+            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+          />
+          <button
+            onClick={() => navigate('/tools')}
+            style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+              padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
+              color: 'var(--text-3)', background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+          >
+            Back to Tools
+          </button>
         </nav>
 
-        {/* Main Content */}
-        <div className="flex h-screen pt-16" style={{ background: 'var(--surface0)' }}>
-          {/* Controls Sidebar */}
-          <div className="controls-sidebar lv-sidebar overflow-y-auto">
-            <h3 className="section-title">
-              <Sliders size={16} />
-              Pattern Settings
-            </h3>
-            
-            {/* Mode Toggle */}
-            <div className="flex gap-1.5 mb-6">
-              {(['basic','advanced'] as const).map(m => (
-                <button key={m} onClick={() => setMode(m)}
-                  className="size-btn flex-1"
-                  style={{
-                    background: mode === m ? 'rgba(216,255,99,0.1)' : 'var(--surface2)',
-                    borderColor: mode === m ? 'rgba(216,255,99,0.3)' : 'var(--border)',
-                    color: mode === m ? '#D8FF63' : 'var(--text-3)',
-                  }}
-                >
-                  {m.charAt(0).toUpperCase() + m.slice(1)}
+        {/* Main Layout */}
+        <div style={{ display: 'flex', height: '100vh', paddingTop: 52 }}>
+
+          {/* ---- SIDEBAR ---- */}
+          <div className="lv-sidebar" style={{
+            width: 300, minWidth: 300,
+            overflowY: 'auto', padding: '16px 14px',
+            borderRight: '1px solid var(--border)',
+            background: 'var(--surface0)',
+          }}>
+
+            {/* Mode toggle */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+              {(['basic', 'advanced'] as const).map(m => (
+                <button key={m} className={`mode-btn ${mode === m ? 'active' : ''}`}
+                  onClick={() => setMode(m)}>
+                  {m}
                 </button>
               ))}
             </div>
 
-            {/* Size Selector - Compact & Innovative */}
-            <div className="mb-6">
-              <div className="control-label mb-3">Pattern Size</div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs" style={{ color: 'var(--text-3)' }}>Rows:</span>
-                  <input
-                    type="number"
-                    min="2"
-                    max="8"
-                    value={pattern.rows}
-                    onChange={(e) => updatePatternSize(parseInt(e.target.value), pattern.cols)}
-                    className="w-16 px-2 py-1 text-xs rounded"
-                    style={{
-                      background: 'var(--surface2)',
-                      border: '1px solid var(--border)',
-                      color: 'var(--text-1)',
-                    }}
-                  />
-                </div>
-                <div className="text-lg" style={{ color: 'var(--accent)' }}>×</div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs" style={{ color: 'var(--text-3)' }}>Cols:</span>
-                  <input
-                    type="number"
-                    min="2"
-                    max="8"
-                    value={pattern.cols}
-                    onChange={(e) => updatePatternSize(pattern.rows, parseInt(e.target.value))}
-                    className="w-16 px-2 py-1 text-xs rounded"
-                    style={{
-                      background: 'var(--surface2)',
-                      border: '1px solid var(--border)',
-                      color: 'var(--text-1)',
-                    }}
-                  />
-                </div>
-                <div className="flex-1" />
-                <div className="text-xs font-mono px-2 py-1 rounded" style={{
-                  background: 'rgba(216,255,99,0.1)',
-                  color: '#D8FF63',
-                  border: '1px solid rgba(216,255,99,0.3)',
-                }}>
-                  {pattern.rows}×{pattern.cols}
-                </div>
+            {/* === GRID SIZE === */}
+            <div className="section-card">
+              <div className="section-title">
+                <Grid size={13} style={{ color: ACCENT }} />
+                Grid Size
               </div>
-            </div>
 
-            {/* Cell Size */}
-            <div className="mb-6">
-              <div className="control-label">Cell Size: {pattern.cellSize}px</div>
-              <input
-                type="range"
-                min="20"
-                max="100"
-                value={pattern.cellSize}
-                onChange={(e) => setPattern({...pattern, cellSize: parseInt(e.target.value)})}
-                className="lv-range w-full"
-                style={{
-                  background: 'linear-gradient(to right, var(--surface3) 0%, var(--surface3) 100%)',
-                }}
-              />
-            </div>
-
-            {/* Rotation */}
-            <div className="mb-6">
-              <div className="control-label">Rotation: {pattern.rotation}°</div>
-              <input
-                type="range"
-                min="0"
-                max="360"
-                value={pattern.rotation}
-                onChange={(e) => setPattern({...pattern, rotation: parseInt(e.target.value)})}
-                className="lv-range w-full"
-                style={{
-                  background: 'linear-gradient(to right, var(--surface3) 0%, var(--surface3) 100%)',
-                }}
-              />
-            </div>
-
-            {/* Colors Section */}
-            {mode === 'basic' ? (
-              <div className="space-y-4 mb-6">
-                <div className="control-label">Colors</div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <ColorPicker
-                      color={pattern.colors[0] || '#ff6b6b'}
-                      onChange={(color) => updateBasicColors(color, pattern.colors[1] || '#ffffff')}
-                    />
-                    <div className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>Color 1</div>
-                  </div>
-                  <div>
-                    <ColorPicker
-                      color={pattern.colors[1] || '#ffffff'}
-                      onChange={(color) => updateBasicColors(pattern.colors[0] || '#ff6b6b', color)}
-                    />
-                    <div className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>Color 2</div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4 mb-6">
-                <div className="control-label">Individual Colors</div>
-                <div 
-                  className="individual-color-grid"
-                  style={{
-                    gridTemplateColumns: `repeat(${pattern.cols}, 1fr)`,
-                  }}
-                >
-                  {pattern.colors.map((color, index) => (
+              {/* Presets */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', marginBottom: 8 }}>PRESETS</div>
+                <div className="preset-grid">
+                  {[
+                    { r: 2, c: 2 }, { r: 2, c: 4 }, { r: 2, c: 7 }, { r: 3, c: 3 }, { r: 3, c: 5 },
+                    { r: 4, c: 4 }, { r: 4, c: 6 }, { r: 2, c: 10 }, { r: 5, c: 5 }, { r: 6, c: 6 },
+                  ].map(({ r, c }) => (
                     <button
-                      key={index}
-                      className={`color-cell-btn ${selectedCellIndex === index ? 'selected' : ''}`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => {
-                        setSelectedCellIndex(index);
-                        setShowAdvancedColorPicker(true);
-                      }}
-                    />
+                      key={`${r}x${c}`}
+                      className={`preset-btn ${pattern.rows === r && pattern.cols === c ? 'active' : ''}`}
+                      onClick={() => updateSize(r, c)}
+                    >
+                      {r}×{c}
+                    </button>
                   ))}
                 </div>
-                
-                {/* Advanced Color Picker Modal */}
-                {showAdvancedColorPicker && selectedCellIndex !== null && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-                    <div className="control-section" style={{ width: '320px' }}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="section-title" style={{ margin: 0 }}>
-                          <Palette size={16} />
-                          Cell Color
-                        </div>
-                        <button
-                          onClick={() => {
-                            setShowAdvancedColorPicker(false);
-                            setSelectedCellIndex(null);
-                          }}
-                          className="size-btn"
-                          style={{ padding: '4px 8px' }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                      <ColorPicker
-                        color={pattern.colors[selectedCellIndex]}
-                        onChange={(color) => updateIndividualColor(selectedCellIndex, color)}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
-            )}
 
-            {/* Texture Settings */}
-            <div className="control-section mb-6">
-              <h3 className="section-title">
-                <Layers size={16} />
-                Texture Overlay
-              </h3>
-              
-              <div className="flex items-center gap-3">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={pattern.texture === 'battenburg'}
-                    onChange={(e) => setPattern({...pattern, texture: e.target.checked ? 'battenburg' : 'none'})}
-                    className="sr-only"
-                  />
-                  <div className="w-10 h-6 rounded-full transition-colors duration-200 ease-in-out" style={{
-                    background: pattern.texture === 'battenburg' ? 'rgba(216,255,99,0.2)' : 'var(--surface2)',
-                    border: '1px solid var(--border)',
-                  }}>
-                    <div className="w-4 h-4 rounded-full bg-white transition-transform duration-200 ease-in-out" style={{
-                      transform: pattern.texture === 'battenburg' ? 'translateX(16px)' : 'translateX(2px)',
-                      boxShadow: '0 0 4px rgba(0,0,0,0.3)',
-                    }} />
-                  </div>
-                </label>
-                <span className="text-xs" style={{ color: 'var(--text-2)' }}>Apply battenburg texture</span>
+              {/* Manual steppers */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Stepper label="ROWS" value={pattern.rows} min={1} max={12} onChange={v => updateSize(v, pattern.cols)} />
+                <Stepper label="COLS" value={pattern.cols} min={1} max={16} onChange={v => updateSize(pattern.rows, v)} />
               </div>
             </div>
 
-            {/* Export Options */}
-            <div className="control-section">
-              <h3 className="section-title">Export</h3>
-              <div className="space-y-2">
-                <button onClick={exportAsPNG} className="export-btn primary">
-                  <Download size={16} />
-                  Download as PNG
-                </button>
+            {/* === CELL SETTINGS === */}
+            <div className="section-card">
+              <div className="section-title">
+                <Sliders size={13} style={{ color: ACCENT }} />
+                Cell Settings
               </div>
+              <SliderControl label="Cell Size" value={pattern.cellSize} min={20} max={120} unit="px"
+                onChange={v => setPattern(p => ({ ...p, cellSize: v }))} />
+              <SliderControl label="Gap" value={pattern.gap} min={0} max={20} unit="px"
+                onChange={v => setPattern(p => ({ ...p, gap: v }))} />
+              <SliderControl label="Border Radius" value={pattern.borderRadius} min={0} max={50} unit="%"
+                onChange={v => setPattern(p => ({ ...p, borderRadius: v }))} />
+            </div>
+
+            {/* === TRANSFORM === */}
+            <div className="section-card">
+              <div className="section-title">
+                <RotateCw size={13} style={{ color: ACCENT }} />
+                Transform
+              </div>
+              <SliderControl label="Rotation" value={pattern.rotation} min={0} max={360} unit="°"
+                onChange={v => setPattern(p => ({ ...p, rotation: v }))} />
+            </div>
+
+            {/* === COLORS === */}
+            <div className="section-card">
+              <div className="section-title">
+                <Palette size={13} style={{ color: ACCENT }} />
+                Colors
+              </div>
+
+              {mode === 'basic' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', marginBottom: 8 }}>COLOR A</div>
+                    <ColorPicker color={color1} onChange={c => updateBasicColors(c, color2)} />
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', marginBottom: 8 }}>COLOR B</div>
+                    <ColorPicker color={color2} onChange={c => updateBasicColors(color1, c)} />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ color: 'var(--text-3)', fontSize: 10, marginBottom: 10 }}>
+                    Click any cell to change its color
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${Math.min(pattern.cols, 8)}, 1fr)`,
+                    gap: 3,
+                    padding: 10,
+                    background: 'var(--surface2)',
+                    borderRadius: 8,
+                    border: '1px solid var(--border)',
+                  }}>
+                    {pattern.colors.map((color, idx) => (
+                      <button
+                        key={idx}
+                        className={`color-cell-btn ${selectedCellIndex === idx ? 'selected' : ''}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => { setSelectedCellIndex(idx); setShowAdvancedColorPicker(true); }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* === TEXTURE === */}
+            <div className="section-card">
+              <div className="section-title">
+                <Layers size={13} style={{ color: ACCENT }} />
+                Texture Overlay
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: pattern.textureEnabled ? 14 : 0 }}>
+                <span style={{ color: 'var(--text-2)', fontSize: 11 }}>Battenburg texture</span>
+                <div
+                  className="toggle-track"
+                  style={{ background: pattern.textureEnabled ? 'rgba(216,255,99,0.2)' : 'var(--surface2)' }}
+                  onClick={() => setPattern(p => ({ ...p, textureEnabled: !p.textureEnabled }))}
+                >
+                  <div className="toggle-thumb" style={{
+                    transform: pattern.textureEnabled ? 'translateX(16px)' : 'translateX(2px)',
+                    background: pattern.textureEnabled ? ACCENT : 'rgba(255,255,255,0.6)',
+                  }} />
+                </div>
+              </div>
+
+              {pattern.textureEnabled && (
+                <SliderControl
+                  label="Opacity"
+                  value={pattern.textureOpacity}
+                  min={5} max={100} unit="%"
+                  onChange={v => setPattern(p => ({ ...p, textureOpacity: v }))}
+                />
+              )}
+            </div>
+
+            {/* === EXPORT === */}
+            <div className="section-card">
+              <div className="section-title">Export</div>
+              <button className="export-btn" onClick={exportAsPNG}>
+                <Download size={14} />
+                Download PNG ({pattern.rows}×{pattern.cols})
+              </button>
+            </div>
+
+            {/* Stats footer */}
+            <div style={{
+              padding: '10px 12px',
+              borderRadius: 8,
+              background: 'var(--surface1)',
+              border: '1px solid var(--border)',
+              display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+              gap: 8, textAlign: 'center',
+            }}>
+              {[
+                { label: 'Cells', val: pattern.rows * pattern.cols },
+                { label: 'Size', val: `${pattern.cols * pattern.cellSize}px` },
+                { label: 'Rotation', val: `${pattern.rotation}°` },
+              ].map(({ label, val }) => (
+                <div key={label}>
+                  <div style={{ color: ACCENT, fontSize: 13, fontWeight: 700, fontFamily: 'monospace' }}>{val}</div>
+                  <div style={{ color: 'var(--text-3)', fontSize: 9, letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 2 }}>{label}</div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Main Preview Area */}
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="main-preview w-full h-full" ref={canvasRef}>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${pattern.cols}, ${pattern.cellSize}px)`,
-                  gridTemplateRows: `repeat(${pattern.rows}, ${pattern.cellSize}px)`,
-                  transform: `rotate(${pattern.rotation}deg)`,
-                  transformOrigin: 'center',
-                  border: '2px solid var(--border)',
-                  position: 'relative',
-                }}
-              >
-                {pattern.colors.map((color, index) => {
-                  const texture = DEFAULT_TEXTURES.find(t => t.id === pattern.texture);
-                  return (
-                    <div
-                      key={index}
-                      style={{
-                        backgroundColor: color,
-                        width: `${pattern.cellSize}px`,
-                        height: `${pattern.cellSize}px`,
-                        border: '1px solid rgba(0,0,0,0.1)',
-                        backgroundImage: texture?.url ? `url(${texture.url})` : 'none',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        position: 'relative',
-                      }}
-                    />
-                  );
-                })}
+          {/* ---- PREVIEW ---- */}
+          <div style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--surface0)', overflow: 'hidden', position: 'relative',
+          }} ref={previewRef}>
+
+            {/* Background grid dots */}
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }} />
+
+            <div style={{
+              transform: `rotate(${pattern.rotation}deg)`,
+              transformOrigin: 'center',
+              transition: 'transform 0.1s ease',
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${pattern.cols}, ${pattern.cellSize}px)`,
+                gridTemplateRows: `repeat(${pattern.rows}, ${pattern.cellSize}px)`,
+                gap: `${pattern.gap}px`,
+                boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
+              }}>
+                {pattern.colors.map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="grid-cell"
+                    style={{
+                      width: pattern.cellSize,
+                      height: pattern.cellSize,
+                      backgroundColor: color,
+                      borderRadius: `${pattern.borderRadius}%`,
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {/* Texture overlay in preview */}
+                    {pattern.textureEnabled && (
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        backgroundImage: `url(${BASE}textures/battenburg.png)`,
+                        backgroundSize: '20px 20px',
+                        backgroundRepeat: 'repeat',
+                        opacity: pattern.textureOpacity / 100,
+                        mixBlendMode: 'overlay',
+                      }} />
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Advanced color picker modal */}
+      {showAdvancedColorPicker && selectedCellIndex !== null && (
+        <div
+          className="modal-enter"
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)',
+          }}
+          onClick={e => { if (e.target === e.currentTarget) { setShowAdvancedColorPicker(false); setSelectedCellIndex(null); } }}
+        >
+          <div style={{
+            background: 'var(--surface1)',
+            border: '1px solid var(--border)',
+            borderRadius: 14,
+            padding: 20,
+            width: 300,
+            boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  width: 20, height: 20, borderRadius: 5,
+                  backgroundColor: pattern.colors[selectedCellIndex],
+                  border: '1px solid rgba(255,255,255,0.15)',
+                }} />
+                <span style={{ color: 'var(--text-1)', fontSize: 13, fontWeight: 700 }}>
+                  Cell {selectedCellIndex + 1}
+                </span>
+              </div>
+              <button
+                onClick={() => { setShowAdvancedColorPicker(false); setSelectedCellIndex(null); }}
+                style={{
+                  background: 'var(--surface2)', border: '1px solid var(--border)',
+                  borderRadius: 6, padding: '4px 8px', cursor: 'pointer',
+                  color: 'var(--text-2)', transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--text-1)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-2)'}
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <ColorPicker
+              color={pattern.colors[selectedCellIndex]}
+              onChange={c => updateCellColor(selectedCellIndex, c)}
+            />
+            <button
+              style={{
+                marginTop: 14, width: '100%', padding: '8px',
+                borderRadius: 8, border: '1px solid rgba(216,255,99,0.3)',
+                background: 'rgba(216,255,99,0.08)', color: ACCENT,
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(216,255,99,0.15)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(216,255,99,0.08)'; }}
+              onClick={() => { setShowAdvancedColorPicker(false); setSelectedCellIndex(null); }}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

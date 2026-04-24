@@ -332,6 +332,8 @@ export default function BattenburgGenerator() {
           background-image: url('${BASE}waves.png');
           background-size: cover;
           background-position: center;
+          transform: scale(${zoomLevel});
+          transform-origin: center;
         }
         
         .zoom-controls {

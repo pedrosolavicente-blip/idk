@@ -30,8 +30,6 @@ interface BattenburgPattern {
 export default function BattenburgGenerator() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
-  const [activeLivery, setActiveLivery] = useState(0);
-  const [activeTexture, setActiveTexture] = useState(0);
   const [pattern, setPattern] = useState<BattenburgPattern>({
     rows: 2,
     cols: 7,
@@ -45,6 +43,7 @@ export default function BattenburgGenerator() {
   });
   const [selectedCellIndex, setSelectedCellIndex] = useState<number | null>(null);
   const [showAdvancedColorPicker, setShowAdvancedColorPicker] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const textureImgRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
@@ -200,6 +199,36 @@ export default function BattenburgGenerator() {
           --text-3: #71717a;
         }
 
+        /* Navbar-inspired theme */
+        .navbar-bg {
+          background: linear-gradient(to bottom, rgba(0,0,0,0.97), rgba(0,0,0,0.92));
+          backdrop-filter: blur(32px);
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+        }
+        .navbar-btn {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 8px 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          color: var(--text-3);
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
+          transition: all 0.15s;
+        }
+        .navbar-btn:hover {
+          color: var(--text-1);
+          border-color: rgba(255,255,255,0.2);
+        }
+        .navbar-btn.active {
+          color: var(--accent);
+          border-color: rgba(216,255,99,0.3);
+          background: rgba(216,255,99,0.08);
+        }
+
         .lv-sidebar::-webkit-scrollbar { width: 3px; }
         .lv-sidebar::-webkit-scrollbar-track { background: transparent; }
         .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(216,255,99,0.2); border-radius: 99px; }
@@ -221,11 +250,34 @@ export default function BattenburgGenerator() {
           letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--border);
           background: var(--surface2); color: var(--text-3); cursor: pointer; transition: all 0.15s;
         }
-        .mode-btn.active { background: rgba(216,255,99,0.1); border-color: rgba(216,255,99,0.35); color: #D8FF63; }
+        .mode-btn:hover {
+          color: var(--text-1);
+          border-color: rgba(255,255,255,0.2);
+        }
+        .mode-btn.active {
+          background: rgba(216,255,99,0.08); border-color: rgba(216,255,99,0.35); color: #D8FF63;
+        }
 
-        .section-card { background: var(--surface1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; }
+        .section-card { 
+          background: var(--surface1); 
+          border: 1px solid var(--border); 
+          border-radius: 12px; 
+          padding: 16px; 
+          margin-bottom: 10px; 
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
-        .section-title { color: var(--text-1); font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .section-title { 
+          color: var(--text-1); 
+          font-weight: 700; 
+          font-size: 11px; 
+          letter-spacing: 0.08em; 
+          text-transform: uppercase; 
+          margin-bottom: 14px; 
+          display: flex; 
+          align-items: center; 
+          gap: 8px; 
+        }
 
         .export-btn {
           width: 100%; padding: 10px 14px; border-radius: 8px; font-size: 10px; font-weight: 700;
@@ -256,8 +308,65 @@ export default function BattenburgGenerator() {
         .color-cell-btn:hover { border-color: rgba(216,255,99,0.5); transform: scale(1.08); }
         .color-cell-btn.selected { border-color: #D8FF63; box-shadow: 0 0 12px rgba(216,255,99,0.5); }
 
-        .toggle-track { width: 36px; height: 20px; border-radius: 99px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; position: relative; flex-shrink: 0; }
-        .toggle-thumb { position: absolute; top: 2px; width: 14px; height: 14px; border-radius: 50%; transition: transform 0.2s, background 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+        .toggle-track { 
+          width: 36px; 
+          height: 20px; 
+          border-radius: 99px; 
+          border: 1px solid var(--border); 
+          cursor: pointer; 
+          transition: all 0.2s; 
+          position: relative; 
+          flex-shrink: 0; 
+          background: var(--surface2);
+        }
+        .toggle-thumb { 
+          position: absolute; 
+          top: 2px; 
+          width: 14px; 
+          height: 14px; 
+          border-radius: 50%; 
+          transition: transform 0.2s, background 0.2s; 
+          box-shadow: 0 1px 4px rgba(0,0,0,0.4); 
+          background: rgba(255,255,255,0.6);
+        }
+        .toggle-track:hover .toggle-thumb {
+          background: var(--accent);
+        }
+
+        .zoom-controls {
+          position: absolute;
+          bottom: 20px;
+          right: 20px;
+          display: flex;
+          gap: 8px;
+          background: var(--surface1);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .zoom-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
+          border: 1px solid var(--border);
+          background: var(--surface2);
+          color: var(--text-3);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s;
+        }
+        .zoom-btn:hover {
+          color: var(--text-1);
+          border-color: rgba(255,255,255,0.2);
+        }
+        .zoom-btn.active {
+          background: rgba(216,255,99,0.08);
+          border-color: rgba(216,255,99,0.3);
+          color: #D8FF63;
+        }
 
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
         .modal-enter { animation: fadeIn 0.15s ease; }
@@ -298,52 +407,20 @@ export default function BattenburgGenerator() {
               ))}
             </div>
 
-            {/* LIVERY */}
-            <div className="section-card">
-              <div className="section-title"><Layers size={13} style={{ color: ACCENT }} />Livery Base</div>
-              <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
-                <button className={`livery-tab ${activeLivery === 0 ? 'active' : ''}`} onClick={() => setActiveLivery(0)}>Rect 38</button>
-                <button className={`livery-tab ${activeLivery === 1 ? 'active' : ''}`} onClick={() => setActiveLivery(1)}>Rect 38 (1)</button>
-              </div>
-              <div style={{
-                borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)',
-                height: 44, background: 'var(--surface2)',
-                backgroundImage: `url(${LIVERY_IMAGES[activeLivery]})`,
-                backgroundSize: 'cover', backgroundPosition: 'center',
-              }} />
-            </div>
-
-            {/* GRID SIZE */}
-            <div className="section-card">
-              <div className="section-title"><Grid size={13} style={{ color: ACCENT }} />Grid Size</div>
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ color: 'var(--text-3)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>PRESETS</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
-                  {PRESETS.map(({ r, c }) => (
-                    <button key={`${r}x${c}`}
-                      className={`preset-btn ${pattern.rows === r && pattern.cols === c ? 'active' : ''}`}
-                      onClick={() => updateSize(r, c)}>{r}×{c}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Stepper label="ROWS" value={pattern.rows} min={1} max={12} onChange={v => updateSize(v, pattern.cols)} />
-                <Stepper label="COLS" value={pattern.cols} min={1} max={16} onChange={v => updateSize(pattern.rows, v)} />
-              </div>
-            </div>
-
-            {/* CELL DIMENSIONS */}
-            <div className="section-card">
-              <div className="section-title"><Sliders size={13} style={{ color: ACCENT }} />Cell Dimensions</div>
-              <SliderControl label="Cell Width" value={pattern.cellWidth} min={20} max={200} unit="px" onChange={v => setPattern(p => ({ ...p, cellWidth: v }))} />
-              <SliderControl label="Cell Height" value={pattern.cellHeight} min={20} max={200} unit="px" onChange={v => setPattern(p => ({ ...p, cellHeight: v }))} />
-              <SliderControl label="Gap" value={pattern.gap} min={0} max={20} unit="px" onChange={v => setPattern(p => ({ ...p, gap: v }))} />
-              <SliderControl label="Border Radius" value={pattern.borderRadius} min={0} max={50} unit="%" onChange={v => setPattern(p => ({ ...p, borderRadius: v }))} />
-            </div>
-
             {/* COLORS */}
             <div className="section-card">
               <div className="section-title"><Palette size={13} style={{ color: ACCENT }} />Colors</div>
+              
+              {/* Advanced Button */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <div style={{ color: 'var(--text-2)', fontSize: 11 }}>Color Mode</div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {(['basic', 'advanced'] as const).map(m => (
+                    <button key={m} className={`mode-btn ${mode === m ? 'active' : ''}`} onClick={() => setMode(m)}>{m}</button>
+                  ))}
+                </div>
+              </div>
+              
               {mode === 'basic' ? (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <div>
@@ -419,21 +496,33 @@ export default function BattenburgGenerator() {
             {/* Dot grid bg */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
-            {/* Composite: livery + pattern */}
+            {/* Zoom Controls */}
+            <div className="zoom-controls">
+              <button 
+                className={`zoom-btn ${zoomLevel === 0.5 ? 'active' : ''}`}
+                onClick={() => setZoomLevel(0.5)}
+              >−</button>
+              <button 
+                className={`zoom-btn ${zoomLevel === 1 ? 'active' : ''}`}
+                onClick={() => setZoomLevel(1)}
+              >100%</button>
+              <button 
+                className={`zoom-btn ${zoomLevel === 2 ? 'active' : ''}`}
+                onClick={() => setZoomLevel(2)}
+              >+</button>
+            </div>
+
+            {/* Composite: pattern */}
             <div style={{
               position: 'relative',
-              width: totalW, height: totalH,
+              width: totalW * zoomLevel, 
+              height: totalH * zoomLevel,
               boxShadow: '0 24px 80px rgba(0,0,0,0.7)',
-              borderRadius: 4, overflow: 'hidden',
+              borderRadius: 4, 
+              overflow: 'hidden',
+              transform: `scale(${zoomLevel})`,
+              transformOrigin: 'center',
             }}>
-              {/* Base livery */}
-              <img
-                src={LIVERY_IMAGES[activeLivery]}
-                alt="livery"
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-              />
-
               {/* Pattern overlay */}
               <div style={{
                 position: 'absolute', inset: 0,

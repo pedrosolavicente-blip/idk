@@ -20,6 +20,7 @@ export default function BattenburgGenerator() {
   const [showAdvancedColourPicker, setShowAdvancedColourPicker] = useState(false);
   const [selectedColourIndex, setSelectedColourIndex] = useState<number | null>(null);
   const [individualColours, setIndividualColours] = useState<string[]>([]);
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
   const [textureEnabled, setTextureEnabled] = useState(false);
   const [textureOpacity, setTextureOpacity] = useState(40);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -52,6 +53,14 @@ export default function BattenburgGenerator() {
       // Update the pattern to use individual colours
     }
   }, [individualColours]);
+
+  // Update pattern size
+  const updateSize = useCallback((newRows: number, newCols: number) => {
+    setRows(Math.max(1, Math.min(12, newRows)));
+    setCols(Math.max(1, Math.min(16, newCols)));
+    // Reset individual colours when pattern size changes
+    setIndividualColours([]);
+  }, [rows, cols]);
 
   const patternColours = individualColours.length > 0 ? individualColours : generatePattern();
 
@@ -282,16 +291,17 @@ export default function BattenburgGenerator() {
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: ${ACCENT};
-          border: 2px solid #080808;
+          background: #1e1e1e;
+          border: 2px solid rgba(255,255,255,0.1);
           cursor: pointer;
-          box-shadow: 0 0 12px rgba(216,255,99,0.6);
+          box-shadow: 0 0 8px rgba(216,255,99,0.4);
           transition: all 0.15s ease;
         }
         
         .control-slider::-webkit-slider-thumb:hover {
           transform: scale(1.2);
-          box-shadow: 0 0 16px rgba(216,255,99,0.8);
+          box-shadow: 0 0 12px rgba(216,255,99,0.6);
+          background: ${ACCENT};
         }
         
         .btn {
@@ -369,11 +379,32 @@ export default function BattenburgGenerator() {
           border: none;
           cursor: pointer;
           transition: none;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .pattern-cell::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 6px;
+          height: 6px;
+          transform: translate(-50%, -50%);
+          background: rgba(216,255,99,0.3);
+          border-radius: 50%;
+          backdrop-filter: blur(4px);
+          opacity: 0;
+          transition: opacity 0.2s ease;
         }
         
         .pattern-cell:hover {
           transform: scale(1.05);
           box-shadow: 0 4px 16px rgba(216,255,99,0.3);
+        }
+        
+        .pattern-cell:hover::before {
+          opacity: 1;
         }
         
         .texture-overlay {
@@ -712,7 +743,11 @@ export default function BattenburgGenerator() {
                 min="1"
                 max="8"
                 value={rows}
-                onChange={(e) => setRows(parseInt(e.target.value))}
+                onChange={(e) => {
+                  const newRows = parseInt(e.target.value);
+                  setRows(newRows);
+                  updateSize(newRows, cols);
+                }}
                 className="control-slider"
               />
             </div>
@@ -724,7 +759,11 @@ export default function BattenburgGenerator() {
                 min="1"
                 max="12"
                 value={cols}
-                onChange={(e) => setCols(parseInt(e.target.value))}
+                onChange={(e) => {
+                  const newCols = parseInt(e.target.value);
+                  setCols(newCols);
+                  updateSize(rows, newCols);
+                }}
                 className="control-slider"
               />
             </div>
@@ -794,48 +833,54 @@ export default function BattenburgGenerator() {
             </div>
             
             <div className="control-group">
-              <label className="control-label">Primary Colour</label>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <input
-                  type="color"
-                  value={colour1}
-                  onChange={(e) => setColour1(e.target.value)}
-                  className="colour-input"
-                />
+              <label className="control-label">Mode</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button 
                   className="btn"
                   onClick={() => {
-                    setSelectedColourIndex(0);
-                    setShowAdvancedColourPicker(true);
+                    if (isAdvancedMode) {
+                      setIndividualColours([]);
+                    }
+                    setIsAdvancedMode(!isAdvancedMode);
                   }}
-                  style={{ padding: '6px 12px', fontSize: '9px' }}
+                  style={{ padding: '8px 16px', fontSize: '10px' }}
                 >
-                  Advanced
+                  {isAdvancedMode ? 'Individual' : 'Basic'}
                 </button>
               </div>
             </div>
             
-            <div className="control-group">
-              <label className="control-label">Secondary Colour</label>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <input
-                  type="color"
-                  value={colour2}
-                  onChange={(e) => setColour2(e.target.value)}
-                  className="colour-input"
-                />
-                <button 
-                  className="btn"
-                  onClick={() => {
-                    setSelectedColourIndex(1);
-                    setShowAdvancedColourPicker(true);
-                  }}
-                  style={{ padding: '6px 12px', fontSize: '9px' }}
-                >
-                  Advanced
-                </button>
+            {isAdvancedMode ? (
+              <div className="control-group">
+                <label className="control-label">Click any square to edit its colour</label>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="control-group">
+                  <label className="control-label">Primary Colour</label>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="color"
+                      value={colour1}
+                      onChange={(e) => setColour1(e.target.value)}
+                      className="colour-input"
+                    />
+                  </div>
+                </div>
+                
+                <div className="control-group">
+                  <label className="control-label">Secondary Colour</label>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="color"
+                      value={colour2}
+                      onChange={(e) => setColour2(e.target.value)}
+                      className="colour-input"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Texture */}

@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Download, Copy, Grid3x3, Palette, Layers, ChevronDown } from 'lucide-react';
+import { Download, Copy, Layers, ChevronDown, Sliders, Palette } from 'lucide-react';
 import ColorPicker from './ColorPicker';
 
 const ACCENT = '#D8FF63';
@@ -17,10 +17,11 @@ interface BattenburgPattern {
 
 const DEFAULT_TEXTURES = [
   { id: 'none', name: 'None', url: '' },
-  { id: 'grid', name: 'Grid', url: '/textures/grid.png' },
-  { id: 'dots', name: 'Dots', url: '/textures/dots.png' },
-  { id: 'lines', name: 'Lines', url: '/textures/lines.png' },
-  { id: 'chevron', name: 'Chevron', url: '/textures/chevron.png' },
+  { id: 'grid', name: 'Grid', url: `${BASE}textures/grid.png` },
+  { id: 'dots', name: 'Dots', url: `${BASE}textures/dots.png` },
+  { id: 'lines', name: 'Lines', url: `${BASE}textures/lines.png` },
+  { id: 'chevron', name: 'Chevron', url: `${BASE}textures/chevron.png` },
+  { id: 'diamond', name: 'Diamond', url: `${BASE}textures/diamond.png` },
 ];
 
 const PRESET_SIZES = [
@@ -48,6 +49,9 @@ export default function BattenburgGenerator() {
     texture: 'none'
   });
   const [showTextureDropdown, setShowTextureDropdown] = useState(false);
+  const [selectedCellIndex, setSelectedCellIndex] = useState<number | null>(null);
+  const [showAdvancedColorPicker, setShowAdvancedColorPicker] = useState(false);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   const generateBattenburgColors = useCallback((rows: number, cols: number, color1: string, color2: string): string[] => {
     const colors: string[] = [];
@@ -90,6 +94,8 @@ export default function BattenburgGenerator() {
       newColors[index] = color;
       return { ...prev, colors: newColors };
     });
+    setSelectedCellIndex(null);
+    setShowAdvancedColorPicker(false);
   }, []);
 
   const exportAsPNG = useCallback(() => {
@@ -110,36 +116,70 @@ export default function BattenburgGenerator() {
   return (
     <>
       <style>{`
-        .bg-container {
-          background: var(--surface0);
-          color: var(--text-1);
+        *, *::before, *::after { font-family: 'Inter', sans-serif !important; }
+
+        :root {
+          --accent: #D8FF63;
+          --surface0: #080808;
+          --surface1: #0e0e0e;
+          --surface2: #161616;
+          --surface3: #1e1e1e;
+          --border: rgba(255,255,255,0.07);
+          --border-accent: rgba(216,255,99,0.28);
+          --text-1: #f4f4f5;
+          --text-2: #a1a1aa;
+          --text-3: #71717a;
+          --text-4: #3f3f46;
         }
-        .control-panel {
-          background: var(--surface1);
-          border: 1px solid var(--border);
-          border-radius: 12px;
+
+        .lv-sidebar::-webkit-scrollbar       { width: 2px; }
+        .lv-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .lv-sidebar::-webkit-scrollbar-thumb { background: rgba(216,255,99,0.2); border-radius: 99px; }
+        .lv-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(216,255,99,0.45); }
+
+        .lv-range {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 4px;
+          border-radius: 99px;
+          outline: none;
+          cursor: pointer;
         }
-        .preview-panel {
-          background: var(--surface1);
-          border: 1px solid var(--border);
-          border-radius: 12px;
+        .lv-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 14px; height: 14px;
+          border-radius: 50%;
+          background: var(--accent);
+          border: 2px solid #080808;
+          box-shadow: 0 0 8px rgba(216,255,99,0.5);
+          cursor: pointer;
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-        .section-title {
-          color: var(--text-1);
-          font-weight: 600;
-          font-size: 13px;
-          letter-spacing: 0.04em;
-          margin-bottom: 16px;
+        .lv-range::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 14px rgba(216,255,99,0.7);
         }
-        .control-label {
-          color: var(--text-2);
+
+        .nav-item {
+          display: flex; align-items: center; gap: 6px;
+          padding: 0 14px;
+          height: 32px;
+          border-radius: 8px;
           font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.02em;
-          margin-bottom: 8px;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          border: 1px solid var(--border);
+          background: var(--surface1);
+          color: var(--text-3);
+          cursor: pointer;
+          transition: all 0.15s ease;
+          white-space: nowrap;
         }
+        .nav-item:hover { border-color: rgba(216,255,99,0.2); color: var(--text-2); }
+        .nav-item.active { border-color: rgba(216,255,99,0.3); background: rgba(216,255,99,0.08); color: #D8FF63; box-shadow: 0 0 12px rgba(216,255,99,0.08); }
+
         .size-btn {
-          padding: 6px 12px;
+          padding: 5px 10px;
           border-radius: 6px;
           font-size: 10px;
           font-weight: 600;
@@ -150,21 +190,45 @@ export default function BattenburgGenerator() {
           cursor: pointer;
           transition: all 0.13s ease;
         }
-        .size-btn:hover {
-          border-color: rgba(216,255,99,0.2);
-          color: var(--text-2);
-        }
+        .size-btn:hover { border-color: rgba(216,255,99,0.15); color: var(--text-2); background: linear-gradient(to right, rgba(216,255,99,0.1), rgba(216,255,99,0.02)); transform: translateY(-1px); }
         .size-btn.active {
-          border-color: rgba(216,255,99,0.3);
-          background: rgba(216,255,99,0.08);
-          color: #D8FF63;
-          box-shadow: 0 0 12px rgba(216,255,99,0.08);
+          background: #D8FF63;
+          border-color: #D8FF63;
+          color: #000;
+          box-shadow: 0 0 14px rgba(216,255,99,0.3);
         }
+
+        .control-section {
+          background: var(--surface1);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 16px;
+        }
+
+        .section-title {
+          color: var(--text-1);
+          font-weight: 600;
+          font-size: 13px;
+          letter-spacing: 0.04em;
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .control-label {
+          color: var(--text-2);
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          margin-bottom: 8px;
+        }
+
         .export-btn {
           width: 100%;
-          padding: 10px 16px;
-          border-radius: 8px;
-          font-size: 11px;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.04em;
           border: 1px solid var(--border);
@@ -173,7 +237,7 @@ export default function BattenburgGenerator() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 6px;
         }
         .export-btn.primary {
           background: rgba(216,255,99,0.1);
@@ -194,6 +258,7 @@ export default function BattenburgGenerator() {
           border-color: rgba(216,255,99,0.2);
           color: var(--text-1);
         }
+
         .texture-dropdown {
           position: absolute;
           top: 100%;
@@ -221,9 +286,10 @@ export default function BattenburgGenerator() {
           background: var(--surface3);
           color: var(--text-1);
         }
+
         .individual-color-grid {
           display: grid;
-          gap: 4px;
+          gap: 3px;
           padding: 12px;
           background: var(--surface2);
           border-radius: 8px;
@@ -240,6 +306,30 @@ export default function BattenburgGenerator() {
         .color-cell-btn:hover {
           border-color: rgba(216,255,99,0.3);
           transform: scale(1.05);
+        }
+        .color-cell-btn.selected {
+          border-color: var(--accent);
+          box-shadow: 0 0 8px rgba(216,255,99,0.4);
+        }
+
+        .main-preview {
+          background: var(--surface0);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 500px;
+          position: relative;
+        }
+
+        .controls-sidebar {
+          width: 320px;
+          background: var(--surface1);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 20px;
+          height: fit-content;
         }
       `}</style>
       
@@ -277,219 +367,239 @@ export default function BattenburgGenerator() {
         </nav>
 
         {/* Main Content */}
-        <div className="container mx-auto px-8 py-12">
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-white mb-4" style={{ color: 'var(--text-1)' }}>Battenburg Generator</h1>
-              <p className="text-lg text-zinc-400" style={{ color: 'var(--text-2)' }}>Create custom battenburg patterns for emergency vehicles</p>
+        <div className="flex h-screen pt-16" style={{ background: 'var(--surface0)' }}>
+          {/* Controls Sidebar */}
+          <div className="controls-sidebar lv-sidebar overflow-y-auto">
+            <h3 className="section-title">
+              <Sliders size={16} />
+              Pattern Settings
+            </h3>
+            
+            {/* Mode Toggle */}
+            <div className="flex gap-1.5 mb-6">
+              {(['basic','advanced'] as const).map(m => (
+                <button key={m} onClick={() => setMode(m)}
+                  className="size-btn flex-1"
+                  style={{
+                    background: mode === m ? 'rgba(216,255,99,0.1)' : 'var(--surface2)',
+                    borderColor: mode === m ? 'rgba(216,255,99,0.3)' : 'var(--border)',
+                    color: mode === m ? '#D8FF63' : 'var(--text-3)',
+                  }}
+                >
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                </button>
+              ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Controls Panel */}
-              <div className="space-y-6">
-                {/* Pattern Settings */}
-                <div className="control-panel p-6">
-                  <h3 className="section-title">Pattern Settings</h3>
-                  
-                  {/* Mode Toggle */}
-                  <div className="flex gap-1.5 mb-6">
-                    {(['basic','advanced'] as const).map(m => (
-                      <button key={m} onClick={() => setMode(m)}
-                        className="size-btn flex-1"
-                        style={{
-                          background: mode === m ? 'rgba(216,255,99,0.1)' : 'var(--surface2)',
-                          borderColor: mode === m ? 'rgba(216,255,99,0.3)' : 'var(--border)',
-                          color: mode === m ? '#D8FF63' : 'var(--text-3)',
-                        }}
-                      >
-                        {m.charAt(0).toUpperCase() + m.slice(1)}
-                      </button>
-                    ))}
-                  </div>
+            {/* Size Presets */}
+            <div className="mb-6">
+              <div className="control-label">Size</div>
+              <div className="grid grid-cols-5 gap-2">
+                {PRESET_SIZES.map(size => (
+                  <button
+                    key={size.label}
+                    onClick={() => updatePatternSize(size.rows, size.cols)}
+                    className={`size-btn ${pattern.rows === size.rows && pattern.cols === size.cols ? 'active' : ''}`}
+                  >
+                    {size.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                  {/* Size Presets */}
-                  <div className="mb-6">
-                    <div className="control-label">Size</div>
-                    <div className="grid grid-cols-5 gap-2">
-                      {PRESET_SIZES.map(size => (
-                        <button
-                          key={size.label}
-                          onClick={() => updatePatternSize(size.rows, size.cols)}
-                          className={`size-btn ${pattern.rows === size.rows && pattern.cols === size.cols ? 'active' : ''}`}
-                        >
-                          {size.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+            {/* Cell Size */}
+            <div className="mb-6">
+              <div className="control-label">Cell Size: {pattern.cellSize}px</div>
+              <input
+                type="range"
+                min="20"
+                max="100"
+                value={pattern.cellSize}
+                onChange={(e) => setPattern({...pattern, cellSize: parseInt(e.target.value)})}
+                className="lv-range w-full"
+                style={{
+                  background: 'linear-gradient(to right, var(--surface3) 0%, var(--surface3) 100%)',
+                }}
+              />
+            </div>
 
-                  {/* Cell Size */}
-                  <div className="mb-6">
-                    <div className="control-label">Cell Size: {pattern.cellSize}px</div>
-                    <input
-                      type="range"
-                      min="20"
-                      max="100"
-                      value={pattern.cellSize}
-                      onChange={(e) => setPattern({...pattern, cellSize: parseInt(e.target.value)})}
-                      className="lv-range w-full"
-                      style={{
-                        background: 'linear-gradient(to right, var(--surface3) 0%, var(--surface3) 100%)',
-                      }}
+            {/* Rotation */}
+            <div className="mb-6">
+              <div className="control-label">Rotation: {pattern.rotation}°</div>
+              <input
+                type="range"
+                min="0"
+                max="360"
+                value={pattern.rotation}
+                onChange={(e) => setPattern({...pattern, rotation: parseInt(e.target.value)})}
+                className="lv-range w-full"
+                style={{
+                  background: 'linear-gradient(to right, var(--surface3) 0%, var(--surface3) 100%)',
+                }}
+              />
+            </div>
+
+            {/* Colors Section */}
+            {mode === 'basic' ? (
+              <div className="space-y-4 mb-6">
+                <div className="control-label">Colors</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <ColorPicker
+                      color={pattern.colors[0] || '#ff6b6b'}
+                      onChange={(color) => updateBasicColors(color, pattern.colors[1] || '#ffffff')}
                     />
+                    <div className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>Color 1</div>
                   </div>
-
-                  {/* Rotation */}
-                  <div className="mb-6">
-                    <div className="control-label">Rotation: {pattern.rotation}°</div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="360"
-                      value={pattern.rotation}
-                      onChange={(e) => setPattern({...pattern, rotation: parseInt(e.target.value)})}
-                      className="lv-range w-full"
-                      style={{
-                        background: 'linear-gradient(to right, var(--surface3) 0%, var(--surface3) 100%)',
-                      }}
+                  <div>
+                    <ColorPicker
+                      color={pattern.colors[1] || '#ffffff'}
+                      onChange={(color) => updateBasicColors(pattern.colors[0] || '#ff6b6b', color)}
                     />
-                  </div>
-
-                  {/* Colors Section */}
-                  {mode === 'basic' ? (
-                    <div className="space-y-4">
-                      <div className="control-label">Colors</div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <ColorPicker
-                            color={pattern.colors[0] || '#ff6b6b'}
-                            onChange={(color) => updateBasicColors(color, pattern.colors[1] || '#ffffff')}
-                          />
-                          <div className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>Color 1</div>
-                        </div>
-                        <div>
-                          <ColorPicker
-                            color={pattern.colors[1] || '#ffffff'}
-                            onChange={(color) => updateBasicColors(pattern.colors[0] || '#ff6b6b', color)}
-                          />
-                          <div className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>Color 2</div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="control-label">Individual Colors</div>
-                      <div 
-                        className="individual-color-grid"
-                        style={{
-                          gridTemplateColumns: `repeat(${pattern.cols}, 1fr)`,
-                        }}
-                      >
-                        {pattern.colors.map((color, index) => (
-                          <button
-                            key={index}
-                            className="color-cell-btn"
-                            style={{ backgroundColor: color }}
-                            onClick={() => {
-                              // TODO: Open color picker for individual cell
-                              console.log('Pick color for cell', index);
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Texture Settings */}
-                <div className="control-panel p-6">
-                  <h3 className="section-title">Texture Overlay</h3>
-                  
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowTextureDropdown(!showTextureDropdown)}
-                      className="export-btn secondary"
-                    >
-                      <Layers size={16} />
-                      {DEFAULT_TEXTURES.find(t => t.id === pattern.texture)?.name || 'None'}
-                      <ChevronDown size={14} className={`transition-transform ${showTextureDropdown ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    {showTextureDropdown && (
-                      <div className="texture-dropdown">
-                        {DEFAULT_TEXTURES.map(texture => (
-                          <div
-                            key={texture.id}
-                            className="texture-option"
-                            onClick={() => {
-                              setPattern({...pattern, texture: texture.id});
-                              setShowTextureDropdown(false);
-                            }}
-                          >
-                            {texture.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Export Options */}
-                <div className="control-panel p-6">
-                  <h3 className="section-title">Export Options</h3>
-                  <div className="space-y-3">
-                    <button onClick={exportAsPNG} className="export-btn primary">
-                      <Download size={16} />
-                      Download as PNG
-                    </button>
-                    <button onClick={exportAsSVG} className="export-btn secondary">
-                      <Download size={16} />
-                      Download as SVG
-                    </button>
-                    <button onClick={copyCSSCode} className="export-btn secondary">
-                      <Copy size={16} />
-                      Copy CSS Code
-                    </button>
+                    <div className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>Color 2</div>
                   </div>
                 </div>
               </div>
-
-              {/* Preview Panel */}
-              <div className="preview-panel p-6">
-                <h3 className="section-title">Preview</h3>
-                <div className="flex items-center justify-center min-h-[400px] rounded-lg" style={{ background: 'var(--surface0)' }}>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: `repeat(${pattern.cols}, ${pattern.cellSize}px)`,
-                      gridTemplateRows: `repeat(${pattern.rows}, ${pattern.cellSize}px)`,
-                      transform: `rotate(${pattern.rotation}deg)`,
-                      transformOrigin: 'center',
-                      border: '2px solid var(--border)',
-                      position: 'relative',
-                    }}
-                  >
-                    {pattern.colors.map((color, index) => {
-                      const texture = DEFAULT_TEXTURES.find(t => t.id === pattern.texture);
-                      return (
-                        <div
-                          key={index}
-                          style={{
-                            backgroundColor: color,
-                            width: `${pattern.cellSize}px`,
-                            height: `${pattern.cellSize}px`,
-                            border: '1px solid rgba(0,0,0,0.1)',
-                            backgroundImage: texture?.url ? `url(${texture.url})` : 'none',
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            position: 'relative',
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
+            ) : (
+              <div className="space-y-4 mb-6">
+                <div className="control-label">Individual Colors</div>
+                <div 
+                  className="individual-color-grid"
+                  style={{
+                    gridTemplateColumns: `repeat(${pattern.cols}, 1fr)`,
+                  }}
+                >
+                  {pattern.colors.map((color, index) => (
+                    <button
+                      key={index}
+                      className={`color-cell-btn ${selectedCellIndex === index ? 'selected' : ''}`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => {
+                        setSelectedCellIndex(index);
+                        setShowAdvancedColorPicker(true);
+                      }}
+                    />
+                  ))}
                 </div>
+                
+                {/* Advanced Color Picker Modal */}
+                {showAdvancedColorPicker && selectedCellIndex !== null && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+                    <div className="control-section" style={{ width: '320px' }}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="section-title" style={{ margin: 0 }}>
+                          <Palette size={16} />
+                          Cell Color
+                        </div>
+                        <button
+                          onClick={() => {
+                            setShowAdvancedColorPicker(false);
+                            setSelectedCellIndex(null);
+                          }}
+                          className="size-btn"
+                          style={{ padding: '4px 8px' }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <ColorPicker
+                        color={pattern.colors[selectedCellIndex]}
+                        onChange={(color) => updateIndividualColor(selectedCellIndex, color)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Texture Settings */}
+            <div className="control-section mb-6">
+              <h3 className="section-title">
+                <Layers size={16} />
+                Texture Overlay
+              </h3>
+              
+              <div className="relative">
+                <button
+                  onClick={() => setShowTextureDropdown(!showTextureDropdown)}
+                  className="export-btn secondary"
+                >
+                  <Layers size={16} />
+                  {DEFAULT_TEXTURES.find(t => t.id === pattern.texture)?.name || 'None'}
+                  <ChevronDown size={14} className={`transition-transform ${showTextureDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {showTextureDropdown && (
+                  <div className="texture-dropdown">
+                    {DEFAULT_TEXTURES.map(texture => (
+                      <div
+                        key={texture.id}
+                        className="texture-option"
+                        onClick={() => {
+                          setPattern({...pattern, texture: texture.id});
+                          setShowTextureDropdown(false);
+                        }}
+                      >
+                        {texture.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Export Options */}
+            <div className="control-section">
+              <h3 className="section-title">Export</h3>
+              <div className="space-y-2">
+                <button onClick={exportAsPNG} className="export-btn primary">
+                  <Download size={16} />
+                  Download as PNG
+                </button>
+                <button onClick={exportAsSVG} className="export-btn secondary">
+                  <Download size={16} />
+                  Download as SVG
+                </button>
+                <button onClick={copyCSSCode} className="export-btn secondary">
+                  <Copy size={16} />
+                  Copy CSS Code
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Preview Area */}
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="main-preview w-full h-full" ref={canvasRef}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${pattern.cols}, ${pattern.cellSize}px)`,
+                  gridTemplateRows: `repeat(${pattern.rows}, ${pattern.cellSize}px)`,
+                  transform: `rotate(${pattern.rotation}deg)`,
+                  transformOrigin: 'center',
+                  border: '2px solid var(--border)',
+                  position: 'relative',
+                }}
+              >
+                {pattern.colors.map((color, index) => {
+                  const texture = DEFAULT_TEXTURES.find(t => t.id === pattern.texture);
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        backgroundColor: color,
+                        width: `${pattern.cellSize}px`,
+                        height: `${pattern.cellSize}px`,
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        backgroundImage: texture?.url ? `url(${texture.url})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        position: 'relative',
+                      }}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>

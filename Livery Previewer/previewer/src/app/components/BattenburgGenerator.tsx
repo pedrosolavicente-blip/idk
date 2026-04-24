@@ -52,7 +52,7 @@ export default function BattenburgGenerator() {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (e.deltaY < 0) {
-        setZoomLevel(prev => Math.min(prev + 0.1, 3));
+        setZoomLevel(prev => Math.min(prev + 0.1, 5));
       } else {
         setZoomLevel(prev => Math.max(prev - 0.1, 0.5));
       }
@@ -293,11 +293,12 @@ export default function BattenburgGenerator() {
         }
         
         .preview-container {
-          background: #161616;
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          padding: 0;
+          box-shadow: none;
+          position: relative;
         }
         
         .pattern-grid {
@@ -307,14 +308,13 @@ export default function BattenburgGenerator() {
           gap: ${gap}px;
           transform: scale(${zoomLevel});
           transform-origin: center;
-          transition: transform 0.2s ease;
         }
         
         .pattern-cell {
           background: #1e1e1e;
-          border: 1px solid rgba(0,0,0,0.1);
+          border: none;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: none;
         }
         
         .pattern-cell:hover {
@@ -324,12 +324,14 @@ export default function BattenburgGenerator() {
         
         .texture-overlay {
           position: absolute;
-          inset: 0;
+          top: 0;
+          left: 0;
           pointer-events: none;
           opacity: ${textureOpacity / 100};
           mix-blend-mode: multiply;
           background-image: url('${BASE}waves.png');
           background-size: cover;
+          background-position: center;
         }
         
         .zoom-controls {
@@ -656,7 +658,7 @@ export default function BattenburgGenerator() {
             </button>
             <button 
               className="zoom-btn"
-              onClick={() => setZoomLevel(prev => Math.min(prev + 0.25, 3))}
+              onClick={() => setZoomLevel(prev => Math.min(prev + 0.25, 5))}
             >
               <Plus size={16} />
             </button>

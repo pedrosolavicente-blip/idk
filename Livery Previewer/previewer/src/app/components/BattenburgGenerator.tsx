@@ -19,6 +19,7 @@ export default function BattenburgGenerator() {
   const [colour2, setColour2] = useState('#006B2B');
   const [showAdvancedColourPicker, setShowAdvancedColourPicker] = useState(false);
   const [selectedColourIndex, setSelectedColourIndex] = useState<number | null>(null);
+  const [individualColours, setIndividualColours] = useState<string[]>([]);
   const [textureEnabled, setTextureEnabled] = useState(false);
   const [textureOpacity, setTextureOpacity] = useState(40);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -38,7 +39,21 @@ export default function BattenburgGenerator() {
     return colours;
   };
 
-  const patternColours = generatePattern();
+  // Update individual colours when pattern changes
+  useEffect(() => {
+    if (individualColours.length === 0) {
+      setIndividualColours(generatePattern());
+    }
+  }, [rows, cols, colour1, colour2]);
+
+  // Update pattern when individual colours change
+  useEffect(() => {
+    if (individualColours.length > 0) {
+      // Update the pattern to use individual colours
+    }
+  }, [individualColours]);
+
+  const patternColours = individualColours.length > 0 ? individualColours : generatePattern();
 
   // Load texture
   useEffect(() => {
@@ -117,7 +132,18 @@ export default function BattenburgGenerator() {
     });
   };
 
-  // Copy CSS
+  // Update individual colour
+  const updateIndividualColour = (index: number, colour: string) => {
+    const newColours = [...individualColours];
+    if (newColours.length === 0) {
+      // Initialize with generated pattern if not set
+      newColours.push(...generatePattern());
+    }
+    newColours[index] = colour;
+    setIndividualColours(newColours);
+    setSelectedColourIndex(null);
+    setShowAdvancedColourPicker(false);
+  };
   const copyCSS = () => {
     const css = `.battenburg {
   display: grid;
@@ -243,20 +269,29 @@ export default function BattenburgGenerator() {
         
         .control-slider {
           width: 100%;
-          height: 4px;
+          height: 6px;
           background: #1e1e1e;
-          border-radius: 2px;
+          border-radius: 3px;
           outline: none;
+          cursor: pointer;
           -webkit-appearance: none;
+          appearance: none;
         }
         
         .control-slider::-webkit-slider-thumb {
-          width: 16px;
-          height: 16px;
-          background: ${ACCENT};
+          width: 18px;
+          height: 18px;
           border-radius: 50%;
+          background: ${ACCENT};
+          border: 2px solid #080808;
           cursor: pointer;
-          -webkit-appearance: none;
+          box-shadow: 0 0 12px rgba(216,255,99,0.6);
+          transition: all 0.15s ease;
+        }
+        
+        .control-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 16px rgba(216,255,99,0.8);
         }
         
         .btn {
@@ -401,6 +436,45 @@ export default function BattenburgGenerator() {
         }
         
         .zoom-btn:hover::before {
+          left: 100%;
+        }
+        
+        .reset-zoom-btn {
+          width: 36px;
+          height: 36px;
+          background: #1e1e1e;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 6px;
+          color: #a1a1aa;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+          font-size: 10px;
+          font-weight: 600;
+        }
+        
+        .reset-zoom-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.3), transparent);
+          transition: left 0.6s ease;
+        }
+        
+        .reset-zoom-btn:hover {
+          color: #ffffff;
+          border-color: ${ACCENT};
+          background: rgba(216,255,99,0.1);
+        }
+        
+        .reset-zoom-btn:hover::before {
           left: 100%;
         }
         
@@ -577,6 +651,7 @@ export default function BattenburgGenerator() {
                 } else {
                   setColour2(e.target.value);
                 }
+                updateIndividualColour(selectedColourIndex, e.target.value);
               }}
               style={{
                 width: '100%',
@@ -863,10 +938,10 @@ export default function BattenburgGenerator() {
               <Minus size={16} />
             </button>
             <button 
-              className="zoom-btn"
+              className="reset-zoom-btn"
               onClick={() => setZoomLevel(1)}
             >
-              100%
+              1x
             </button>
             <button 
               className="zoom-btn"

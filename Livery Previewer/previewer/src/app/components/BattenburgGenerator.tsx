@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Copy, Grid, Sliders, Palette, Plus, Minus } from 'lucide-react';
+import { Download, Copy, Grid, Sliders, Palette, Plus, Minus, X } from 'lucide-react';
 
 const ACCENT = '#D8FF63';
 const BASE = import.meta.env?.BASE_URL || '';
@@ -15,8 +15,10 @@ export default function BattenburgGenerator() {
   const [cellHeight, setCellHeight] = useState(60);
   const [gap, setGap] = useState(0);
   const [borderRadius, setBorderRadius] = useState(0);
-  const [color1, setColor1] = useState('#C4FF0D');
-  const [color2, setColor2] = useState('#006B2B');
+  const [colour1, setColour1] = useState('#C4FF0D');
+  const [colour2, setColour2] = useState('#006B2B');
+  const [showAdvancedColourPicker, setShowAdvancedColourPicker] = useState(false);
+  const [selectedColourIndex, setSelectedColourIndex] = useState<number | null>(null);
   const [textureEnabled, setTextureEnabled] = useState(false);
   const [textureOpacity, setTextureOpacity] = useState(40);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -25,18 +27,18 @@ export default function BattenburgGenerator() {
   const textureRef = useRef<HTMLImageElement | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Generate pattern colors
+  // Generate pattern colours
   const generatePattern = () => {
-    const colors = [];
+    const colours = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        colors.push((r + c) % 2 === 0 ? color1 : color2);
+        colours.push((r + c) % 2 === 0 ? colour1 : colour2);
       }
     }
-    return colors;
+    return colours;
   };
 
-  const patternColors = generatePattern();
+  const patternColours = generatePattern();
 
   // Load texture
   useEffect(() => {
@@ -78,13 +80,13 @@ export default function BattenburgGenerator() {
     canvas.height = totalHeight;
 
     // Draw pattern
-    patternColors.forEach((color, index) => {
+    patternColours.forEach((colour, index) => {
       const row = Math.floor(index / cols);
       const col = index % cols;
       const x = col * (cellWidth + gap);
       const y = row * (cellHeight + gap);
       
-      ctx.fillStyle = color;
+      ctx.fillStyle = colour;
       if (borderRadius > 0) {
         const radius = (borderRadius / 100) * Math.min(cellWidth, cellHeight);
         ctx.beginPath();
@@ -125,12 +127,12 @@ export default function BattenburgGenerator() {
 }
 
 .battenburg-cell {
-  background: ${color1};
+  background: ${colour1};
   border-radius: ${borderRadius}px;
 }
 
 .battenburg-cell:nth-child(even) {
-  background: ${color2};
+  background: ${colour2};
 }`;
     
     navigator.clipboard.writeText(css);
@@ -274,12 +276,29 @@ export default function BattenburgGenerator() {
           align-items: center;
           justify-content: center;
           gap: 8px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.3), transparent);
+          transition: left 0.6s ease;
         }
         
         .btn:hover {
           background: rgba(216,255,99,0.15);
           border-color: rgba(216,255,99,0.5);
           box-shadow: 0 4px 16px rgba(216,255,99,0.2);
+        }
+        
+        .btn:hover::before {
+          left: 100%;
         }
         
         .preview-area {
@@ -360,12 +379,29 @@ export default function BattenburgGenerator() {
           align-items: center;
           justify-content: center;
           transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .zoom-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(216,255,99,0.3), transparent);
+          transition: left 0.6s ease;
         }
         
         .zoom-btn:hover {
           color: #ffffff;
           border-color: ${ACCENT};
           background: rgba(216,255,99,0.1);
+        }
+        
+        .zoom-btn:hover::before {
+          left: 100%;
         }
         
         .zoom-indicator {
@@ -387,6 +423,28 @@ export default function BattenburgGenerator() {
           border: 2px solid rgba(255,255,255,0.1);
           border-radius: 6px;
           cursor: pointer;
+          background: #1e1e1e;
+          transition: all 0.2s ease;
+        }
+        
+        .color-input:hover {
+          border-color: rgba(216,255,99,0.3);
+          box-shadow: 0 0 8px rgba(216,255,99,0.2);
+        }
+        
+        .colour-input {
+          width: 50px;
+          height: 40px;
+          border: 2px solid rgba(255,255,255,0.1);
+          border-radius: 6px;
+          cursor: pointer;
+          background: #1e1e1e;
+          transition: all 0.2s ease;
+        }
+        
+        .colour-input:hover {
+          border-color: rgba(216,255,99,0.3);
+          box-shadow: 0 0 8px rgba(216,255,99,0.2);
         }
         
         .toggle {
@@ -426,8 +484,132 @@ export default function BattenburgGenerator() {
         .toggle-switch.active::after {
           transform: translateX(20px);
           background: ${ACCENT};
+          box-shadow: 0 0 8px rgba(216,255,99,0.5);
         }
       `}</style>
+
+      {/* Advanced Colour Picker Modal */}
+      {showAdvancedColourPicker && selectedColourIndex !== null && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}>
+          <div style={{
+            background: '#161616',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '16px',
+            padding: '24px',
+            maxWidth: '320px',
+            width: '90%',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+            }}>
+              <div style={{
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}>
+                <div 
+                  style={{ 
+                    width: 24, 
+                    height: 24, 
+                    backgroundColor: selectedColourIndex === 0 ? colour1 : colour2, 
+                    borderRadius: '4px', 
+                    border: '1px solid rgba(255,255,255,0.1)' 
+                  }} 
+                />
+                Cell {selectedColourIndex + 1} Colour
+              </div>
+              <button 
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '6px',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  background: '#1e1e1e',
+                  color: '#a1a1aa',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => {
+                  setShowAdvancedColourPicker(false);
+                  setSelectedColourIndex(null);
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = '#ffffff';
+                  e.currentTarget.style.borderColor = ACCENT;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = '#a1a1aa';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+            
+            <input
+              type="color"
+              value={selectedColourIndex === 0 ? colour1 : colour2}
+              onChange={(e) => {
+                if (selectedColourIndex === 0) {
+                  setColour1(e.target.value);
+                } else {
+                  setColour2(e.target.value);
+                }
+              }}
+              style={{
+                width: '100%',
+                height: 50,
+                border: '2px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                background: '#1e1e1e',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'rgba(216,255,99,0.3)';
+                e.currentTarget.style.boxShadow = '0 0 8px rgba(216,255,99,0.2)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            />
+            
+            <button 
+              className="btn" 
+              onClick={() => {
+                setShowAdvancedColourPicker(false);
+                setSelectedColourIndex(null);
+              }}
+              style={{ marginTop: '16px' }}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Navbar */}
       <nav className="navbar">
@@ -529,31 +711,55 @@ export default function BattenburgGenerator() {
             </div>
           </div>
 
-          {/* Colors */}
+          {/* Colours */}
           <div className="section">
             <div className="section-title">
               <Palette size={16} />
-              Colors
+              Colours
             </div>
             
             <div className="control-group">
-              <label className="control-label">Primary Color</label>
-              <input
-                type="color"
-                value={color1}
-                onChange={(e) => setColor1(e.target.value)}
-                className="color-input"
-              />
+              <label className="control-label">Primary Colour</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  type="color"
+                  value={colour1}
+                  onChange={(e) => setColour1(e.target.value)}
+                  className="colour-input"
+                />
+                <button 
+                  className="btn"
+                  onClick={() => {
+                    setSelectedColourIndex(0);
+                    setShowAdvancedColourPicker(true);
+                  }}
+                  style={{ padding: '6px 12px', fontSize: '9px' }}
+                >
+                  Advanced
+                </button>
+              </div>
             </div>
             
             <div className="control-group">
-              <label className="control-label">Secondary Color</label>
-              <input
-                type="color"
-                value={color2}
-                onChange={(e) => setColor2(e.target.value)}
-                className="color-input"
-              />
+              <label className="control-label">Secondary Colour</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  type="color"
+                  value={colour2}
+                  onChange={(e) => setColour2(e.target.value)}
+                  className="colour-input"
+                />
+                <button 
+                  className="btn"
+                  onClick={() => {
+                    setSelectedColourIndex(1);
+                    setShowAdvancedColourPicker(true);
+                  }}
+                  style={{ padding: '6px 12px', fontSize: '9px' }}
+                >
+                  Advanced
+                </button>
+              </div>
             </div>
           </div>
 
@@ -615,17 +821,21 @@ export default function BattenburgGenerator() {
                 height: totalHeight,
               }}
             >
-              {patternColors.map((color, index) => {
+              {patternColours.map((colour, index) => {
                 const radius = (borderRadius / 100) * Math.min(cellWidth, cellHeight);
                 return (
                   <div
                     key={index}
                     className="pattern-cell"
                     style={{
-                      backgroundColor: color,
+                      backgroundColor: colour,
                       borderRadius: radius > 0 ? `${radius}px` : '0',
                       width: cellWidth,
                       height: cellHeight,
+                    }}
+                    onClick={() => {
+                      setSelectedColourIndex(index);
+                      setShowAdvancedColourPicker(true);
                     }}
                   />
                 );

@@ -296,9 +296,27 @@ export default function BattenburgGenerator() {
           cursor: pointer;
           box-shadow: none;
           transition: all 0.15s ease;
+          -webkit-appearance: none;
+        }
+        
+        .control-slider::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: #1e1e1e;
+          border: 2px solid rgba(255,255,255,0.1);
+          cursor: pointer;
+          box-shadow: none;
+          transition: all 0.15s ease;
         }
         
         .control-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 4px rgba(255,255,255,0.2);
+          background: #2a2a2a;
+        }
+        
+        .control-slider::-moz-range-thumb:hover {
           transform: scale(1.2);
           box-shadow: 0 0 4px rgba(255,255,255,0.2);
           background: #2a2a2a;
@@ -954,8 +972,10 @@ export default function BattenburgGenerator() {
                       height: cellHeight,
                     }}
                     onClick={() => {
-                      setSelectedColourIndex(index);
-                      setShowAdvancedColourPicker(true);
+                      if (isAdvancedMode) {
+                        setSelectedColourIndex(index);
+                        setShowAdvancedColourPicker(true);
+                      }
                     }}
                   />
                 );

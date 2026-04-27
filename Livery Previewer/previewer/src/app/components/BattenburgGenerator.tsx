@@ -294,13 +294,13 @@ export default function BattenburgGenerator() {
           background: #1e1e1e;
           border: 2px solid rgba(255,255,255,0.1);
           cursor: pointer;
-          box-shadow: 0 0 8px rgba(216,255,99,0.4);
+          box-shadow: 0 0 8px rgba(216,255,99,0.2);
           transition: all 0.15s ease;
         }
         
         .control-slider::-webkit-slider-thumb:hover {
           transform: scale(1.2);
-          box-shadow: 0 0 12px rgba(216,255,99,0.6);
+          box-shadow: 0 0 12px rgba(216,255,99,0.4);
           background: ${ACCENT};
         }
         

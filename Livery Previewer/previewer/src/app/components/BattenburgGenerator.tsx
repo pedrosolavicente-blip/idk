@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Copy, Grid, Sliders, Palette, Plus, Minus, X } from 'lucide-react';
 
@@ -50,7 +50,7 @@ export default function BattenburgGenerator() {
   // Update pattern when individual colours change
   useEffect(() => {
     if (individualColours.length > 0) {
-      // Update the pattern to use individual colours
+      // Update pattern to use individual colours
     }
   }, [individualColours]);
 
@@ -60,7 +60,7 @@ export default function BattenburgGenerator() {
     setCols(Math.max(1, Math.min(16, newCols)));
     // Reset individual colours when pattern size changes
     setIndividualColours([]);
-  }, [rows, cols]);
+  }, []);
 
   const patternColours = individualColours.length > 0 ? individualColours : generatePattern();
 

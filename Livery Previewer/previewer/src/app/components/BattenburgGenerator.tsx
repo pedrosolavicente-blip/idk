@@ -178,12 +178,31 @@ export default function BattenburgGenerator() {
   const totalHeight = rows * (cellHeight + gap) - gap;
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#080808',
-      color: '#ffffff',
-      fontFamily: 'Inter, sans-serif'
-    }}>
+    <div className="relative flex h-screen w-full bg-[#080808] text-white overflow-hidden">
+
+      {/* ── Background layer ── */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <img
+          src={`${BASE}Vector_(7).svg`}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '92%',
+            height: 'auto',
+            opacity: 0.045,
+            filter: 'brightness(0) invert(1)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div className="absolute -top-32 -right-32 rounded-full" style={{ width: 700, height: 700, opacity: 0.2, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 65%)' }} />
+        <div className="absolute -bottom-24 -left-24 rounded-full" style={{ width: 500, height: 500, opacity: 0.12, background: 'radial-gradient(circle, #88ff00 0%, transparent 65%)' }} />
+        <div className="absolute rounded-full" style={{ width: 620, height: 620, top: '50%', left: '58%', transform: 'translate(-50%,-50%)', opacity: 0.09, background: 'radial-gradient(circle, #c4ff0d 0%, transparent 60%)' }} />
+        <div className="absolute rounded-full" style={{ width: 280, height: 280, top: '33%', left: '22%', opacity: 0.07, background: 'radial-gradient(circle, #aaff00 0%, transparent 70%)' }} />
+      </div>
       <style>{`
         * { box-sizing: border-box; }
         
@@ -735,290 +754,395 @@ export default function BattenburgGenerator() {
         </div>
       )}
 
-      {/* Navbar */}
-      <nav className="navbar">
-        <h1 className="nav-title">Battenburg Generator</h1>
-        <button className="nav-btn" onClick={() => navigate('/tools')}>
+      {/* ── Navbar ── */}
+      <nav
+        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8"
+        style={{
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 1px 0 0 rgba(196,255,13,0.05), inset 0 1px 0 0 rgba(255,255,255,0.06)',
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-black tracking-tight">Battenburg Generator</h1>
+          <div className="h-px w-4 bg-[#c4ff0d]/30" />
+          <p className="text-[10px] text-zinc-600 tracking-[0.18em] uppercase">Emergency Services</p>
+        </div>
+
+        <button 
+          onClick={() => navigate('/tools')}
+          className="text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all text-zinc-400 hover:text-white"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
           Back to Tools
         </button>
       </nav>
 
-      {/* Main Content */}
-      <div className="main-container">
-        {/* Sidebar */}
-        <div className="sidebar">
-          {/* Pattern Size */}
-          <div className="section">
-            <div className="section-title">
-              <Grid size={16} />
-              Pattern Size
+      {/* ── Main Content ── */}
+      <div className="flex h-full pt-[70px] relative z-10">
+        {/* ── Sidebar ── */}
+        <div className="w-[360px] bg-[#0f0f0f]/50 backdrop-blur-xl border-r border-white/8 overflow-y-auto">
+          <div className="p-6 space-y-4">
+            {/* Pattern Size */}
+            <div className="bg-[#161616]/60 backdrop-blur-sm border border-white/8 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Grid size={18} className="text-[#c4ff0d]" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-white">Pattern Dimensions</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-medium text-zinc-400">Rows</label>
+                    <span className="text-[10px] font-bold text-[#c4ff0d]">{rows}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="8"
+                    value={rows}
+                    onChange={(e) => {
+                      const newRows = parseInt(e.target.value);
+                      setRows(newRows);
+                      updateSize(newRows, cols);
+                    }}
+                    className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${(rows - 1) / 7 * 100}%, #1e1e1e ${(rows - 1) / 7 * 100}%, #1e1e1e 100%)`,
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-medium text-zinc-400">Columns</label>
+                    <span className="text-[10px] font-bold text-[#c4ff0d]">{cols}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="12"
+                    value={cols}
+                    onChange={(e) => {
+                      const newCols = parseInt(e.target.value);
+                      setCols(newCols);
+                      updateSize(rows, newCols);
+                    }}
+                    className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${(cols - 1) / 11 * 100}%, #1e1e1e ${(cols - 1) / 11 * 100}%, #1e1e1e 100%)`,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-            
-            <div className="control-group">
-              <label className="control-label">Rows: {rows}</label>
-              <input
-                type="range"
-                min="1"
-                max="8"
-                value={rows}
-                onChange={(e) => {
-                  const newRows = parseInt(e.target.value);
-                  setRows(newRows);
-                  updateSize(newRows, cols);
-                }}
-                className="control-slider"
-              />
-            </div>
-            
-            <div className="control-group">
-              <label className="control-label">Columns: {cols}</label>
-              <input
-                type="range"
-                min="1"
-                max="12"
-                value={cols}
-                onChange={(e) => {
-                  const newCols = parseInt(e.target.value);
-                  setCols(newCols);
-                  updateSize(rows, newCols);
-                }}
-                className="control-slider"
-              />
-            </div>
-          </div>
 
-          {/* Cell Dimensions */}
-          <div className="section">
-            <div className="section-title">
-              <Sliders size={16} />
-              Cell Dimensions
+            {/* Cell Properties */}
+            <div className="bg-[#161616]/60 backdrop-blur-sm border border-white/8 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Sliders size={18} className="text-[#c4ff0d]" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-white">Cell Properties</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-medium text-zinc-400">Width</label>
+                    <span className="text-[10px] font-bold text-[#c4ff0d]">{cellWidth}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="20"
+                    max="200"
+                    value={cellWidth}
+                    onChange={(e) => setCellWidth(parseInt(e.target.value))}
+                    className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${(cellWidth - 20) / 180 * 100}%, #1e1e1e ${(cellWidth - 20) / 180 * 100}%, #1e1e1e 100%)`,
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-medium text-zinc-400">Height</label>
+                    <span className="text-[10px] font-bold text-[#c4ff0d]">{cellHeight}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="20"
+                    max="200"
+                    value={cellHeight}
+                    onChange={(e) => setCellHeight(parseInt(e.target.value))}
+                    className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${(cellHeight - 20) / 180 * 100}%, #1e1e1e ${(cellHeight - 20) / 180 * 100}%, #1e1e1e 100%)`,
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-medium text-zinc-400">Gap</label>
+                    <span className="text-[10px] font-bold text-[#c4ff0d]">{gap}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    value={gap}
+                    onChange={(e) => setGap(parseInt(e.target.value))}
+                    className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${gap / 20 * 100}%, #1e1e1e ${gap / 20 * 100}%, #1e1e1e 100%)`,
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-medium text-zinc-400">Corner Radius</label>
+                    <span className="text-[10px] font-bold text-[#c4ff0d]">{borderRadius}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    value={borderRadius}
+                    onChange={(e) => setBorderRadius(parseInt(e.target.value))}
+                    className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${borderRadius / 50 * 100}%, #1e1e1e ${borderRadius / 50 * 100}%, #1e1e1e 100%)`,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-            
-            <div className="control-group">
-              <label className="control-label">Width: {cellWidth}px</label>
-              <input
-                type="range"
-                min="20"
-                max="200"
-                value={cellWidth}
-                onChange={(e) => setCellWidth(parseInt(e.target.value))}
-                className="control-slider"
-              />
-            </div>
-            
-            <div className="control-group">
-              <label className="control-label">Height: {cellHeight}px</label>
-              <input
-                type="range"
-                min="20"
-                max="200"
-                value={cellHeight}
-                onChange={(e) => setCellHeight(parseInt(e.target.value))}
-                className="control-slider"
-              />
-            </div>
-            
-            <div className="control-group">
-              <label className="control-label">Gap: {gap}px</label>
-              <input
-                type="range"
-                min="0"
-                max="20"
-                value={gap}
-                onChange={(e) => setGap(parseInt(e.target.value))}
-                className="control-slider"
-              />
-            </div>
-            
-            <div className="control-group">
-              <label className="control-label">Corner Radius: {borderRadius}%</label>
-              <input
-                type="range"
-                min="0"
-                max="50"
-                value={borderRadius}
-                onChange={(e) => setBorderRadius(parseInt(e.target.value))}
-                className="control-slider"
-              />
-            </div>
-          </div>
 
-          {/* Colours */}
-          <div className="section">
-            <div className="section-title">
-              <Palette size={16} />
-              Colours
+            {/* Colour Scheme */}
+            <div className="bg-[#161616]/60 backdrop-blur-sm border border-white/8 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Palette size={18} className="text-[#c4ff0d]" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-white">Colour Scheme</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-medium text-zinc-400 block mb-2">Mode</label>
+                  <button 
+                    onClick={() => {
+                      if (isAdvancedMode) {
+                        setIndividualColours([]);
+                      }
+                      setIsAdvancedMode(!isAdvancedMode);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-[#1e1e1e]/50 border border-white/10 rounded-xl transition-all hover:bg-[#1e1e1e]/80 hover:border-[#c4ff0d]/30"
+                  >
+                    <span className="text-[10px] font-bold text-white">
+                      {isAdvancedMode ? 'Individual Cells' : 'Basic Pattern'}
+                    </span>
+                    <div className="w-8 h-5 bg-[#1e1e1e] border border-white/20 rounded-full relative transition-all">
+                      <div className={`absolute top-0.5 w-4 h-4 bg-[#c4ff0d] rounded-full transition-all ${isAdvancedMode ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                </div>
+                
+                {isAdvancedMode ? (
+                  <div className="text-[10px] text-zinc-500 bg-[#1e1e1e]/30 border border-white/5 rounded-lg px-3 py-2">
+                    Click any square to edit its colour individually
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-[10px] font-medium text-zinc-400 block mb-2">Primary Colour</label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={colour1}
+                          onChange={(e) => setColour1(e.target.value)}
+                          className="w-12 h-12 bg-[#1e1e1e] border-2 border-white/10 rounded-lg cursor-pointer transition-all hover:border-[#c4ff0d]/50"
+                        />
+                        <span className="text-[10px] font-mono text-zinc-500">{colour1}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-[10px] font-medium text-zinc-400 block mb-2">Secondary Colour</label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={colour2}
+                          onChange={(e) => setColour2(e.target.value)}
+                          className="w-12 h-12 bg-[#1e1e1e] border-2 border-white/10 rounded-lg cursor-pointer transition-all hover:border-[#c4ff0d]/50"
+                        />
+                        <span className="text-[10px] font-mono text-zinc-500">{colour2}</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            
-            <div className="control-group">
-              <label className="control-label">Mode</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+
+            {/* Texture Overlay */}
+            <div className="bg-[#161616]/60 backdrop-blur-sm border border-white/8 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Grid size={18} className="text-[#c4ff0d]" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-white">Texture Overlay</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <button
+                    onClick={() => setTextureEnabled(!textureEnabled)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-[#1e1e1e]/50 border border-white/10 rounded-xl transition-all hover:bg-[#1e1e1e]/80 hover:border-[#c4ff0d]/30"
+                  >
+                    <span className="text-[10px] font-bold text-white">Waves Texture</span>
+                    <div className="w-8 h-5 bg-[#1e1e1e] border border-white/20 rounded-full relative transition-all">
+                      <div className={`absolute top-0.5 w-4 h-4 bg-[#c4ff0d] rounded-full transition-all ${textureEnabled ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                </div>
+                
+                {textureEnabled && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-[10px] font-medium text-zinc-400">Opacity</label>
+                      <span className="text-[10px] font-bold text-[#c4ff0d]">{textureOpacity}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={textureOpacity}
+                      onChange={(e) => setTextureOpacity(parseInt(e.target.value))}
+                      className="w-full h-1.5 bg-[#1e1e1e] rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #c4ff0d 0%, #c4ff0d ${textureOpacity}%, #1e1e1e ${textureOpacity}%, #1e1e1e 100%)`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Export Options */}
+            <div className="bg-[#161616]/60 backdrop-blur-sm border border-white/8 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Download size={18} className="text-[#c4ff0d]" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-white">Export Options</h3>
+              </div>
+              
+              <div className="space-y-3">
                 <button 
-                  className="btn"
-                  onClick={() => {
-                    if (isAdvancedMode) {
-                      setIndividualColours([]);
-                    }
-                    setIsAdvancedMode(!isAdvancedMode);
-                  }}
-                  style={{ padding: '8px 16px', fontSize: '10px' }}
+                  onClick={exportPNG}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#c4ff0d]/10 border border-[#c4ff0d]/30 rounded-xl transition-all hover:bg-[#c4ff0d]/20 hover:border-[#c4ff0d]/50 hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  {isAdvancedMode ? 'Individual' : 'Basic'}
+                  <Download size={16} className="text-[#c4ff0d]" />
+                  <span className="text-[10px] font-bold text-[#c4ff0d]">Export as PNG</span>
+                </button>
+                
+                <button 
+                  onClick={copyCSS}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#1e1e1e]/50 border border-white/10 rounded-xl transition-all hover:bg-[#1e1e1e]/80 hover:border-white/20 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Copy size={16} className="text-zinc-400" />
+                  <span className="text-[10px] font-bold text-zinc-400">Copy CSS Code</span>
                 </button>
               </div>
             </div>
-            
-            {isAdvancedMode ? (
-              <div className="control-group">
-                <label className="control-label">Click any square to edit its colour</label>
-              </div>
-            ) : (
-              <>
-                <div className="control-group">
-                  <label className="control-label">Primary Colour</label>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <input
-                      type="color"
-                      value={colour1}
-                      onChange={(e) => setColour1(e.target.value)}
-                      className="colour-input"
-                    />
-                  </div>
-                </div>
-                
-                <div className="control-group">
-                  <label className="control-label">Secondary Colour</label>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <input
-                      type="color"
-                      value={colour2}
-                      onChange={(e) => setColour2(e.target.value)}
-                      className="colour-input"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Texture */}
-          <div className="section">
-            <div className="section-title">
-              <Grid size={16} />
-              Texture Overlay
-            </div>
-            
-            <div className="control-group">
-              <div className="toggle">
-                <label className="control-label">Waves Texture</label>
-                <div
-                  className={`toggle-switch ${textureEnabled ? 'active' : ''}`}
-                  onClick={() => setTextureEnabled(!textureEnabled)}
-                />
-              </div>
-            </div>
-            
-            {textureEnabled && (
-              <div className="control-group">
-                <label className="control-label">Opacity: {textureOpacity}%</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={textureOpacity}
-                  onChange={(e) => setTextureOpacity(parseInt(e.target.value))}
-                  className="control-slider"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Export */}
-          <div className="section">
-            <div className="section-title">Export</div>
-            
-            <button className="btn" onClick={exportPNG} style={{ marginBottom: '8px' }}>
-              <Download size={16} />
-              Export as PNG
-            </button>
-            
-            <button className="btn" onClick={copyCSS}>
-              <Copy size={16} />
-              Copy CSS Code
-            </button>
           </div>
         </div>
 
-        {/* Preview Area */}
-        <div className="preview-area" ref={previewRef}>
-          <div className="preview-container">
-            <div 
-              className="pattern-grid"
-              style={{
-                width: totalWidth,
-                height: totalHeight,
-              }}
-            >
-              {patternColours.map((colour, index) => {
-                const radius = (borderRadius / 100) * Math.min(cellWidth, cellHeight);
-                return (
-                  <div
-                    key={index}
-                    className="pattern-cell"
-                    style={{
-                      backgroundColor: colour,
-                      borderRadius: radius > 0 ? `${radius}px` : '0',
-                      width: cellWidth,
-                      height: cellHeight,
-                    }}
-                    onClick={() => {
-                      if (isAdvancedMode) {
-                        setSelectedColourIndex(index);
-                        setShowAdvancedColourPicker(true);
-                      }
-                    }}
-                  />
-                );
-              })}
-            </div>
-            
-            {/* Texture Overlay */}
-            {textureEnabled && (
+        {/* ── Preview Area ── */}
+        <div className="flex-1 relative overflow-hidden" ref={previewRef}>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative">
               <div 
-                className="texture-overlay"
+                className="grid transition-transform duration-200 ease-out"
                 style={{
-                  width: totalWidth,
-                  height: totalHeight,
+                  gridTemplateColumns: `repeat(${cols}, ${cellWidth}px)`,
+                  gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
+                  gap: `${gap}px`,
+                  transform: `scale(${zoomLevel})`,
+                  transformOrigin: 'center',
                 }}
-              />
-            )}
+              >
+                {patternColours.map((colour, index) => {
+                  const radius = (borderRadius / 100) * Math.min(cellWidth, cellHeight);
+                  return (
+                    <div
+                      key={index}
+                      className="relative overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-[#c4ff0d]/20 cursor-pointer"
+                      style={{
+                        backgroundColor: colour,
+                        borderRadius: radius > 0 ? `${radius}px` : '0',
+                        width: cellWidth,
+                        height: cellHeight,
+                      }}
+                      onClick={() => {
+                        if (isAdvancedMode) {
+                          setSelectedColourIndex(index);
+                          setShowAdvancedColourPicker(true);
+                        }
+                      }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
+                        <div className="w-2 h-2 bg-[#c4ff0d]/50 rounded-full backdrop-blur-sm" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Texture Overlay */}
+              {textureEnabled && (
+                <div 
+                  className="absolute inset-0 pointer-events-none mix-blend-multiply"
+                  style={{
+                    backgroundImage: `url('${BASE}waves.png')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    opacity: textureOpacity / 100,
+                    transform: `scale(${zoomLevel})`,
+                    transformOrigin: 'center',
+                  }}
+                />
+              )}
+            </div>
           </div>
 
           {/* Zoom Controls */}
-          <div className="zoom-controls">
+          <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-[#0f0f0f]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2">
             <button 
-              className="zoom-btn"
+              className="w-10 h-10 flex items-center justify-center bg-[#1e1e1e]/50 border border-white/10 rounded-lg transition-all hover:bg-[#1e1e1e]/80 hover:border-[#c4ff0d]/30 hover:scale-105"
               onClick={() => setZoomLevel(prev => Math.max(prev - 0.25, 0.5))}
             >
-              <Minus size={16} />
+              <Minus size={16} className="text-zinc-400" />
             </button>
             <button 
-              className="reset-zoom-btn"
+              className="w-10 h-10 flex items-center justify-center bg-[#c4ff0d]/10 border border-[#c4ff0d]/30 rounded-lg transition-all hover:bg-[#c4ff0d]/20 hover:scale-105"
               onClick={() => setZoomLevel(1)}
             >
-              1x
+              <span className="text-[10px] font-bold text-[#c4ff0d]">1x</span>
             </button>
             <button 
-              className="zoom-btn"
+              className="w-10 h-10 flex items-center justify-center bg-[#1e1e1e]/50 border border-white/10 rounded-lg transition-all hover:bg-[#1e1e1e]/80 hover:border-[#c4ff0d]/30 hover:scale-105"
               onClick={() => setZoomLevel(prev => Math.min(prev + 0.25, 5))}
             >
-              <Plus size={16} />
+              <Plus size={16} className="text-zinc-400" />
             </button>
           </div>
 
           {/* Zoom Indicator */}
-          <div className="zoom-indicator">
-            {Math.round(zoomLevel * 100)}%
+          <div className="absolute top-6 left-6 bg-[#0f0f0f]/80 backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2">
+            <span className="text-[10px] font-bold text-[#c4ff0d]">{Math.round(zoomLevel * 100)}%</span>
           </div>
         </div>
       </div>

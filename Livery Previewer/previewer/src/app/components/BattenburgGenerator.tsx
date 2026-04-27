@@ -1062,16 +1062,21 @@ export default function BattenburgGenerator() {
 
         {/* ── Preview Area ── */}
         <div className="flex-1 relative overflow-hidden" ref={previewRef}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative">
+          <div className="absolute inset-0 flex items-center justify-center p-8">
+            <div 
+              className="relative bg-transparent border-none"
+              style={{
+                width: totalWidth,
+                height: totalHeight,
+              }}
+            >
               <div 
-                className="grid transition-transform duration-200 ease-out"
+                className="grid"
                 style={{
+                  display: 'grid',
                   gridTemplateColumns: `repeat(${cols}, ${cellWidth}px)`,
                   gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
                   gap: `${gap}px`,
-                  width: totalWidth,
-                  height: totalHeight,
                   transform: `scale(${zoomLevel})`,
                   transformOrigin: 'center',
                 }}
@@ -1087,6 +1092,7 @@ export default function BattenburgGenerator() {
                         borderRadius: radius > 0 ? `${radius}px` : '0',
                         width: cellWidth,
                         height: cellHeight,
+                        border: 'none',
                       }}
                       onClick={() => {
                         if (isAdvancedMode) {

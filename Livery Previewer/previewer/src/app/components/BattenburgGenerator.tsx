@@ -1070,6 +1070,8 @@ export default function BattenburgGenerator() {
                   gridTemplateColumns: `repeat(${cols}, ${cellWidth}px)`,
                   gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
                   gap: `${gap}px`,
+                  width: totalWidth,
+                  height: totalHeight,
                   transform: `scale(${zoomLevel})`,
                   transformOrigin: 'center',
                 }}

@@ -4,7 +4,7 @@ import {
   Settings, BarChart2, ShoppingBag, Users, AlertCircle,
 } from 'lucide-react';
 import SharedNavbar from './SharedNavbar';
-import type { Product, AdminStats } from './types';
+import type { Product, AdminStats } from '../hooks/Types';
 
 const BASE = (import.meta as any).env?.BASE_URL || '';
 

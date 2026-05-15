@@ -58,7 +58,7 @@ export default {
     }
     
 // ── Maintenance mode ──────────────────────────────────────────────────────────
-const MAINTENANCE = true;
+const MAINTENANCE = false;
 
 if (MAINTENANCE && (path === '/' || path === '/index.html')) {
   return new Response(`
